@@ -148,12 +148,18 @@ Respuesta       (id, evaluacion_id, item_id, nivel_seleccionado)
 ### Etapa 1 — Esquema de datos y contenido del Criterio 1 (piloto)
 **Objetivo:** base de datos real, cargada con el único criterio ya disponible.
 
-- [ ] Crear tablas en Supabase según el esquema de la sección 5.
-- [ ] Cargar los 10 ítems del Criterio 1 (ya disponibles, ver imagen del instrumento).
-- [ ] Cargar recomendaciones por ítem × nivel para Criterio 1 (bloqueado por Dr. Sergio,
+- [x] Crear tablas en Supabase según el esquema de la sección 5. Hecho en Etapa 0
+      (esquema `nom036`).
+- [x] Cargar los 10 ítems del Criterio 1 (ya disponibles, ver imagen del instrumento).
+      Contenido real, cargado vía `supabase/seed_etapa1_criterio1.sql`.
+- [x] Cargar recomendaciones por ítem × nivel para Criterio 1 (bloqueado por Dr. Sergio,
       sección 4 — puede avanzarse con contenido ficticio de prueba mientras tanto).
-- [ ] Cargar plantillas de apertura/cierre por bucket para Criterio 1 (mismo bloqueo).
-- [ ] Semilla de datos de prueba (empresa ficticia + evaluación ficticia + respuestas).
+      50 filas dummy (`[PLACEHOLDER]`), pendientes de contenido real.
+- [x] Cargar plantillas de apertura/cierre por bucket para Criterio 1 (mismo bloqueo).
+      10 filas dummy (`[PLACEHOLDER]`), pendientes de contenido real.
+- [x] Semilla de datos de prueba (empresa ficticia + evaluación ficticia + respuestas).
+      Respuestas construidas para sumar 17/40, igual que el Criterio 1 real del caso
+      JASANA, para poder validar el motor de cálculo (Etapa 2) contra ese dato real.
 
 **Entregable:** base de datos poblada y consultable con datos reales de Criterio 1 (o
 ficticios equivalentes si el contenido real no ha llegado).
