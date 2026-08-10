@@ -259,16 +259,38 @@ Criterio 1, con estructura equivalente al informe de referencia.
 ### Etapa 5 — Panel privado (equipo del Dr. Sergio)
 **Objetivo:** gestión de evaluaciones sin exponer nada públicamente.
 
-- [ ] Autenticación con Supabase Auth (login simple, sin roles complejos).
-- [ ] Vista: crear nueva evaluación (alta de empresa + generación de enlace único).
-- [ ] Vista: listado de evaluaciones (estado: pendiente / completado / revisado).
-- [ ] Vista: revisar resultados de una evaluación completada antes de aprobar/generar informe
-      final.
-- [ ] Descarga del `.docx` generado.
-- [ ] Auto-logout por inactividad (temporizador simple en frontend).
+- [x] Autenticación con Supabase Auth (login simple, sin roles complejos). `/panel/login` +
+      `web/src/lib/supabase/` (cliente browser/server) + `web/src/proxy.ts` (protege
+      `/panel/*`, redirige según haya o no sesión). Cuenta de prueba creada vía Admin API
+      para verificar el flujo; cuentas reales del equipo del Dr. se dan de alta desde el
+      dashboard de Supabase (Authentication → Users), no hay UI de invitación en la app.
+- [x] Vista: crear nueva evaluación (alta de empresa + generación de enlace único).
+      `/panel/nueva`: solo pide el nombre; el resto de los datos generales los llena la
+      empresa en el formulario público (igual que en los seeds de la Etapa 3).
+- [x] Vista: listado de evaluaciones (estado: pendiente / completado / revisado). `/panel`.
+- [x] Vista: revisar resultados de una evaluación completada antes de aprobar/generar informe
+      final. `/panel/evaluaciones/[id]`: llama a un endpoint JSON nuevo del servicio Python
+      (`GET /informes/{id}/resumen`, reutiliza `calcular_resultados` del generador de la
+      Etapa 4 sin generar el `.docx`) para mostrar puntajes, narrativa y temas antes de
+      aprobar. Botón "Marcar como revisado" (estado `completado` → `revisado`).
+- [x] Descarga del `.docx` generado. Vía `/panel/api/informes/[id]`, un Route Handler que
+      hace de proxy autenticado hacia el servicio Python — así el endpoint real del servicio
+      Python no queda expuesto sin control de acceso más allá de un UUID difícil de adivinar.
+- [x] Auto-logout por inactividad (temporizador simple en frontend). `AutoLogout.tsx`
+      (cliente): 15 minutos sin mousemove/keydown/click/scroll/touchstart → `signOut()` +
+      redirect a `/panel/login`. Verificado con un timeout reducido de prueba.
 
 **Entregable:** panel funcional para operar el ciclo completo sin tocar la base de datos
-manualmente.
+manualmente. Probado de punta a punta con Playwright: login → crear evaluación → responder
+el formulario público con ese enlace → volver a entrar → ver resultados calculados → marcar
+como revisado → descargar el `.docx` — sin errores de consola ni requests fallidos, y con el
+contenido (incluyendo acentos) verificado en cada paso.
+
+**Nota de arquitectura descubierta en esta etapa:** el servicio Python en Railway no podía
+conectarse a la base de datos con la `DATABASE_URL` de conexión directa
+(`db.<ref>.supabase.co:5432`) porque ese host solo resuelve a IPv6 y Railway no tiene salida
+IPv6 (`Network is unreachable`). Se cambió a usar el connection pooler de Supabase (mismo que
+ya usaba `web/`), ver sección 7.
 
 ---
 
@@ -323,8 +345,9 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | Sesión 2 | Se descarta explorar negocio multi-NOM por ahora | Foco en entregar MVP + paper en 2-3 meses; ver bitácora sesión 2 para el análisis de mercado si se retoma a futuro |
 | Sesión 3 | Monorepo con `web/` (Next.js) y `service/` (Python) en un solo repositorio Git | Un solo desarrollador; simplifica mantener un único CLAUDE.md como fuente de verdad |
 | Sesión 3 | Se reutiliza el proyecto Supabase "talleres culturales" (no uno nuevo) para NOM-036, con todas las tablas dentro de un esquema Postgres dedicado `nom036` (no `public`) | Límite de 2 proyectos activos en el plan free de Supabase; el esquema propio permite migrar limpio (`pg_dump --schema=nom036`) a un proyecto dedicado cuando se pase a un plan de pago, sin tocar ni mezclarse con las tablas de la otra plataforma |
-| Sesión 3 | El esquema `nom036` NO se agrega a "Exposed schemas" de la Data API/PostgREST del proyecto compartido | Evitar tocar la configuración de API del proyecto ajeno ("talleres culturales" ya tiene una web conectada); en su lugar, `web/` y `service/` usan conexión directa a Postgres (`DATABASE_URL`, pooler en modo transacción para Next.js/Vercel, conexión directa para el servicio Python en Railway) en vez de `supabase-js`/PostgREST para leer y escribir datos. Supabase Auth (Etapa 5, panel privado) sigue disponible normalmente vía `SUPABASE_SERVICE_ROLE_KEY`, ya que `auth.users` es un esquema estándar aparte, no `nom036` |
+| Sesión 3 | El esquema `nom036` NO se agrega a "Exposed schemas" de la Data API/PostgREST del proyecto compartido | Evitar tocar la configuración de API del proyecto ajeno ("talleres culturales" ya tiene una web conectada); en su lugar, `web/` y `service/` usan conexión directa a Postgres (`DATABASE_URL`) en vez de `supabase-js`/PostgREST para leer y escribir datos. Supabase Auth (Etapa 5, panel privado) sigue disponible normalmente vía `SUPABASE_SERVICE_ROLE_KEY`, ya que `auth.users` es un esquema estándar aparte, no `nom036` |
 | Sesión 3 | Deploy en cuentas ya existentes: Vercel (team `moises-garcias-projects`, proyecto `web`) y Railway (proyecto `nom036-service`) | Cuentas que el usuario ya tenía configuradas; se reutilizan en vez de crear nuevas |
+| Sesión 5 | `service/` (Railway) usa el connection pooler de Supabase (`aws-0-*.pooler.supabase.com:6543`) para `DATABASE_URL`, igual que `web/` (Vercel), en vez de la conexión directa (`db.<ref>.supabase.co:5432`) | La conexión directa solo resuelve a una IP IPv6, y Railway no tiene salida IPv6 — falla con `Network is unreachable`. Se descubrió al probar el endpoint `/informes/{id}/resumen` de la Etapa 5 en producción; corrige también la suposición original de la Etapa 0 de que la conexión directa era mejor por ser un proceso persistente |
 
 ---
 

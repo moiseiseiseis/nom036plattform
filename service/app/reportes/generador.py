@@ -8,7 +8,7 @@ from docxtpl import DocxTemplate, InlineImage
 
 from app.db import get_connection
 from app.engine.engine import evaluar_criterio, evaluar_global
-from app.engine.models import ResultadoCriterio
+from app.engine.models import ResultadoCriterio, ResultadoGlobal
 from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_puntaje, clasificar_bucket
 
 from .grafica import generar_grafica_radar
@@ -37,10 +37,13 @@ def generar_informe(evaluacion_id: str) -> bytes:
     return generar_informe_desde_datos(datos)
 
 
-def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
-    """Lógica de ensamblado del informe a partir de datos ya resueltos, sin
-    tocar la base de datos — es lo que permite probar el generador completo
-    (motor + gráfica + plantilla + tablas) con datos sintéticos."""
+def calcular_resultados(
+    datos: DatosEvaluacion,
+) -> tuple[list[ResultadoCriterio], ResultadoGlobal]:
+    """Corre el motor de cálculo (Etapa 2) sobre los datos de una evaluación
+    ya resueltos. No toca la base de datos ni genera ningún documento —
+    la reutilizan tanto el generador de `.docx` como el resumen JSON del
+    panel privado (Etapa 5)."""
     if not datos.criterios:
         raise ValueError("La evaluación no tiene respuestas registradas para ningún criterio")
 
@@ -63,6 +66,14 @@ def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
     resultado_global = evaluar_global(
         resultados, plantilla_cierre=datos.plantillas_cierre_global.get(bucket_global, "")
     )
+    return resultados, resultado_global
+
+
+def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
+    """Lógica de ensamblado del informe a partir de datos ya resueltos, sin
+    tocar la base de datos — es lo que permite probar el generador completo
+    (motor + gráfica + plantilla + tablas) con datos sintéticos."""
+    resultados, resultado_global = calcular_resultados(datos)
 
     tpl = DocxTemplate(str(PLANTILLA_BASE))
     grafica_imagen = InlineImage(tpl, io.BytesIO(generar_grafica_radar(resultados)), width=Mm(140))

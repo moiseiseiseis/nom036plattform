@@ -31,3 +31,11 @@ export interface DatosGeneralesInput {
   turnos: string;
   descripcion_mmh: string;
 }
+
+export interface EvaluacionResumen {
+  id: string;
+  token_publico: string;
+  estado: EstadoEvaluacion;
+  fecha: string;
+  empresa_nombre: string;
+}
