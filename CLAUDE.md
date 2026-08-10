@@ -202,16 +202,27 @@ de FastAPI ni de la base de datos (recibe listas de respuestas y catálogos ya r
 ### Etapa 3 — Formulario público de autoevaluación
 **Objetivo:** la empresa puede responder el cuestionario sin fricción.
 
-- [ ] Página pública `/evaluar/[token]`, sin autenticación.
-- [ ] Formulario de datos generales de la empresa.
-- [ ] Formulario Likert del Criterio 1 (10 ítems, escala 0-4 visual tipo semáforo, como en el
-      instrumento original).
-- [ ] Guardado de respuestas en Supabase, asociado al token de la evaluación.
-- [ ] Validación de token (evaluación existe, no expirada, no ya completada).
-- [ ] Pantalla de confirmación de envío.
+- [x] Página pública `/evaluar/[token]`, sin autenticación. `web/src/app/evaluar/[token]/`.
+- [x] Formulario de datos generales de la empresa. La empresa se crea con solo el nombre
+      (como lo dejaría el equipo del Dr. al generar el enlace, Etapa 5); el resto de los
+      campos (ubicación, giro, num_trabajadores, turnos, descripcion_mmh) los llena el
+      formulario público.
+- [x] Formulario Likert del Criterio 1 (10 ítems, escala 0-4 visual tipo semáforo, como en el
+      instrumento original). Colores rojo/naranja/amarillo/verde/azul, ítems cargados
+      dinámicamente desde `nom036.item` (no hardcodeados).
+- [x] Guardado de respuestas en Supabase, asociado al token de la evaluación. Server Action
+      (`actions.ts`) dentro de una transacción con `select ... for update` sobre la
+      evaluación, para evitar doble envío por condición de carrera.
+- [x] Validación de token (evaluación existe, no ya completada). **Nota:** el esquema de
+      datos (sección 5) no tiene un campo de expiración en `Evaluacion`, así que "no
+      expirada" no se implementó — no hay dato que expirar. Si se requiere expiración real,
+      falta agregar la columna al esquema.
+- [x] Pantalla de confirmación de envío. `/evaluar/[token]/gracias`.
 
 **Entregable:** flujo de autoevaluación funcional end-to-end para Criterio 1, en un dispositivo
-móvil y de escritorio.
+móvil y de escritorio. Probado con Playwright (formulario → envío → confirmación,
+persistencia verificada en base de datos, sin errores de consola ni requests fallidos) en
+viewport móvil (390×844) y de escritorio (1440×900).
 
 ---
 
