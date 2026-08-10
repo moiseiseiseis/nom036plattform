@@ -284,7 +284,8 @@ Criterio 1, con estructura equivalente al informe de referencia.
 manualmente. Probado de punta a punta con Playwright: login → crear evaluación → responder
 el formulario público con ese enlace → volver a entrar → ver resultados calculados → marcar
 como revisado → descargar el `.docx` — sin errores de consola ni requests fallidos, y con el
-contenido (incluyendo acentos) verificado en cada paso.
+contenido (incluyendo acentos) verificado en cada paso. Desplegado en
+https://web-liard-psi-30.vercel.app/panel.
 
 **Nota de arquitectura descubierta en esta etapa:** el servicio Python en Railway no podía
 conectarse a la base de datos con la `DATABASE_URL` de conexión directa
