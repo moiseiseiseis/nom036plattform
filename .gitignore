@@ -8,3 +8,6 @@ service/.env
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code (config local de máquina, no del proyecto)
+.claude/

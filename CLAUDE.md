@@ -100,6 +100,11 @@ contexto.
 
 ## 5. Esquema de datos (referencia)
 
+Todas las tablas viven en el esquema Postgres `nom036` (no `public`), aislado dentro del
+proyecto Supabase compartido — ver decisión de sesión 3 en la sección 7. Migraciones en
+`supabase/migrations/`, aplicadas por conexión directa (`psql`/`DATABASE_URL`), no por
+`supabase db push`, para no tocar el historial de migraciones del proyecto compartido.
+
 ```
 Normativa       (id, nombre, version)              -- por diseño, no hardcodear "NOM-036"
 Criterio        (id, normativa_id, numero, nombre, orden)
@@ -120,17 +125,21 @@ Respuesta       (id, evaluacion_id, item_id, nivel_seleccionado)
 
 - [x] Inicializar repo (Next.js + TypeScript). Repo git local + Next.js 16 (App Router,
       TypeScript, Tailwind, ESLint) en `web/`.
-- [ ] Configurar Supabase (proyecto, variables de entorno, conexión). Pendiente: conectar
-      credenciales del proyecto Supabase ya existente (`web/.env.example` y
-      `service/.env.example` listos con las variables esperadas).
+- [x] Configurar Supabase (proyecto, variables de entorno, conexión). Se reutiliza el
+      proyecto existente "talleres culturales" (no se creó uno nuevo por límite de 2
+      proyectos activos en el plan free), en un esquema Postgres dedicado y aislado
+      `nom036` (ver sección 7). Credenciales en `web/.env.local` y `service/.env`
+      (gitignored).
 - [x] Configurar microservicio Python separado (carpeta o repo aparte) con `docxtpl`,
       `python-docx`, `matplotlib`/`plotly` instalados. FastAPI en `service/`, venv local
       verificado (`/health` responde 200).
 - [x] Definir estructura de carpetas del monorepo o de los dos repos. Monorepo: `web/`
       (Next.js), `service/` (Python), `references/` (material del Dr. Sergio).
-- [ ] Deploy inicial "hola mundo" en Vercel (frontend) y Railway (servicio Python), para
-      validar el pipeline de despliegue desde el día uno. Pendiente: conectar cuentas
-      existentes de Vercel/Railway.
+- [x] Deploy inicial "hola mundo" en Vercel (frontend) y Railway (servicio Python), para
+      validar el pipeline de despliegue desde el día uno. `web/` en
+      https://web-liard-psi-30.vercel.app (proyecto `moises-garcias-projects/web`),
+      `service/` en https://nom036-service-production.up.railway.app (proyecto
+      `nom036-service`), ambos con `/health` verificado.
 
 **Entregable:** proyecto vacío mismo desplegado y accesible, con CI/CD básico.
 
@@ -271,6 +280,9 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | Sesión 1 | Sin roles/multi-tenant, sin login para autoevaluador | Alcance real es herramienta interna simple, no SaaS multiempresa |
 | Sesión 2 | Se descarta explorar negocio multi-NOM por ahora | Foco en entregar MVP + paper en 2-3 meses; ver bitácora sesión 2 para el análisis de mercado si se retoma a futuro |
 | Sesión 3 | Monorepo con `web/` (Next.js) y `service/` (Python) en un solo repositorio Git | Un solo desarrollador; simplifica mantener un único CLAUDE.md como fuente de verdad |
+| Sesión 3 | Se reutiliza el proyecto Supabase "talleres culturales" (no uno nuevo) para NOM-036, con todas las tablas dentro de un esquema Postgres dedicado `nom036` (no `public`) | Límite de 2 proyectos activos en el plan free de Supabase; el esquema propio permite migrar limpio (`pg_dump --schema=nom036`) a un proyecto dedicado cuando se pase a un plan de pago, sin tocar ni mezclarse con las tablas de la otra plataforma |
+| Sesión 3 | El esquema `nom036` NO se agrega a "Exposed schemas" de la Data API/PostgREST del proyecto compartido | Evitar tocar la configuración de API del proyecto ajeno ("talleres culturales" ya tiene una web conectada); en su lugar, `web/` y `service/` usan conexión directa a Postgres (`DATABASE_URL`, pooler en modo transacción para Next.js/Vercel, conexión directa para el servicio Python en Railway) en vez de `supabase-js`/PostgREST para leer y escribir datos. Supabase Auth (Etapa 5, panel privado) sigue disponible normalmente vía `SUPABASE_SERVICE_ROLE_KEY`, ya que `auth.users` es un esquema estándar aparte, no `nom036` |
+| Sesión 3 | Deploy en cuentas ya existentes: Vercel (team `moises-garcias-projects`, proyecto `web`) y Railway (proyecto `nom036-service`) | Cuentas que el usuario ya tenía configuradas; se reutilizan en vez de crear nuevas |
 
 ---
 
