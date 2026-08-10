@@ -1,0 +1,10 @@
+# Python
+service/.venv/
+service/__pycache__/
+service/**/__pycache__/
+service/.env
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

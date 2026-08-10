@@ -1,0 +1,282 @@
+# Proyecto: Automatización de Informes de Diagnóstico Ergonómico (NOM-036-1-STPS-2018)
+
+Este documento es la fuente de verdad del proyecto. Debe leerse al inicio de cualquier sesión
+de trabajo con Claude Code. Se actualiza al cerrar cada etapa (marcar checkboxes, anotar
+decisiones, mover pendientes).
+
+---
+
+## 1. Contexto (resumen para IA)
+
+Plataforma que automatiza la redacción de informes de prediagnóstico ergonómico bajo la
+NOM-036-1-STPS-2018, como continuación del instrumento publicado por el Dr. Sergio Valenzuela
+(Physical Ergonomics & Human Factors, Vol. 223, 2026). Objetivo doble: (1) herramienta funcional
+en producción, (2) artículo académico derivado, en un horizonte de 2-3 meses.
+
+**Desarrollador:** Moisés (solo, asistido por Claude Code en VS Code).
+**Supervisión de contenido/validación:** Dr. Sergio Valenzuela.
+
+**Flujo funcional:**
+1. Equipo del Dr. genera un enlace único de autoevaluación para una empresa (panel privado).
+2. El responsable de la empresa llena el formulario público (sin login): datos generales +
+   cuestionario Likert de 50 ítems (5 criterios × 10 ítems, escala 0-4).
+3. El sistema calcula puntajes, clasifica en niveles y genera un informe en `.docx` con
+   gráficas y recomendaciones automáticas.
+4. El Dr. revisa/aprueba antes de la entrega final a la empresa.
+
+**Modelo de generación de recomendaciones (determinista, NO generación libre por LLM):**
+- Nivel 1 (Ítem): 1 recomendación pre-redactada por cada combinación (ítem × nivel 0-4).
+- Nivel 2 (Criterio): % de cumplimiento → bucket (quintiles de 20%) → plantilla de apertura +
+  hallazgos concatenados de los ítems con nivel bajo.
+- Nivel 3 (Global): % global → bucket → plantilla de cierre + lista de "Temas obligatorios" y
+  "Temas optativos" (derivados de ítems débiles de todos los criterios).
+
+**Por qué determinista y no LLM libre:** el informe cita una norma oficial y alimenta un
+artículo académico; se requiere que sea 100% reproducible, auditable y sin riesgo de
+alucinación de cifras o citas normativas. Ver sección 9 (decisiones de arquitectura) para más
+contexto.
+
+---
+
+## 2. Stack técnico
+
+| Capa | Tecnología |
+|---|---|
+| Frontend + backend web | Next.js |
+| Base de datos + Auth (panel privado) | Supabase (Postgres) |
+| Generación de documentos | Microservicio Python (`python-docx` / `docxtpl`) |
+| Gráficas (radar, barras, heatmap) | `matplotlib` / `plotly`, generadas server-side e insertadas como imagen |
+| Hosting frontend | Vercel |
+| Hosting microservicio Python | Railway |
+
+**Explícitamente fuera de alcance (no construir):**
+- Sistema de roles complejo o multi-tenant.
+- Registro/login para el respondiente de la autoevaluación (solo enlace único).
+- Tokens de seguridad personalizados tipo banca (usar Supabase Auth estándar).
+- Generación de texto libre por LLM en el motor de recomendaciones v1.
+- App móvil o de escritorio nativa.
+
+---
+
+## 3. Glosario
+
+- **Ítem**: pregunta individual del checklist (50 en total).
+- **Criterio**: agrupación de 10 ítems (5 criterios en total).
+- **Nivel**: calificación de un ítem, escala 0-4 (Nada, Mínimo, Regular, Aceptable, Óptimo).
+- **Bucket**: clasificación de un % de cumplimiento en 5 franjas de 20 puntos (Inexistente,
+  Mínimo, Regular, Aceptable, Óptimo). Aplica a nivel criterio y a nivel global.
+- **Hallazgo**: recomendación de un ítem con nivel bajo (umbral hipótesis: nivel ≤ 1), usado
+  para componer el párrafo narrativo del criterio.
+- **Tema obligatorio / optativo**: hallazgo etiquetado según si corresponde a una exigencia
+  directa de la norma (obligatorio) o a una buena práctica sugerida (optativo).
+
+---
+
+## 4. Preguntas abiertas / bloqueantes con el Dr. Sergio
+
+> No avanzar en el contenido de un criterio sin resolver lo correspondiente aquí.
+
+- [ ] Confirmar escala real: **0-4** (confirmado por imagen del instrumento) — verificar que
+      no haya confusión con "0-5" mencionado en conversación inicial.
+- [ ] Lista completa de los 50 ítems (actualmente solo Criterio 1 disponible). Los nombres de
+      los 5 criterios ya están confirmados por el informe JASANA real
+      (`references/REPORTE FINAL JASANA 07.03.26.docx`): (1) Identificación y clasificación de
+      los puestos de trabajo ocupacionalmente expuestos, (2) Uso de equipos auxiliares y
+      condiciones ambientales, (3) Capacitación, adiestramiento y vigilancia a la salud,
+      (4) Difusión, registro y políticas en materia de Ergonomía, (5) Medidas de prevención y
+      control. Faltan los ítems 2-5 (solo Criterio 1 disponible por imagen del instrumento).
+- [ ] Cortes de porcentaje exactos por bucket — hipótesis de trabajo: quintiles de 20%,
+      validada contra los datos del caso JASANA: 42.5%→Regular, 70%→Aceptable, 22.5%→Mínimo
+      (x2), 25%→Mínimo (tabla 2 del informe real). Consistente con franjas de 20 puntos.
+      Confirmar tratamiento de valores límite exactos (ej. ¿20% es "Mínimo" o "Inexistente"?).
+- [ ] Umbral de nivel de ítem para considerarlo "hallazgo" — hipótesis de trabajo: nivel ≤ 1.
+- [ ] Respuestas individuales de los 50 ítems del caso JASANA (para calibrar el umbral con
+      precisión, si están disponibles).
+- [ ] Para cada ítem: numeral de la NOM-036 correspondiente + recomendación por nivel (0-4) +
+      clasificación obligatorio/optativo.
+- [ ] Campos exactos de "información general de la empresa" a solicitar en el formulario.
+
+---
+
+## 5. Esquema de datos (referencia)
+
+```
+Normativa       (id, nombre, version)              -- por diseño, no hardcodear "NOM-036"
+Criterio        (id, normativa_id, numero, nombre, orden)
+Item            (id, criterio_id, numero, texto_pregunta, numeral_nom, es_obligatorio)
+Recomendacion   (id, item_id, nivel[0-4], texto)
+PlantillaBucket (id, criterio_id NULL para global, bucket, tipo[apertura|cierre], texto)
+Empresa         (id, nombre, ubicacion, giro, num_trabajadores, turnos, descripcion_mmh)
+Evaluacion      (id, empresa_id, token_publico, estado[pendiente|completado|revisado], fecha)
+Respuesta       (id, evaluacion_id, item_id, nivel_seleccionado)
+```
+
+---
+
+## 6. Etapas del proyecto
+
+### Etapa 0 — Fundaciones del repositorio
+**Objetivo:** ambiente de desarrollo listo, sin lógica de negocio todavía.
+
+- [x] Inicializar repo (Next.js + TypeScript). Repo git local + Next.js 16 (App Router,
+      TypeScript, Tailwind, ESLint) en `web/`.
+- [ ] Configurar Supabase (proyecto, variables de entorno, conexión). Pendiente: conectar
+      credenciales del proyecto Supabase ya existente (`web/.env.example` y
+      `service/.env.example` listos con las variables esperadas).
+- [x] Configurar microservicio Python separado (carpeta o repo aparte) con `docxtpl`,
+      `python-docx`, `matplotlib`/`plotly` instalados. FastAPI en `service/`, venv local
+      verificado (`/health` responde 200).
+- [x] Definir estructura de carpetas del monorepo o de los dos repos. Monorepo: `web/`
+      (Next.js), `service/` (Python), `references/` (material del Dr. Sergio).
+- [ ] Deploy inicial "hola mundo" en Vercel (frontend) y Railway (servicio Python), para
+      validar el pipeline de despliegue desde el día uno. Pendiente: conectar cuentas
+      existentes de Vercel/Railway.
+
+**Entregable:** proyecto vacío mismo desplegado y accesible, con CI/CD básico.
+
+---
+
+### Etapa 1 — Esquema de datos y contenido del Criterio 1 (piloto)
+**Objetivo:** base de datos real, cargada con el único criterio ya disponible.
+
+- [ ] Crear tablas en Supabase según el esquema de la sección 5.
+- [ ] Cargar los 10 ítems del Criterio 1 (ya disponibles, ver imagen del instrumento).
+- [ ] Cargar recomendaciones por ítem × nivel para Criterio 1 (bloqueado por Dr. Sergio,
+      sección 4 — puede avanzarse con contenido ficticio de prueba mientras tanto).
+- [ ] Cargar plantillas de apertura/cierre por bucket para Criterio 1 (mismo bloqueo).
+- [ ] Semilla de datos de prueba (empresa ficticia + evaluación ficticia + respuestas).
+
+**Entregable:** base de datos poblada y consultable con datos reales de Criterio 1 (o
+ficticios equivalentes si el contenido real no ha llegado).
+
+**Dependencia crítica:** contenido del Dr. Sergio (sección 4). Si no está disponible, usar
+contenido dummy con la MISMA estructura para no bloquear el desarrollo técnico.
+
+---
+
+### Etapa 2 — Motor de cálculo y recomendaciones (determinista)
+**Objetivo:** lógica pura de negocio, testeable de forma aislada, sin UI todavía.
+
+- [ ] Función: calcular suma y % de cumplimiento por criterio a partir de respuestas.
+- [ ] Función: clasificar % en bucket (quintiles).
+- [ ] Función: seleccionar recomendación de ítem según (item_id, nivel).
+- [ ] Función: ensamblar párrafo narrativo de criterio (plantilla de apertura + hallazgos de
+      ítems con nivel ≤ umbral).
+- [ ] Función: calcular % global y bucket global.
+- [ ] Función: ensamblar cierre global + listas de temas obligatorios/optativos.
+- [ ] Suite de pruebas unitarias, incluyendo el caso de validación contra los datos reales de
+      JASANA (17/40, 28/40, 9/40, 9/40, 10/40 → Regular, Aceptable, Mínimo, Mínimo, Mínimo).
+
+**Entregable:** módulo de motor de recomendaciones con cobertura de pruebas, ejecutable de
+forma independiente del resto del sistema.
+
+---
+
+### Etapa 3 — Formulario público de autoevaluación
+**Objetivo:** la empresa puede responder el cuestionario sin fricción.
+
+- [ ] Página pública `/evaluar/[token]`, sin autenticación.
+- [ ] Formulario de datos generales de la empresa.
+- [ ] Formulario Likert del Criterio 1 (10 ítems, escala 0-4 visual tipo semáforo, como en el
+      instrumento original).
+- [ ] Guardado de respuestas en Supabase, asociado al token de la evaluación.
+- [ ] Validación de token (evaluación existe, no expirada, no ya completada).
+- [ ] Pantalla de confirmación de envío.
+
+**Entregable:** flujo de autoevaluación funcional end-to-end para Criterio 1, en un dispositivo
+móvil y de escritorio.
+
+---
+
+### Etapa 4 — Generación del informe (.docx)
+**Objetivo:** de respuestas guardadas a documento Word descargable.
+
+- [ ] Plantilla base `.docx` con `docxtpl` (portada, secciones fijas, huecos Jinja2 para
+      variables y bloques narrativos).
+- [ ] Generación de gráfica de radar comparativa (aunque sea con 1 solo criterio poblado para
+      esta etapa).
+- [ ] Endpoint/función que reciba `evaluacion_id`, ejecute el motor (Etapa 2) y produzca el
+      `.docx` final.
+- [ ] Prueba de extremo a extremo: datos ficticios → formulario → motor → documento generado,
+      comparado visualmente contra la estructura del informe JASANA real.
+
+**Entregable:** informe `.docx` generado automáticamente a partir de una evaluación real de
+Criterio 1, con estructura equivalente al informe de referencia.
+
+---
+
+### Etapa 5 — Panel privado (equipo del Dr. Sergio)
+**Objetivo:** gestión de evaluaciones sin exponer nada públicamente.
+
+- [ ] Autenticación con Supabase Auth (login simple, sin roles complejos).
+- [ ] Vista: crear nueva evaluación (alta de empresa + generación de enlace único).
+- [ ] Vista: listado de evaluaciones (estado: pendiente / completado / revisado).
+- [ ] Vista: revisar resultados de una evaluación completada antes de aprobar/generar informe
+      final.
+- [ ] Descarga del `.docx` generado.
+- [ ] Auto-logout por inactividad (temporizador simple en frontend).
+
+**Entregable:** panel funcional para operar el ciclo completo sin tocar la base de datos
+manualmente.
+
+---
+
+### Etapa 6 — Validación piloto y cierre de MVP (Criterio 1)
+**Objetivo:** confirmar que el sistema completo funciona con un caso real o semi-real.
+
+- [ ] Ejecutar el flujo completo con una empresa piloto (real o simulada por el Dr.).
+- [ ] Comparar el informe generado contra lo que el Dr. redactaría manualmente para el mismo
+      set de respuestas.
+- [ ] Ajustar plantillas/umbrales según retroalimentación.
+- [ ] Documentar hallazgos de esta validación en la bitácora del proyecto.
+
+**Entregable:** MVP validado para 1 de 5 criterios — listo para decidir si se replica el
+patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
+
+---
+
+### Etapa 7 — Expansión a los 5 criterios completos
+**Objetivo:** cobertura total del instrumento de 50 ítems.
+
+- [ ] Recibir y cargar contenido (ítems + recomendaciones + plantillas) de los Criterios 2-5.
+- [ ] Extender formulario público a los 50 ítems.
+- [ ] Extender generación de gráficas (radar completo de 5 ejes, heatmap de 50 ítems).
+- [ ] Prueba de extremo a extremo con el caso JASANA completo, comparando el informe generado
+      contra el informe real ya analizado.
+
+**Entregable:** sistema funcional para el instrumento completo (50 ítems, 5 criterios).
+
+---
+
+### Etapa 8 — Pulido, seguridad y entrega
+**Objetivo:** listo para uso con empresas reales de forma sostenida.
+
+- [ ] Revisión de seguridad básica: HTTPS, rate limiting en endpoints públicos, expiración de
+      tokens, logs de auditoría (quién generó/aprobó cada informe).
+- [ ] Pulido de UI del formulario público (accesibilidad, responsive).
+- [ ] Manual breve de uso del panel para el equipo del Dr.
+- [ ] Preparar material de la plataforma para la sección de metodología del artículo
+      académico.
+
+**Entregable:** plataforma en producción, lista para uso operativo real.
+
+---
+
+## 7. Registro de decisiones (actualizar según avance el proyecto)
+
+| Fecha | Decisión | Motivo |
+|---|---|---|
+| Sesión 1 | Motor de recomendaciones determinista (no LLM libre) | Reproducibilidad, sin riesgo de alucinación, defendible en el paper |
+| Sesión 1 | Cortes de bucket por quintiles de 20% (hipótesis) | Validado contra 5 datos reales del caso JASANA |
+| Sesión 1 | Sin roles/multi-tenant, sin login para autoevaluador | Alcance real es herramienta interna simple, no SaaS multiempresa |
+| Sesión 2 | Se descarta explorar negocio multi-NOM por ahora | Foco en entregar MVP + paper en 2-3 meses; ver bitácora sesión 2 para el análisis de mercado si se retoma a futuro |
+| Sesión 3 | Monorepo con `web/` (Next.js) y `service/` (Python) en un solo repositorio Git | Un solo desarrollador; simplifica mantener un único CLAUDE.md como fuente de verdad |
+
+---
+
+## 8. Cómo usar este documento con Claude Code
+
+- Al iniciar una sesión nueva, referenciar este archivo primero.
+- Al completar una tarea, marcar el checkbox correspondiente.
+- Si una decisión de arquitectura cambia, actualizar la sección 7 antes de continuar.
+- No avanzar el contenido de un criterio nuevo sin resolver sus bloqueos en la sección 4.
