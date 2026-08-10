@@ -88,8 +88,12 @@ contexto.
 - [ ] Cortes de porcentaje exactos por bucket — hipótesis de trabajo: quintiles de 20%,
       validada contra los datos del caso JASANA: 42.5%→Regular, 70%→Aceptable, 22.5%→Mínimo
       (x2), 25%→Mínimo (tabla 2 del informe real). Consistente con franjas de 20 puntos.
-      Confirmar tratamiento de valores límite exactos (ej. ¿20% es "Mínimo" o "Inexistente"?).
+      Implementado en `scoring.py::clasificar_bucket` con límite inferior cerrado / superior
+      abierto (ej. 20% ya es "Mínimo", no "Inexistente"). Confirmar con el Dr. Sergio si el
+      tratamiento del valor límite exacto es el correcto.
 - [ ] Umbral de nivel de ítem para considerarlo "hallazgo" — hipótesis de trabajo: nivel ≤ 1.
+      Implementado como default en `recomendaciones.py` (`UMBRAL_HALLAZGO_DEFAULT = 1`),
+      parametrizable.
 - [ ] Respuestas individuales de los 50 ítems del caso JASANA (para calibrar el umbral con
       precisión, si están disponibles).
 - [ ] Para cada ítem: numeral de la NOM-036 correspondiente + recomendación por nivel (0-4) +
@@ -172,18 +176,26 @@ contenido dummy con la MISMA estructura para no bloquear el desarrollo técnico.
 ### Etapa 2 — Motor de cálculo y recomendaciones (determinista)
 **Objetivo:** lógica pura de negocio, testeable de forma aislada, sin UI todavía.
 
-- [ ] Función: calcular suma y % de cumplimiento por criterio a partir de respuestas.
-- [ ] Función: clasificar % en bucket (quintiles).
-- [ ] Función: seleccionar recomendación de ítem según (item_id, nivel).
-- [ ] Función: ensamblar párrafo narrativo de criterio (plantilla de apertura + hallazgos de
-      ítems con nivel ≤ umbral).
-- [ ] Función: calcular % global y bucket global.
-- [ ] Función: ensamblar cierre global + listas de temas obligatorios/optativos.
-- [ ] Suite de pruebas unitarias, incluyendo el caso de validación contra los datos reales de
+- [x] Función: calcular suma y % de cumplimiento por criterio a partir de respuestas.
+      `service/app/engine/scoring.py::calcular_puntaje` / `calcular_porcentaje`.
+- [x] Función: clasificar % en bucket (quintiles). `scoring.py::clasificar_bucket`.
+- [x] Función: seleccionar recomendación de ítem según (item_id, nivel).
+      `service/app/engine/recomendaciones.py::seleccionar_recomendacion`.
+- [x] Función: ensamblar párrafo narrativo de criterio (plantilla de apertura + hallazgos de
+      ítems con nivel ≤ umbral). `service/app/engine/narrativa.py` +
+      `recomendaciones.py::identificar_hallazgos` (umbral por defecto: nivel ≤ 1).
+- [x] Función: calcular % global y bucket global. `scoring.py::calcular_global`.
+- [x] Función: ensamblar cierre global + listas de temas obligatorios/optativos.
+      `service/app/engine/recomendaciones.py::construir_temas` +
+      `engine.py::evaluar_global`.
+- [x] Suite de pruebas unitarias, incluyendo el caso de validación contra los datos reales de
       JASANA (17/40, 28/40, 9/40, 9/40, 10/40 → Regular, Aceptable, Mínimo, Mínimo, Mínimo).
+      30 tests en `service/tests/`, todos pasando (`pytest`), incluyendo el global (36.5% →
+      Mínimo).
 
 **Entregable:** módulo de motor de recomendaciones con cobertura de pruebas, ejecutable de
-forma independiente del resto del sistema.
+forma independiente del resto del sistema. Vive en `service/app/engine/`, sin dependencias
+de FastAPI ni de la base de datos (recibe listas de respuestas y catálogos ya resueltos).
 
 ---
 
