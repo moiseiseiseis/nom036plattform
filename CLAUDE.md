@@ -229,14 +229,27 @@ viewport móvil (390×844) y de escritorio (1440×900).
 ### Etapa 4 — Generación del informe (.docx)
 **Objetivo:** de respuestas guardadas a documento Word descargable.
 
-- [ ] Plantilla base `.docx` con `docxtpl` (portada, secciones fijas, huecos Jinja2 para
-      variables y bloques narrativos).
-- [ ] Generación de gráfica de radar comparativa (aunque sea con 1 solo criterio poblado para
-      esta etapa).
-- [ ] Endpoint/función que reciba `evaluacion_id`, ejecute el motor (Etapa 2) y produzca el
-      `.docx` final.
-- [ ] Prueba de extremo a extremo: datos ficticios → formulario → motor → documento generado,
-      comparado visualmente contra la estructura del informe JASANA real.
+- [x] Plantilla base `.docx` con `docxtpl` (portada, secciones fijas, huecos Jinja2 para
+      variables y bloques narrativos). Generada programáticamente con `python-docx` en
+      `service/scripts/generar_plantilla_base.py` → `service/app/templates/informe_base.docx`
+      (así se evita el problema clásico de docxtpl de tags Jinja partidos en varios runs de
+      Word al escribirlos a mano). Las dos tablas (puntajes y porcentajes) se insertan aparte
+      con `python-docx` después del render de docxtpl — más simple y robusto que las
+      etiquetas de fila `{%tr%}` de docxtpl para tablas puramente numéricas.
+- [x] Generación de gráfica de radar comparativa (aunque sea con 1 solo criterio poblado para
+      esta etapa). `service/app/reportes/grafica.py`, con matplotlib; con un solo criterio
+      el radar sale degenerado (un solo eje), esperado para esta etapa.
+- [x] Endpoint/función que reciba `evaluacion_id`, ejecute el motor (Etapa 2) y produzca el
+      `.docx` final. `GET /informes/{evaluacion_id}` en `service/app/routers/informes.py`,
+      usando `service/app/reportes/generador.py` (con `service/app/reportes/repository.py`
+      para leer de `nom036.*` por conexión directa a Postgres, `psycopg`).
+- [x] Prueba de extremo a extremo: datos ficticios → formulario → motor → documento generado,
+      comparado visualmente contra la estructura del informe JASANA real. Probado dos veces:
+      (1) contra la evaluación real sembrada en la Etapa 1 (`GET /informes/{id}` → 200,
+      `.docx` de 114KB, contenido inspeccionado con `python-docx`: datos de empresa,
+      narrativa con los 3 hallazgos correctos, tabla 17/40, tabla 42.5%/Regular, 1 gráfica);
+      (2) suite automatizada en `service/tests/test_generador_informe.py` con datos
+      sintéticos (sin DB) que reproduce el mismo caso.
 
 **Entregable:** informe `.docx` generado automáticamente a partir de una evaluación real de
 Criterio 1, con estructura equivalente al informe de referencia.

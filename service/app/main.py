@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
+from app.routers import informes
+
 app = FastAPI(title="Servicio de generación de informes NOM-036")
+app.include_router(informes.router)
 
 
 @app.get("/health")
