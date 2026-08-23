@@ -96,8 +96,13 @@ contexto.
       parametrizable.
 - [ ] Respuestas individuales de los 50 ítems del caso JASANA (para calibrar el umbral con
       precisión, si están disponibles).
-- [ ] Para cada ítem: numeral de la NOM-036 correspondiente + recomendación por nivel (0-4) +
-      clasificación obligatorio/optativo.
+- [x] Para cada ítem: numeral de la NOM-036 correspondiente + recomendación por nivel (0-4) +
+      clasificación obligatorio/optativo. **Primera versión** para el Criterio 1, redactada
+      junto con el desarrollador con base en el texto oficial de la norma (Capítulos 7 y 8) y
+      la estructura narrativa del informe JASANA real —
+      `supabase/content_v1_criterio1.sql`. Los 10 ítems se clasificaron como obligatorios
+      (derivan del análisis exigido por el Capítulo 7). Sigue pendiente la revisión y
+      validación final del Dr. Sergio antes de usarse en un informe real a una empresa.
 - [ ] Campos exactos de "información general de la empresa" a solicitar en el formulario.
 
 ---
