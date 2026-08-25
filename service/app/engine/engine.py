@@ -35,6 +35,7 @@ def evaluar_criterio(
         porcentaje=porcentaje,
         bucket=bucket,
         narrativa=narrativa,
+        plantilla_apertura=plantilla_apertura,
         hallazgos=hallazgos,
     )
 

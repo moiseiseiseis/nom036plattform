@@ -32,6 +32,7 @@ class ResultadoCriterio:
     porcentaje: float
     bucket: str
     narrativa: str
+    plantilla_apertura: str
     hallazgos: list[Hallazgo] = field(default_factory=list)
 
 

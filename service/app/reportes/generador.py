@@ -4,13 +4,14 @@ from pathlib import Path
 from docx import Document as DocxDocument
 from docx.document import Document as DocxDocumentType
 from docx.shared import Mm
-from docxtpl import DocxTemplate, InlineImage
+from docxtpl import DocxTemplate, InlineImage, RichText
 
 from app.db import get_connection
 from app.engine.engine import evaluar_criterio, evaluar_global
 from app.engine.models import ResultadoCriterio, ResultadoGlobal
 from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_puntaje, clasificar_bucket
 
+from . import colores_revision as colores
 from .grafica import generar_grafica_radar
 from .models import DatosEvaluacion
 from .repository import fetch_datos_evaluacion
@@ -29,12 +30,18 @@ BUCKET_ETIQUETAS = {
 }
 
 
-def generar_informe(evaluacion_id: str) -> bytes:
+def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
     """Punto de entrada usado por la API: trae los datos de la evaluación de
-    la base de datos y produce el `.docx` final."""
+    la base de datos y produce el `.docx` final.
+
+    `modo_revision` resalta el texto por su origen (dato de la empresa,
+    resultado calculado, plantilla fija, recomendación de catálogo) para
+    facilitar la validación piloto de la Etapa 6. Por defecto está activo
+    mientras dure esa etapa; se desactivará para el informe de entrega real
+    a una empresa."""
     with get_connection() as conn:
         datos = fetch_datos_evaluacion(conn, evaluacion_id)
-    return generar_informe_desde_datos(datos)
+    return generar_informe_desde_datos(datos, modo_revision=modo_revision)
 
 
 def calcular_resultados(
@@ -69,7 +76,7 @@ def calcular_resultados(
     return resultados, resultado_global
 
 
-def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
+def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = True) -> bytes:
     """Lógica de ensamblado del informe a partir de datos ya resueltos, sin
     tocar la base de datos — es lo que permite probar el generador completo
     (motor + gráfica + plantilla + tablas) con datos sintéticos."""
@@ -78,25 +85,53 @@ def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
     tpl = DocxTemplate(str(PLANTILLA_BASE))
     grafica_imagen = InlineImage(tpl, io.BytesIO(generar_grafica_radar(resultados)), width=Mm(140))
 
+    # El marcador `{{r ... }}` de la plantilla solo acepta objetos RichText
+    # (necesita aislar el tag en su propio run de XML para insertar texto
+    # enriquecido); por eso todo el texto que pasa por él se envuelve en
+    # RichText incluso cuando no hay color que aplicar (modo_revision=False).
+    color_empresa = colores.DATO_EMPRESA if modo_revision else None
+    color_plantilla = colores.PLANTILLA_FIJA if modo_revision else None
+    color_recomendacion = colores.RECOMENDACION_CATALOGO if modo_revision else None
+    color_tema = colores.TEMA_OBLIGATORIO_OPTATIVO if modo_revision else None
+
+    empresa_nombre = _rt(datos.empresa_nombre, color_empresa, bold=True)
+    empresa_ubicacion = _rt(datos.empresa_ubicacion or "no especificada", color_empresa)
+    empresa_giro = _rt(datos.empresa_giro or "no especificado", color_empresa)
+    empresa_num_trabajadores = _rt(
+        datos.empresa_num_trabajadores
+        if datos.empresa_num_trabajadores is not None
+        else "no especificado",
+        color_empresa,
+        bold=True,
+    )
+    empresa_turnos = _rt(datos.empresa_turnos or "no especificados", color_empresa)
+    empresa_descripcion_mmh = _rt(datos.empresa_descripcion_mmh or "no especificadas", color_empresa)
+    criterios_ctx = [
+        {
+            "numero": r.numero,
+            "nombre": r.nombre,
+            "narrativa": _narrativa_rt(r, color_plantilla, color_recomendacion),
+        }
+        for r in resultados
+    ]
+    resultado_global_cierre = _rt(resultado_global.cierre, color_plantilla)
+    temas_obligatorios = [_rt(t, color_tema) for t in resultado_global.temas_obligatorios]
+    temas_optativos = [_rt(t, color_tema) for t in resultado_global.temas_optativos]
+
     tpl.render(
         {
-            "empresa_nombre": datos.empresa_nombre,
-            "empresa_ubicacion": datos.empresa_ubicacion or "no especificada",
-            "empresa_giro": datos.empresa_giro or "no especificado",
-            "empresa_num_trabajadores": (
-                datos.empresa_num_trabajadores
-                if datos.empresa_num_trabajadores is not None
-                else "no especificado"
-            ),
-            "empresa_turnos": datos.empresa_turnos or "no especificados",
-            "empresa_descripcion_mmh": datos.empresa_descripcion_mmh or "no especificadas",
+            "empresa_nombre": empresa_nombre,
+            "empresa_ubicacion": empresa_ubicacion,
+            "empresa_giro": empresa_giro,
+            "empresa_num_trabajadores": empresa_num_trabajadores,
+            "empresa_turnos": empresa_turnos,
+            "empresa_descripcion_mmh": empresa_descripcion_mmh,
             "grafica_radar": grafica_imagen,
-            "criterios": [
-                {"numero": r.numero, "nombre": r.nombre, "narrativa": r.narrativa} for r in resultados
-            ],
-            "resultado_global_cierre": resultado_global.cierre,
-            "temas_obligatorios": resultado_global.temas_obligatorios,
-            "temas_optativos": resultado_global.temas_optativos,
+            "criterios": criterios_ctx,
+            "resultado_global_cierre": resultado_global_cierre,
+            "temas_obligatorios": temas_obligatorios,
+            "temas_optativos": temas_optativos,
+            "es_revision": modo_revision,
         }
     )
 
@@ -105,9 +140,11 @@ def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
     buffer.seek(0)
 
     documento = DocxDocument(buffer)
-    _reemplazar_marcador_con_tabla(documento, MARCADOR_TABLA_PUNTAJES, _construir_tabla_puntajes, resultados)
     _reemplazar_marcador_con_tabla(
-        documento, MARCADOR_TABLA_PORCENTAJES, _construir_tabla_porcentajes, resultados
+        documento, MARCADOR_TABLA_PUNTAJES, _construir_tabla_puntajes, resultados, modo_revision
+    )
+    _reemplazar_marcador_con_tabla(
+        documento, MARCADOR_TABLA_PORCENTAJES, _construir_tabla_porcentajes, resultados, modo_revision
     )
 
     salida = io.BytesIO()
@@ -115,17 +152,40 @@ def generar_informe_desde_datos(datos: DatosEvaluacion) -> bytes:
     return salida.getvalue()
 
 
-def _reemplazar_marcador_con_tabla(documento, marcador, construir_tabla, resultados):
+def _rt(texto, color_hex: str | None, *, bold: bool = False) -> RichText:
+    """Envuelve un valor en un RichText, resaltado con el color dado si se
+    proporciona uno (o sin resaltar, si `color_hex` es `None`)."""
+    rt = RichText()
+    rt.add(texto, highlight=color_hex, bold=bold)
+    return rt
+
+
+def _narrativa_rt(
+    resultado: ResultadoCriterio, color_plantilla: str | None, color_recomendacion: str | None
+) -> RichText:
+    """Narrativa de un criterio con la plantilla de apertura y los hallazgos
+    resaltados con colores distintos, reproduciendo exactamente el mismo
+    ensamblado de `narrativa.ensamblar_narrativa_criterio`."""
+    rt = RichText()
+    rt.add(resultado.plantilla_apertura, highlight=color_plantilla)
+    for h in resultado.hallazgos:
+        rt.add(f" {h.texto_recomendacion}", highlight=color_recomendacion)
+    return rt
+
+
+def _reemplazar_marcador_con_tabla(documento, marcador, construir_tabla, resultados, modo_revision):
     for parrafo in documento.paragraphs:
         if parrafo.text.strip() == marcador:
-            tabla = construir_tabla(documento, resultados)
+            tabla = construir_tabla(documento, resultados, modo_revision)
             parrafo._p.addnext(tabla._tbl)
             parrafo._p.getparent().remove(parrafo._p)
             return
     raise ValueError(f"No se encontró el marcador {marcador!r} en la plantilla")
 
 
-def _construir_tabla_puntajes(documento: DocxDocumentType, resultados: list[ResultadoCriterio]):
+def _construir_tabla_puntajes(
+    documento: DocxDocumentType, resultados: list[ResultadoCriterio], modo_revision: bool
+):
     tabla = documento.add_table(rows=1, cols=2)
     tabla.style = "Table Grid"
     encabezado = tabla.rows[0].cells
@@ -135,10 +195,14 @@ def _construir_tabla_puntajes(documento: DocxDocumentType, resultados: list[Resu
         fila = tabla.add_row().cells
         fila[0].text = f"{r.numero}. {r.nombre}"
         fila[1].text = f"{r.puntaje}/{r.puntaje_maximo}"
+        if modo_revision:
+            colores.sombrear_run(fila[1].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
     return tabla
 
 
-def _construir_tabla_porcentajes(documento: DocxDocumentType, resultados: list[ResultadoCriterio]):
+def _construir_tabla_porcentajes(
+    documento: DocxDocumentType, resultados: list[ResultadoCriterio], modo_revision: bool
+):
     tabla = documento.add_table(rows=1, cols=3)
     tabla.style = "Table Grid"
     encabezado = tabla.rows[0].cells
@@ -150,4 +214,7 @@ def _construir_tabla_porcentajes(documento: DocxDocumentType, resultados: list[R
         fila[0].text = f"{r.numero}. {r.nombre}"
         fila[1].text = f"{r.porcentaje:.1f}%"
         fila[2].text = BUCKET_ETIQUETAS.get(r.bucket, r.bucket)
+        if modo_revision:
+            colores.sombrear_run(fila[1].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
+            colores.sombrear_run(fila[2].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
     return tabla

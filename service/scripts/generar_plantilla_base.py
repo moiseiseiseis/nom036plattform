@@ -8,10 +8,15 @@ plantilla. No se ejecuta en cada generación de informe.
 Uso: python scripts/generar_plantilla_base.py
 """
 
+import sys
 from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from app.reportes.colores_revision import LEYENDA, sombrear_run  # noqa: E402
 
 SALIDA = Path(__file__).resolve().parent.parent / "app" / "templates" / "informe_base.docx"
 
@@ -40,18 +45,32 @@ def construir_documento() -> Document:
         "manual de cargas en los centros de trabajo. El presente documento resume los "
         "resultados obtenidos al aplicar el instrumento de autoevaluación con base en "
         "dicha norma dentro de la empresa "
-    ).add_run("{{ empresa_nombre }}.").bold = True
+    ).add_run("{{r empresa_nombre }}.")
+
+    doc.add_paragraph("{% if es_revision %}")
+    doc.add_heading("Guía de colores de este documento", level=2)
+    doc.add_paragraph(
+        "Esta versión del informe, generada durante la etapa de validación piloto, resalta el "
+        "texto según su origen dentro del motor de recomendaciones, para facilitar su revisión:"
+    )
+    for etiqueta, descripcion, color in LEYENDA:
+        p = doc.add_paragraph(style="List Bullet")
+        r = p.add_run(etiqueta)
+        r.bold = True
+        sombrear_run(r, color)
+        p.add_run(f": {descripcion}")
+    doc.add_paragraph("{% endif %}")
 
     doc.add_heading("Información general de la empresa", level=1)
     p = doc.add_paragraph()
     p.add_run("La empresa ")
-    p.add_run("{{ empresa_nombre }}").bold = True
-    p.add_run(" se encuentra ubicada en {{ empresa_ubicacion }}. Cuenta con aproximadamente ")
-    p.add_run("{{ empresa_num_trabajadores }}").bold = True
+    p.add_run("{{r empresa_nombre }}")
+    p.add_run(" se encuentra ubicada en {{r empresa_ubicacion }}. Cuenta con aproximadamente ")
+    p.add_run("{{r empresa_num_trabajadores }}")
     p.add_run(
-        " trabajadores, con el siguiente esquema de turnos: {{ empresa_turnos }}. Su giro "
-        "es {{ empresa_giro }}. Las actividades relacionadas con el manejo manual de "
-        "cargas identificadas son: {{ empresa_descripcion_mmh }}."
+        " trabajadores, con el siguiente esquema de turnos: {{r empresa_turnos }}. Su giro "
+        "es {{r empresa_giro }}. Las actividades relacionadas con el manejo manual de "
+        "cargas identificadas son: {{r empresa_descripcion_mmh }}."
     )
 
     doc.add_heading("Resultados de la evaluación", level=1)
@@ -76,7 +95,7 @@ def construir_documento() -> Document:
     doc.add_paragraph("{% for c in criterios %}")
     cp = doc.add_paragraph()
     cp.add_run("Criterio {{ c.numero }}.- ").bold = True
-    cp.add_run("{{ c.narrativa }}")
+    cp.add_run("{{r c.narrativa }}")
     doc.add_paragraph("{% endfor %}")
 
     doc.add_heading("Áreas de oportunidad", level=1)
@@ -85,16 +104,16 @@ def construir_documento() -> Document:
         "que se puede trabajar para facilitar la implementación y el cumplimiento de la "
         "NOM-036-1-STPS-2018."
     )
-    doc.add_paragraph("{{ resultado_global_cierre }}")
+    doc.add_paragraph("{{r resultado_global_cierre }}")
 
     doc.add_heading("Temas obligatorios", level=2)
     doc.add_paragraph("{% for tema in temas_obligatorios %}")
-    doc.add_paragraph("{{ loop.index }}. {{ tema }}")
+    doc.add_paragraph("{{ loop.index }}. {{r tema }}")
     doc.add_paragraph("{% endfor %}")
 
     doc.add_heading("Temas optativos", level=2)
     doc.add_paragraph("{% for tema in temas_optativos %}")
-    doc.add_paragraph("{{ loop.index }}. {{ tema }}")
+    doc.add_paragraph("{{ loop.index }}. {{r tema }}")
     doc.add_paragraph("{% endfor %}")
 
     doc.add_paragraph("Atentamente,")

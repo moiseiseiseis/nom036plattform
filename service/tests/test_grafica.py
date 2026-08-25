@@ -14,6 +14,7 @@ def _resultado(numero: int, porcentaje: float) -> ResultadoCriterio:
         porcentaje=porcentaje,
         bucket="regular",
         narrativa="",
+        plantilla_apertura="",
     )
 
 
