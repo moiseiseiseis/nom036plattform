@@ -11,3 +11,7 @@ Thumbs.db
 
 # Claude Code (config local de máquina, no del proyecto)
 .claude/
+
+# Informes .docx generados (pueden contener datos de empresas reales) —
+# quedan solo en disco local, nunca en el historial de git.
+contenido/*.docx
