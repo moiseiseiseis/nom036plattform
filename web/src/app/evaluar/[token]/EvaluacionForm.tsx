@@ -14,6 +14,9 @@ const NIVELES = [
 
 const ESTADO_INICIAL: EnviarEvaluacionState = { error: null };
 
+const CAMPO =
+  "rounded-lg border border-black/15 px-3 py-2 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30";
+
 export function EvaluacionForm({
   token,
   empresa,
@@ -27,8 +30,8 @@ export function EvaluacionForm({
   const [state, formAction, pending] = useActionState(accion, ESTADO_INICIAL);
 
   return (
-    <form action={formAction} className="flex flex-col gap-10">
-      <fieldset className="flex flex-col gap-4 rounded-lg border border-black/10 p-4 sm:p-6">
+    <form action={formAction} className="flex flex-col gap-6">
+      <fieldset className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm sm:p-6">
         <legend className="px-1 text-lg font-semibold">Datos generales de la empresa</legend>
 
         <div className="flex flex-col gap-1">
@@ -42,7 +45,7 @@ export function EvaluacionForm({
             name="ubicacion"
             required
             defaultValue={empresa.ubicacion ?? ""}
-            className="rounded-md border border-black/15 px-3 py-2"
+            className={CAMPO}
             placeholder="Ciudad, estado"
           />
         </label>
@@ -53,7 +56,7 @@ export function EvaluacionForm({
             name="giro"
             required
             defaultValue={empresa.giro ?? ""}
-            className="rounded-md border border-black/15 px-3 py-2"
+            className={CAMPO}
             placeholder="Ej. Textil y confección"
           />
         </label>
@@ -67,7 +70,7 @@ export function EvaluacionForm({
             step={1}
             required
             defaultValue={empresa.num_trabajadores ?? ""}
-            className="rounded-md border border-black/15 px-3 py-2"
+            className={CAMPO}
           />
         </label>
 
@@ -77,7 +80,7 @@ export function EvaluacionForm({
             name="turnos"
             required
             defaultValue={empresa.turnos ?? ""}
-            className="rounded-md border border-black/15 px-3 py-2"
+            className={CAMPO}
             placeholder="Ej. Un turno, dos turnos rotativos..."
           />
         </label>
@@ -91,22 +94,28 @@ export function EvaluacionForm({
             required
             rows={3}
             defaultValue={empresa.descripcion_mmh ?? ""}
-            className="rounded-md border border-black/15 px-3 py-2"
+            className={CAMPO}
             placeholder="Describe brevemente qué se levanta, transporta o manipula manualmente"
           />
         </label>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-6 rounded-lg border border-black/10 p-4 sm:p-6">
+      <fieldset className="flex flex-col gap-6 rounded-2xl border border-black/10 bg-white p-4 shadow-sm sm:p-6">
         <legend className="px-1 text-lg font-semibold">
           Criterio 1 — Identificación y clasificación de los puestos de trabajo
           ocupacionalmente expuestos
         </legend>
 
-        {items.map((item) => (
-          <div key={item.id} className="flex flex-col gap-3">
+        {items.map((item, index) => (
+          <div
+            key={item.id}
+            className={`flex flex-col gap-3 ${index > 0 ? "border-t border-black/5 pt-6" : ""}`}
+          >
             <p className="font-medium">
-              {item.numero}. {item.texto_pregunta}
+              <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
+                {item.numero}
+              </span>
+              {item.texto_pregunta}
             </p>
             <div className="grid grid-cols-5 gap-2">
               {NIVELES.map((nivel) => (
@@ -119,7 +128,7 @@ export function EvaluacionForm({
                     className="peer sr-only"
                   />
                   <span
-                    className={`flex h-10 w-full items-center justify-center rounded-md text-sm font-semibold text-white ring-offset-2 peer-checked:ring-2 peer-focus-visible:ring-2 ${nivel.color}`}
+                    className={`flex h-10 w-full items-center justify-center rounded-md text-sm font-semibold text-white ring-offset-2 transition peer-checked:scale-105 peer-checked:ring-2 peer-focus-visible:ring-2 hover:opacity-90 ${nivel.color}`}
                   >
                     {nivel.valor}
                   </span>
@@ -132,7 +141,7 @@ export function EvaluacionForm({
       </fieldset>
 
       {state.error && (
-        <p role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           {state.error}
         </p>
       )}
@@ -140,7 +149,7 @@ export function EvaluacionForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-black px-6 py-3 font-semibold text-white disabled:opacity-50"
+        className="rounded-lg bg-black px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 disabled:opacity-50"
       >
         {pending ? "Enviando…" : "Enviar autoevaluación"}
       </button>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #fafaf9;
   --foreground: #171717;
 }
 
@@ -12,12 +12,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/*
+ * El resto de la interfaz está escrita con clases de Tailwind fijas para
+ * modo claro (bg-white, text-black, border-black/10, etc.), sin variantes
+ * `dark:`. Antes había aquí un `prefers-color-scheme: dark` que solo
+ * cambiaba estas dos variables — dejando el fondo oscuro pero el resto del
+ * contenido en sus colores claros de siempre, ilegible. Se quita hasta que
+ * exista un soporte real de modo oscuro en toda la app.
+ */
 
 body {
   background: var(--background);

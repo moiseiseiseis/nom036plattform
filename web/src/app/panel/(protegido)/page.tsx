@@ -47,32 +47,34 @@ export default async function ListadoEvaluacionesPage() {
         <h1 className="text-xl font-semibold">Evaluaciones</h1>
         <Link
           href="/panel/nueva"
-          className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
         >
           + Nueva evaluación
         </Link>
       </div>
 
       {evaluaciones.length === 0 ? (
-        <p className="text-gray-600">Todavía no hay evaluaciones. Crea la primera.</p>
+        <div className="rounded-2xl border border-black/10 bg-white p-8 text-center shadow-sm">
+          <p className="text-gray-600">Todavía no hay evaluaciones. Crea la primera.</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white shadow-sm">
           <table className="w-full border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-black/10 text-gray-500">
-                <th className="py-2 pr-4">Empresa</th>
-                <th className="py-2 pr-4">Estado</th>
-                <th className="py-2 pr-4">Resultado global</th>
-                <th className="py-2 pr-4">Fecha</th>
-                <th className="py-2" />
+                <th className="py-3 pr-4 pl-6">Empresa</th>
+                <th className="py-3 pr-4">Estado</th>
+                <th className="py-3 pr-4">Resultado global</th>
+                <th className="py-3 pr-4">Fecha</th>
+                <th className="py-3 pr-6" />
               </tr>
             </thead>
             <tbody>
               {evaluaciones.map((ev) => {
                 const resumen = resumenes.get(ev.id);
                 return (
-                  <tr key={ev.id} className="border-b border-black/5">
-                    <td className="py-3 pr-4 font-medium">{ev.empresa_nombre}</td>
+                  <tr key={ev.id} className="border-b border-black/5 transition-colors last:border-0 hover:bg-gray-50">
+                    <td className="py-3 pr-4 pl-6 font-medium">{ev.empresa_nombre}</td>
                     <td className="py-3 pr-4">
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-medium ${COLOR_ESTADO[ev.estado] ?? ""}`}
@@ -94,9 +96,12 @@ export default async function ListadoEvaluacionesPage() {
                     <td className="py-3 pr-4 text-gray-500">
                       {new Date(ev.fecha).toLocaleDateString("es-MX")}
                     </td>
-                    <td className="py-3 text-right">
-                      <Link href={`/panel/evaluaciones/${ev.id}`} className="text-sm underline">
-                        Ver detalle
+                    <td className="py-3 pr-6 text-right">
+                      <Link
+                        href={`/panel/evaluaciones/${ev.id}`}
+                        className="text-sm font-medium text-blue-700 hover:underline"
+                      >
+                        Ver detalle →
                       </Link>
                     </td>
                   </tr>
