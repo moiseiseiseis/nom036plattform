@@ -45,3 +45,17 @@ export async function obtenerResumenInforme(evaluacionId: string): Promise<Resum
 export async function descargarInformeDocx(evaluacionId: string): Promise<Response> {
   return fetch(`${urlServicioPython()}/informes/${evaluacionId}`, { cache: "no-store" });
 }
+
+/** Igual que `obtenerResumenInforme`, pero nunca lanza — si el servicio de
+ * informes no responde, se ve como "sin resultados" en vez de romper toda
+ * la vista (útil en el listado del panel, donde se piden varios resúmenes
+ * a la vez y uno solo no debería tumbar la página completa). */
+export async function obtenerResumenInformeSeguro(
+  evaluacionId: string
+): Promise<ResumenInforme | null> {
+  try {
+    return await obtenerResumenInforme(evaluacionId);
+  } catch {
+    return null;
+  }
+}
