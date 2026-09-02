@@ -81,7 +81,46 @@ def test_generar_informe_produce_docx_valido_y_con_contenido_correcto():
     assert tabla_porcentajes.rows[1].cells[1].text == "42.5%"
     assert tabla_porcentajes.rows[1].cells[2].text == "Regular"
 
-    assert len(documento.inline_shapes) == 1  # la gráfica de radar
+    # Gráfica de radar + gráfica de temas obligatorios/optativos (hay 3 hallazgos, todos
+    # obligatorios porque las respuestas de prueba alternan es_obligatorio por paridad).
+    assert len(documento.inline_shapes) == 2
+
+
+def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
+    """Con niveles altos en todos los ítems no hay hallazgos, por lo que no
+    hay temas obligatorios ni optativos que graficar — solo debe insertarse
+    la gráfica de radar."""
+    datos = _datos_evaluacion_jasana()
+    criterio_sin_hallazgos = DatosCriterio(
+        id=datos.criterios[0].id,
+        numero=datos.criterios[0].numero,
+        nombre=datos.criterios[0].nombre,
+        respuestas=[
+            RespuestaItem(item_id=f"item-{n}", numero=n, nivel=4, es_obligatorio=n % 2 == 1)
+            for n in range(1, 11)
+        ],
+        recomendaciones={
+            (f"item-{n}", 4): f"[PLACEHOLDER] Recomendación ítem {n} nivel 4." for n in range(1, 11)
+        },
+        plantillas_apertura=datos.criterios[0].plantillas_apertura,
+    )
+    datos_sin_hallazgos = DatosEvaluacion(
+        evaluacion_id=datos.evaluacion_id,
+        token_publico=datos.token_publico,
+        estado=datos.estado,
+        empresa_nombre=datos.empresa_nombre,
+        empresa_ubicacion=datos.empresa_ubicacion,
+        empresa_giro=datos.empresa_giro,
+        empresa_num_trabajadores=datos.empresa_num_trabajadores,
+        empresa_turnos=datos.empresa_turnos,
+        empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
+        criterios=[criterio_sin_hallazgos],
+        plantillas_cierre_global=datos.plantillas_cierre_global,
+    )
+
+    contenido = generar_informe_desde_datos(datos_sin_hallazgos)
+    documento = Document(io.BytesIO(contenido))
+    assert len(documento.inline_shapes) == 1
 
 
 def test_generar_informe_sin_criterios_lanza_error():

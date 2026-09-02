@@ -12,7 +12,7 @@ from app.engine.models import ResultadoCriterio, ResultadoGlobal
 from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_puntaje, clasificar_bucket
 
 from . import colores_revision as colores
-from .grafica import generar_grafica_radar
+from .grafica import generar_grafica_radar, generar_grafica_temas
 from .models import DatosEvaluacion
 from .repository import fetch_datos_evaluacion
 
@@ -118,6 +118,17 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
     temas_obligatorios = [_rt(t, color_tema) for t in resultado_global.temas_obligatorios]
     temas_optativos = [_rt(t, color_tema) for t in resultado_global.temas_optativos]
 
+    num_obligatorios = len(resultado_global.temas_obligatorios)
+    num_optativos = len(resultado_global.temas_optativos)
+    hay_temas = (num_obligatorios + num_optativos) > 0
+    grafica_temas_imagen = (
+        InlineImage(
+            tpl, io.BytesIO(generar_grafica_temas(num_obligatorios, num_optativos)), width=Mm(100)
+        )
+        if hay_temas
+        else None
+    )
+
     tpl.render(
         {
             "empresa_nombre": empresa_nombre,
@@ -131,6 +142,8 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "resultado_global_cierre": resultado_global_cierre,
             "temas_obligatorios": temas_obligatorios,
             "temas_optativos": temas_optativos,
+            "grafica_temas": grafica_temas_imagen,
+            "hay_temas": hay_temas,
             "es_revision": modo_revision,
         }
     )

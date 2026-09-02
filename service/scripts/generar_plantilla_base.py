@@ -106,6 +106,11 @@ def construir_documento() -> Document:
     )
     doc.add_paragraph("{{r resultado_global_cierre }}")
 
+    doc.add_paragraph("{% if hay_temas %}")
+    img_temas_p = doc.add_paragraph("{{ grafica_temas }}")
+    img_temas_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("{% endif %}")
+
     doc.add_heading("Temas obligatorios", level=2)
     doc.add_paragraph("{% for tema in temas_obligatorios %}")
     doc.add_paragraph("{{ loop.index }}. {{r tema }}")
