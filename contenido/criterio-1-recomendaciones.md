@@ -2,11 +2,13 @@
 
 **Criterio:** Identificación y clasificación de los puestos de trabajo ocupacionalmente
 expuestos (al manejo manual de cargas).
-**Estado:** primera versión de trabajo, co-redactada con el desarrollador a partir del texto
-oficial de la NOM-036-1-STPS-2018 (Capítulos 7 y 8) y de la estructura narrativa del informe
-JASANA real. **Pendiente de revisión y validación final antes de usarse en un informe a una
-empresa real.**
-**Fuente en el repositorio:** `supabase/content_v1_criterio1.sql`.
+**Estado:** segunda versión de trabajo — mismo contenido normativo que la primera, reescrito
+en lenguaje menos técnico a solicitud del Dr. Sergio (reunión de seguimiento). Co-redactada con
+el desarrollador a partir del texto oficial de la NOM-036-1-STPS-2018 (Capítulos 7 y 8) y de la
+estructura narrativa del informe JASANA real. **Pendiente de revisión y validación final antes
+de usarse en un informe a una empresa real.**
+**Fuente en el repositorio:** `supabase/content_v2_lenguaje_simple.sql` (versión de lenguaje
+técnico previa: `supabase/content_v1_criterio1.sql`).
 
 ## Cómo revisar este documento
 
@@ -32,8 +34,15 @@ quedó clasificado como tema **obligatorio** (exigencia directa de la norma) u *
 de "temas obligatorios" y "temas optativos". Los diez ítems de este criterio se clasificaron
 como obligatorios.
 
+**Cambio de estilo respecto a la primera versión:** frases más cortas y en voz activa, el
+numeral de la norma se movió al final entre paréntesis en vez de ir incrustado a media oración,
+y se evitó vocabulario administrativo ("análisis de identificación", "grado de cumplimiento
+general") a favor de lenguaje cotidiano — buscando que una persona sin formación técnica
+entienda la recomendación sin tener que releerla.
+
 Al revisar, lo más útil es señalar, por cada recomendación: (a) si el contenido es correcto y
-suficiente, (b) si el numeral citado es el correcto, o (c) si el texto necesita reescribirse.
+suficiente, (b) si el numeral citado es el correcto, (c) si el texto necesita reescribirse, o
+(d) si la simplificación del lenguaje perdió algún matiz importante que sí debería estar.
 
 ---
 
@@ -44,11 +53,11 @@ jalar, transportar o estibar materiales manualmente?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se han identificado las tareas que implican manejo manual de cargas (levantar, bajar, empujar, jalar, transportar o estibar materiales). Se recomienda realizar el análisis de identificación que exige el numeral 7.2 de la NOM-036-1-STPS-2018, enlistando cada actividad, tarea o puesto de trabajo en el que se manipulen cargas. |
-| 1 — Mínimo | La identificación de tareas con manejo manual de cargas es parcial o informal. Se recomienda formalizarla por escrito, cubriendo todas las actividades de levantar, bajar, empujar, jalar, transportar y estibar materiales, conforme al numeral 7.2. |
-| 2 — Regular | Existe una identificación de tareas con manejo manual de cargas, pero no cubre todos los puestos de trabajo. Se recomienda revisarla y completarla para todos los puestos ocupacionalmente expuestos. |
-| 3 — Aceptable | La identificación de tareas con manejo manual de cargas cubre la mayoría de los puestos. Se recomienda mantenerla actualizada y revisarla cuando cambien las condiciones de trabajo (numeral 7.6). |
-| 4 — Óptimo | La identificación de tareas con manejo manual de cargas está completa y documentada conforme al numeral 7.2. Se recomienda mantener este proceso y actualizarlo periódicamente. |
+| 0 — Nada | Todavía no se ha hecho una lista de las tareas donde el personal levanta, empuja, jala o transporta cargas manualmente. Se recomienda hacer esa lista, anotando en qué puesto y actividad ocurre cada una. (NOM-036, numeral 7.2) |
+| 1 — Mínimo | Existe una lista de tareas con manejo de cargas, pero es informal o está incompleta. Se recomienda ponerla por escrito y cubrir todas las actividades de levantar, empujar, jalar y transportar. (NOM-036, numeral 7.2) |
+| 2 — Regular | Ya hay una lista de tareas con manejo de cargas, pero no cubre todos los puestos. Se recomienda revisarla y completarla para todo el personal expuesto. |
+| 3 — Aceptable | La lista de tareas con manejo de cargas cubre la mayoría de los puestos. Se recomienda mantenerla al día y revisarla cuando cambien las condiciones de trabajo. (NOM-036, numeral 7.6) |
+| 4 — Óptimo | La lista de tareas con manejo de cargas está completa y por escrito. Se recomienda mantener este control y actualizarlo periódicamente. (NOM-036, numeral 7.2) |
 
 ---
 
@@ -59,11 +68,11 @@ de trabajo?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se conoce el peso promedio ni máximo de las cargas manipuladas en las estaciones de trabajo. Se recomienda determinar estos datos como parte de las características de la carga que exige el numeral 8.2 c) de la NOM-036-1-STPS-2018. |
-| 1 — Mínimo | Se tiene una idea aproximada del peso de las cargas, pero no está documentada ni verificada. Se recomienda medir y registrar el peso promedio y máximo por estación de trabajo. |
-| 2 — Regular | Se conoce el peso de las cargas en algunas estaciones de trabajo, pero no en todas. Se recomienda completar el registro para todas las estaciones donde se manipulen cargas. |
-| 3 — Aceptable | Se conoce el peso promedio y máximo de las cargas en la mayoría de las estaciones de trabajo. Se recomienda mantener este registro actualizado. |
-| 4 — Óptimo | Se conoce y tiene documentado el peso promedio y máximo de las cargas en todas las estaciones de trabajo, conforme al numeral 8.2 c). Se recomienda mantener este control. |
+| 0 — Nada | No se conoce cuánto pesan, en promedio ni como máximo, las cargas que se manejan en cada estación de trabajo. Se recomienda pesarlas y anotar ese dato. (NOM-036, numeral 8.2) |
+| 1 — Mínimo | Se tiene una idea aproximada del peso de las cargas, pero no se ha medido ni registrado. Se recomienda medir y anotar el peso promedio y máximo por estación. |
+| 2 — Regular | Se conoce el peso de las cargas en algunas estaciones, pero no en todas. Se recomienda completar este registro en las que faltan. |
+| 3 — Aceptable | Se conoce el peso de las cargas en la mayoría de las estaciones de trabajo. Se recomienda mantener este registro actualizado. |
+| 4 — Óptimo | Se conoce y está por escrito el peso promedio y máximo de las cargas en todas las estaciones de trabajo. Se recomienda mantener este control. (NOM-036, numeral 8.2) |
 
 ---
 
@@ -74,11 +83,11 @@ y sin obstrucciones?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | Las actividades de carga manual se realizan en espacios reducidos o con obstrucciones frecuentes. Se recomienda mantener las áreas de tránsito y de trabajo libres de obstáculos, conforme al numeral 8.3 a). |
-| 1 — Mínimo | Existen obstrucciones o falta de espacio en varias de las áreas donde se realiza manejo manual de cargas. Se recomienda revisar y despejar dichas áreas. |
-| 2 — Regular | La mayoría de las áreas cuentan con espacio suficiente, pero persisten algunos puntos con obstrucciones. Se recomienda identificarlos y corregirlos. |
-| 3 — Aceptable | Las áreas de trabajo cuentan con espacio suficiente y están libres de obstáculos en la mayoría de los casos. Se recomienda mantener esta condición mediante inspecciones periódicas. |
-| 4 — Óptimo | Todas las áreas donde se realiza manejo manual de cargas cuentan con espacio suficiente y están libres de obstrucciones. Se recomienda mantener este control como parte de las inspecciones rutinarias. |
+| 0 — Nada | Las tareas de carga manual se hacen en espacios reducidos o con obstáculos frecuentes. Se recomienda mantener despejadas las áreas de trabajo y de paso. (NOM-036, numeral 8.3) |
+| 1 — Mínimo | Hay obstáculos o falta de espacio en varias de las áreas donde se manejan cargas. Se recomienda revisar y despejar esas áreas. |
+| 2 — Regular | La mayoría de las áreas tienen espacio suficiente, pero todavía hay algunos puntos con obstáculos. Se recomienda identificarlos y corregirlos. |
+| 3 — Aceptable | Las áreas de trabajo tienen espacio suficiente y están despejadas en la mayoría de los casos. Se recomienda mantener esta condición con inspecciones periódicas. |
+| 4 — Óptimo | Todas las áreas donde se manejan cargas tienen espacio suficiente y están libres de obstáculos. Se recomienda mantener este control en las inspecciones de rutina. |
 
 ---
 
@@ -89,11 +98,11 @@ carga laboral?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se aplica ningún método de estimación del riesgo para las actividades de manejo manual de cargas. Se recomienda realizar la estimación del nivel de riesgo conforme al Apéndice I (levantar, bajar o transportar cargas) o al Apéndice II (empujar o jalar cargas) de la NOM-036-1-STPS-2018, según corresponda. |
-| 1 — Mínimo | Se ha intentado aplicar algún método de estimación del riesgo, pero de forma incompleta o no sistemática. Se recomienda formalizar su aplicación conforme al numeral 7.3. |
-| 2 — Regular | Se aplican métodos de estimación del riesgo en algunas actividades, pero no en todas las que involucran manejo manual de cargas. Se recomienda extender su aplicación a todas las actividades identificadas. |
-| 3 — Aceptable | Se aplican métodos de estimación del riesgo (Apéndice I o II) en la mayoría de las actividades de manejo manual de cargas. Se recomienda mantener esta práctica y documentar los resultados. |
-| 4 — Óptimo | Se aplican y documentan métodos de estimación del riesgo (Apéndice I o II) para todas las actividades de manejo manual de cargas, conforme al numeral 7.3. Se recomienda mantener esta práctica. |
+| 0 — Nada | No se usa ningún método para estimar el riesgo de las tareas de manejo de cargas. Se recomienda aplicar el Apéndice I (para levantar, bajar o transportar cargas) o el Apéndice II (para empujar o jalar) de la NOM-036, según el caso. |
+| 1 — Mínimo | Se ha intentado aplicar algún método de estimación del riesgo, pero de forma incompleta. Se recomienda hacerlo de manera formal, siguiendo el Apéndice I o II. |
+| 2 — Regular | Se aplican métodos de estimación del riesgo en algunas tareas, pero no en todas las que involucran manejo de cargas. Se recomienda extenderlo a todas las tareas identificadas. |
+| 3 — Aceptable | Se aplican los métodos de estimación del riesgo (Apéndice I o II) en la mayoría de las tareas. Se recomienda mantener esta práctica y documentar los resultados. |
+| 4 — Óptimo | Se aplican y quedan documentados los métodos de estimación del riesgo (Apéndice I o II) en todas las tareas de manejo de cargas. Se recomienda mantener esta práctica. |
 
 ---
 
@@ -104,11 +113,11 @@ laboral?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se registra la frecuencia con que se levantan o trasladan cargas durante la jornada laboral. Se recomienda registrar este dato como parte de la identificación de actividades que exige el numeral 7.2 d). |
-| 1 — Mínimo | Se tiene una estimación informal de la frecuencia, sin registro documentado. Se recomienda formalizar su registro. |
-| 2 — Regular | Se registra la frecuencia en algunas actividades, pero no de manera sistemática en todas. Se recomienda extender el registro a todas las actividades con manejo manual de cargas. |
+| 0 — Nada | No se lleva un registro de cuántas veces al día se levantan o trasladan cargas. Se recomienda registrar ese dato para cada actividad. (NOM-036, numeral 7.2) |
+| 1 — Mínimo | Se tiene una idea aproximada de la frecuencia, pero no está registrada por escrito. Se recomienda formalizar ese registro. |
+| 2 — Regular | Se registra la frecuencia en algunas actividades, pero no en todas. Se recomienda extender el registro a todas las tareas con manejo de cargas. |
 | 3 — Aceptable | Se registra la frecuencia de levantamiento o traslado de cargas en la mayoría de las actividades. Se recomienda mantener y actualizar este registro. |
-| 4 — Óptimo | Se registra sistemáticamente la frecuencia de levantamiento o traslado de cargas en todas las actividades, conforme al numeral 7.2 d). Se recomienda mantener esta práctica. |
+| 4 — Óptimo | Se registra de forma sistemática la frecuencia de levantamiento o traslado de cargas en todas las actividades. Se recomienda mantener esta práctica. (NOM-036, numeral 7.2) |
 
 ---
 
@@ -119,11 +128,11 @@ al género y edad?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se verifica que las cargas manipuladas respeten los límites de masa máxima por género y edad establecidos en la Tabla 1 de la NOM-036-1-STPS-2018. Se recomienda implementar esta verificación conforme al numeral 8.3 b). |
-| 1 — Mínimo | Existe una verificación informal de los límites de carga por género y edad, sin comparación sistemática contra la Tabla 1. Se recomienda formalizar esta verificación. |
-| 2 — Regular | Se verifica el cumplimiento de los límites de carga en algunos puestos, pero no en todos. Se recomienda extender la verificación a todos los puestos con manejo manual de cargas. |
-| 3 — Aceptable | Las cargas manipuladas respetan los límites de la Tabla 1 en la mayoría de los puestos. Se recomienda mantener esta verificación de forma periódica. |
-| 4 — Óptimo | Se verifica y documenta que las cargas manipuladas respetan los límites de masa máxima por género y edad de la Tabla 1 en todos los puestos. Se recomienda mantener este control. |
+| 0 — Nada | No se revisa si las cargas que se manejan respetan los límites de peso permitidos según género y edad (Tabla 1 de la NOM-036). Se recomienda empezar a hacer esa revisión. |
+| 1 — Mínimo | Se revisa de forma informal si las cargas respetan esos límites, sin comparar sistemáticamente contra la Tabla 1. Se recomienda formalizar esta revisión. |
+| 2 — Regular | Se revisa el cumplimiento de los límites de carga en algunos puestos, pero no en todos. Se recomienda extenderlo a todos los puestos con manejo de cargas. |
+| 3 — Aceptable | Las cargas que se manejan respetan los límites de la Tabla 1 en la mayoría de los puestos. Se recomienda seguir revisándolo periódicamente. |
+| 4 — Óptimo | Se revisa y queda documentado que las cargas respetan los límites de peso por género y edad en todos los puestos. Se recomienda mantener este control. |
 
 ---
 
@@ -134,11 +143,11 @@ Manejo Manual de Cargas (MMC)?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se cuenta con documentación ni planos que indiquen los puntos críticos de manejo manual de cargas. Se recomienda elaborar el informe del análisis de factores de riesgo ergonómico que exige el numeral 7.4, identificando dichos puntos críticos. |
-| 1 — Mínimo | Existe documentación parcial o informal sobre los puntos críticos de MMC. Se recomienda formalizarla conforme al numeral 7.4. |
-| 2 — Regular | Se cuenta con documentación de los puntos críticos de MMC en algunas áreas, pero no en todas. Se recomienda completarla para todos los puestos identificados. |
-| 3 — Aceptable | Se cuenta con documentación de los puntos críticos de MMC para la mayoría de los puestos. Se recomienda mantenerla actualizada. |
-| 4 — Óptimo | Se cuenta con documentación y/o planos completos de los puntos críticos de manejo manual de cargas, conforme al numeral 7.4. Se recomienda mantener esta documentación actualizada. |
+| 0 — Nada | No existe ningún documento ni plano que señale los puntos donde el manejo de cargas representa un riesgo mayor. Se recomienda elaborar ese documento. (NOM-036, numeral 7.4) |
+| 1 — Mínimo | Existe documentación parcial o informal sobre esos puntos críticos. Se recomienda formalizarla. |
+| 2 — Regular | Se cuenta con documentación de los puntos críticos en algunas áreas, pero no en todas. Se recomienda completarla para todos los puestos identificados. |
+| 3 — Aceptable | Se cuenta con documentación de los puntos críticos para la mayoría de los puestos. Se recomienda mantenerla actualizada. |
+| 4 — Óptimo | Se cuenta con documentación y/o planos completos de los puntos críticos de manejo de cargas. Se recomienda mantenerlos actualizados. (NOM-036, numeral 7.4) |
 
 ---
 
@@ -149,11 +158,11 @@ innecesarios?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se han realizado ajustes en la distribución de procesos o materiales para evitar posturas forzadas o traslados innecesarios. Se recomienda evaluar la redistribución física de instalaciones, procesos, maquinaria y equipos como medida de control técnica (numeral 8.7). |
-| 1 — Mínimo | Se han realizado ajustes puntuales y aislados, sin un criterio sistemático. Se recomienda evaluar de forma integral la distribución de procesos y materiales. |
-| 2 — Regular | Se han reubicado procesos o materiales en algunas áreas, pero persisten posturas forzadas o traslados innecesarios en otras. Se recomienda extender esta revisión a todas las áreas. |
-| 3 — Aceptable | Se han reubicado procesos o materiales en la mayoría de las áreas para evitar posturas forzadas o traslados innecesarios. Se recomienda mantener esta práctica y evaluar las áreas restantes. |
-| 4 — Óptimo | Los procesos y materiales están distribuidos de manera que se evitan posturas forzadas y traslados innecesarios, conforme al numeral 8.7. Se recomienda mantener este control. |
+| 0 — Nada | No se ha ajustado la forma en que están distribuidos los procesos o materiales para evitar posturas forzadas o traslados innecesarios. Se recomienda revisar y reacomodar el espacio de trabajo. (NOM-036, numeral 8.7) |
+| 1 — Mínimo | Se han hecho algunos ajustes puntuales, sin un plan general. Se recomienda evaluar la distribución del espacio de trabajo de forma integral. |
+| 2 — Regular | Se han reubicado procesos o materiales en algunas áreas, pero en otras persisten posturas forzadas o traslados innecesarios. Se recomienda revisar las áreas restantes. |
+| 3 — Aceptable | Se han reubicado procesos o materiales en la mayoría de las áreas para evitar posturas forzadas o traslados innecesarios. Se recomienda revisar las áreas que faltan. |
+| 4 — Óptimo | Los procesos y materiales están acomodados de forma que se evitan posturas forzadas y traslados innecesarios. Se recomienda mantener este control. |
 
 ---
 
@@ -164,11 +173,11 @@ repetitivas con MMC?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No existen pausas activas ni descansos programados para actividades repetitivas de manejo manual de cargas. Se recomienda establecer periodos de descanso como medida de control administrativa (numeral 8.6 a). |
-| 1 — Mínimo | Las pausas o descansos se dan de manera informal, sin un programa establecido. Se recomienda documentar y programar los periodos de descanso conforme al numeral 8.6. |
-| 2 — Regular | Existen pausas o descansos, pero no están formalizados para todas las actividades repetitivas con MMC. Se recomienda extender el programa a todos los puestos que lo requieran. |
-| 3 — Aceptable | El programa de pausas activas y descansos cubre la mayoría de las actividades repetitivas. Se recomienda documentarlo formalmente y darle seguimiento periódico. |
-| 4 — Óptimo | El programa de pausas activas y descansos está documentado y se aplica de forma consistente. Se recomienda mantenerlo y revisarlo cuando cambien las condiciones de trabajo. |
+| 0 — Nada | No hay pausas activas ni descansos programados para las tareas repetitivas de manejo de cargas. Se recomienda establecer periodos de descanso. (NOM-036, numeral 8.6) |
+| 1 — Mínimo | Las pausas o descansos se dan de manera informal, sin un programa establecido. Se recomienda programarlos y ponerlos por escrito. |
+| 2 — Regular | Existen pausas o descansos, pero no para todas las actividades repetitivas que lo requieren. Se recomienda extender el programa a todos los puestos necesarios. |
+| 3 — Aceptable | El programa de pausas activas y descansos cubre la mayoría de las actividades repetitivas. Se recomienda ponerlo por escrito y darle seguimiento. |
+| 4 — Óptimo | El programa de pausas activas y descansos está documentado y se aplica de forma constante. Se recomienda mantenerlo y revisarlo si cambian las condiciones de trabajo. |
 
 ---
 
@@ -179,37 +188,44 @@ trabajador durante su jornada?
 
 | Nivel | Recomendación |
 |---|---|
-| 0 — Nada | No se limita ni se controla la masa acumulada que cada trabajador maneja manualmente durante su jornada. Se recomienda asegurar que no se exceda de 10,000 kg/jornada de 8 horas para distancias menores a 10 m, o de 6,000 kg/jornada para distancias no mayores a 20 m, conforme al numeral 8.3 b) 5). |
-| 1 — Mínimo | Existe un control informal de la masa acumulada, sin verificación sistemática contra los límites normativos. Se recomienda formalizar esta verificación. |
-| 2 — Regular | Se controla la masa acumulada en algunos puestos, pero no en todos los que involucran manejo manual de cargas. Se recomienda extender el control a todos los puestos. |
-| 3 — Aceptable | Se controla la masa acumulada por trabajador en la mayoría de los puestos, dentro de los límites normativos. Se recomienda mantener este control. |
-| 4 — Óptimo | Se controla y documenta que la masa acumulada por trabajador no excede los límites establecidos en el numeral 8.3 b) 5). Se recomienda mantener este control. |
+| 0 — Nada | No se controla cuánto peso en total maneja cada trabajador durante su jornada. Se recomienda asegurar que no se pasen de 10,000 kg al día para distancias cortas, o 6,000 kg para distancias de hasta 20 m. (NOM-036, numeral 8.3) |
+| 1 — Mínimo | Hay un control informal de ese total, sin comparar contra los límites de la norma. Se recomienda formalizar esta revisión. |
+| 2 — Regular | Se controla el peso total en algunos puestos, pero no en todos los que manejan cargas. Se recomienda extenderlo a todos los puestos. |
+| 3 — Aceptable | Se controla el peso total que maneja cada trabajador en la mayoría de los puestos, dentro de los límites permitidos. Se recomienda mantener este control. |
+| 4 — Óptimo | Se controla y queda documentado que ningún trabajador excede los límites de peso total por jornada. Se recomienda mantener este control. (NOM-036, numeral 8.3) |
 
 ---
 
 ## Anexo — Plantillas de apertura y cierre por nivel de cumplimiento
 
-Además de la recomendación por ítem, el informe usa dos plantillas fijas por franja de
+Además de la recomendación por ítem, el informe usa plantillas fijas por franja de
 cumplimiento (0-20% inexistente, 20-40% mínimo, 40-60% regular, 60-80% aceptable, 80-100%
-óptimo): una de **apertura**, que introduce el párrafo del criterio, y una de **cierre**, que
-introduce la conclusión general del informe. También están pendientes de validación.
+óptimo). A nivel de criterio, una plantilla de **apertura** introduce el párrafo del criterio.
+A nivel global (informe completo), una plantilla de **apertura** introduce la sección de "Áreas
+de oportunidad" y una de **cierre** da el veredicto general antes de las listas de temas.
+También están pendientes de validación.
 
-### Apertura y cierre del Criterio 1
+### Apertura del Criterio 1
 
-| Franja | Apertura | Cierre |
-|---|---|---|
-| Inexistente | Con respecto a la identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos al manejo manual de cargas, se observa que este proceso es prácticamente inexistente. | Se requiere atención prioritaria e inmediata en este criterio para cumplir con lo establecido por el Capítulo 7 de la NOM-036-1-STPS-2018. |
-| Mínimo | Con respecto a la identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos, se observa que existen esfuerzos aislados, pero el proceso es incompleto en la mayoría de sus componentes. | Se recomienda priorizar las acciones de este criterio en el corto plazo. |
-| Regular | Con respecto a la identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos, se observa que se cuenta con avances relevantes, aunque persisten áreas sin cubrir. | Se recomienda continuar reforzando este criterio en el mediano plazo. |
-| Aceptable | Con respecto a la identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos, se observa un nivel de cumplimiento aceptable, con algunos puntos específicos por reforzar. | Se recomienda mantener y consolidar las buenas prácticas identificadas en este criterio. |
-| Óptimo | Con respecto a la identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos, se observa un cumplimiento óptimo de los requisitos establecidos por la NOM-036-1-STPS-2018. | Se recomienda mantener este nivel de cumplimiento y usarlo como referencia para los demás criterios. |
+| Franja | Apertura |
+|---|---|
+| Inexistente | Casi no se ha trabajado en identificar y clasificar los puestos donde el personal maneja cargas manualmente. |
+| Mínimo | Hay algunos avances sueltos para identificar y clasificar los puestos donde se maneja carga manualmente, pero falta cubrir la mayor parte. |
+| Regular | Ya hay avances importantes en identificar y clasificar los puestos con manejo de cargas, aunque todavía quedan áreas sin cubrir. |
+| Aceptable | El trabajo de identificar y clasificar los puestos con manejo de cargas está en buen nivel, con algunos puntos específicos por reforzar. |
+| Óptimo | La identificación y clasificación de los puestos con manejo de cargas cumple con lo que pide la norma. |
 
 ### Apertura y cierre globales (nivel informe completo)
 
-| Franja | Apertura | Cierre |
+| Franja | Apertura (introduce la lista) | Cierre (da el veredicto) |
 |---|---|---|
-| Inexistente | A continuación se describen los puntos más importantes en los que la empresa presenta un nivel de cumplimiento inexistente respecto a la NOM-036-1-STPS-2018. | El grado de cumplimiento general de la empresa respecto a la NOM-036-1-STPS-2018 es prácticamente inexistente. Se recomienda iniciar de manera urgente con las acciones señaladas como temas obligatorios, ya que la empresa se encuentra expuesta a un riesgo elevado de incumplimiento normativo y de afectaciones a la salud de los trabajadores. |
-| Mínimo | A continuación se describen los puntos más importantes en los que la empresa presenta un nivel de cumplimiento mínimo respecto a la NOM-036-1-STPS-2018. | El grado de cumplimiento general de la empresa respecto a la NOM-036-1-STPS-2018 es mínimo. Se recomienda atender de manera prioritaria los temas obligatorios señalados a continuación, ya que constituyen los requisitos básicos establecidos por la norma. |
-| Regular | A continuación se describen los puntos más importantes en los que la empresa presenta un nivel de cumplimiento regular respecto a la NOM-036-1-STPS-2018. | El grado de cumplimiento general de la empresa respecto a la NOM-036-1-STPS-2018 es regular. Si bien existen avances, se recomienda continuar trabajando en los temas obligatorios señalados a continuación para consolidar el cumplimiento de la norma. |
-| Aceptable | A continuación se describen los puntos más importantes en los que la empresa presenta un nivel de cumplimiento aceptable respecto a la NOM-036-1-STPS-2018. | El grado de cumplimiento general de la empresa respecto a la NOM-036-1-STPS-2018 es aceptable. Se recomienda atender los temas obligatorios pendientes y considerar los temas optativos como oportunidades de mejora continua. |
-| Óptimo | A continuación se describen los puntos más importantes en los que la empresa presenta un nivel de cumplimiento óptimo respecto a la NOM-036-1-STPS-2018. | El grado de cumplimiento general de la empresa respecto a la NOM-036-1-STPS-2018 es óptimo. Se recomienda mantener las prácticas actuales y considerar los temas optativos señalados a continuación como oportunidades de mejora continua. |
+| Inexistente | A continuación se detallan los puntos que la empresa necesita atender de inmediato. | En general, la empresa prácticamente no cumple con la NOM-036-1-STPS-2018. Conviene empezar de inmediato con los temas obligatorios de abajo: mientras no se atiendan, el riesgo de que el personal se lastime por manejo de cargas es alto. |
+| Mínimo | A continuación se detallan los puntos que conviene empezar a atender cuanto antes. | En general, la empresa apenas empieza a cumplir con la NOM-036-1-STPS-2018. Los temas marcados como obligatorios abajo son lo mínimo que la norma exige — conviene atenderlos primero. |
+| Regular | A continuación se detallan los puntos específicos en los que conviene seguir trabajando. | En general, la empresa va por buen camino con la NOM-036-1-STPS-2018, aunque todavía falta trabajo. Conviene seguir avanzando en los temas obligatorios de abajo para terminar de cumplir con la norma. |
+| Aceptable | A continuación se detallan los puntos específicos que quedan por reforzar. | En general, la empresa cumple bien con la NOM-036-1-STPS-2018. Conviene cerrar los temas obligatorios pendientes y usar los optativos como oportunidades de mejora. |
+| Óptimo | A continuación se detallan las áreas que conviene seguir vigilando para mantener este nivel. | En general, la empresa cumple de forma sobresaliente con la NOM-036-1-STPS-2018. Conviene mantener las buenas prácticas actuales y considerar los temas optativos de abajo como oportunidades de mejora. |
+
+Nota: existe también una plantilla de **cierre** por franja a nivel de cada criterio individual
+(no solo a nivel global), pero el motor de cálculo actual no la usa todavía en el ensamblado de
+la narrativa del criterio — queda como contenido de reserva para una futura revisión de ese
+ensamblado.

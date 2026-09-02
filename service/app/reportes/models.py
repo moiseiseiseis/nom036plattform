@@ -26,4 +26,5 @@ class DatosEvaluacion:
     empresa_turnos: str | None
     empresa_descripcion_mmh: str | None
     criterios: list[DatosCriterio]
+    plantillas_apertura_global: dict[str, str]  # bucket -> texto
     plantillas_cierre_global: dict[str, str]  # bucket -> texto

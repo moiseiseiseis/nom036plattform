@@ -38,6 +38,10 @@ def _datos_evaluacion_jasana() -> DatosEvaluacion:
         recomendaciones=recomendaciones,
         plantillas_apertura=plantillas_apertura,
     )
+    plantillas_apertura_global = {
+        bucket: f"[PLACEHOLDER] Apertura global, bucket {bucket}."
+        for bucket in ("inexistente", "minimo", "regular", "aceptable", "optimo")
+    }
     plantillas_cierre_global = {
         bucket: f"[PLACEHOLDER] Cierre global, bucket {bucket}."
         for bucket in ("inexistente", "minimo", "regular", "aceptable", "optimo")
@@ -53,6 +57,7 @@ def _datos_evaluacion_jasana() -> DatosEvaluacion:
         empresa_turnos="Un turno",
         empresa_descripcion_mmh="Levantamiento y transporte de rollos de tela.",
         criterios=[criterio],
+        plantillas_apertura_global=plantillas_apertura_global,
         plantillas_cierre_global=plantillas_cierre_global,
     )
 
@@ -115,6 +120,7 @@ def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
         empresa_turnos=datos.empresa_turnos,
         empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
         criterios=[criterio_sin_hallazgos],
+        plantillas_apertura_global=datos.plantillas_apertura_global,
         plantillas_cierre_global=datos.plantillas_cierre_global,
     )
 
@@ -136,6 +142,7 @@ def test_generar_informe_sin_criterios_lanza_error():
         empresa_turnos=datos.empresa_turnos,
         empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
         criterios=[],
+        plantillas_apertura_global=datos.plantillas_apertura_global,
         plantillas_cierre_global=datos.plantillas_cierre_global,
     )
     with pytest.raises(ValueError):

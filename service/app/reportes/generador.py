@@ -114,6 +114,9 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
         }
         for r in resultados
     ]
+    resultado_global_apertura = _rt(
+        datos.plantillas_apertura_global.get(resultado_global.bucket, ""), color_plantilla
+    )
     resultado_global_cierre = _rt(resultado_global.cierre, color_plantilla)
     temas_obligatorios = [_rt(t, color_tema) for t in resultado_global.temas_obligatorios]
     temas_optativos = [_rt(t, color_tema) for t in resultado_global.temas_optativos]
@@ -139,6 +142,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "empresa_descripcion_mmh": empresa_descripcion_mmh,
             "grafica_radar": grafica_imagen,
             "criterios": criterios_ctx,
+            "resultado_global_apertura": resultado_global_apertura,
             "resultado_global_cierre": resultado_global_cierre,
             "temas_obligatorios": temas_obligatorios,
             "temas_optativos": temas_optativos,

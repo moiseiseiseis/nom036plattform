@@ -101,6 +101,15 @@ def fetch_datos_evaluacion(conn: psycopg.Connection, evaluacion_id: str) -> Dato
             """
             select bucket, texto
             from nom036.plantilla_bucket
+            where criterio_id is null and tipo = 'apertura'
+            """
+        )
+        plantillas_apertura_global = {row["bucket"]: row["texto"] for row in cur.fetchall()}
+
+        cur.execute(
+            """
+            select bucket, texto
+            from nom036.plantilla_bucket
             where criterio_id is null and tipo = 'cierre'
             """
         )
@@ -117,5 +126,6 @@ def fetch_datos_evaluacion(conn: psycopg.Connection, evaluacion_id: str) -> Dato
         empresa_turnos=evaluacion["turnos"],
         empresa_descripcion_mmh=evaluacion["descripcion_mmh"],
         criterios=criterios,
+        plantillas_apertura_global=plantillas_apertura_global,
         plantillas_cierre_global=plantillas_cierre_global,
     )

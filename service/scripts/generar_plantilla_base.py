@@ -40,11 +40,9 @@ def construir_documento() -> Document:
 
     doc.add_heading("Introducción", level=1)
     doc.add_paragraph(
-        "La NOM-036-1-STPS-2018 establece los lineamientos para identificar, analizar, "
-        "prevenir y controlar los factores de riesgo ergonómico derivados del manejo "
-        "manual de cargas en los centros de trabajo. El presente documento resume los "
-        "resultados obtenidos al aplicar el instrumento de autoevaluación con base en "
-        "dicha norma dentro de la empresa "
+        "La NOM-036-1-STPS-2018 busca identificar y prevenir los riesgos de salud que "
+        "puede causar el manejo manual de cargas en el trabajo. Este documento resume "
+        "los resultados de la autoevaluación que respondió la empresa "
     ).add_run("{{r empresa_nombre }}.")
 
     doc.add_paragraph("{% if es_revision %}")
@@ -75,11 +73,9 @@ def construir_documento() -> Document:
 
     doc.add_heading("Resultados de la evaluación", level=1)
     doc.add_paragraph(
-        "El instrumento de evaluación se divide en secciones (criterios), cada una "
-        "constituida por diez ítems o afirmaciones calificados en una escala de 0 a 4, "
-        "en donde 0 = Nada y 4 = Óptimo. La calificación máxima por criterio es de 40 "
-        "puntos; entre mayor sea el puntaje, mayor es el grado de cumplimiento de la "
-        "norma en ese rubro."
+        "El cuestionario se divide en temas. Cada tema tiene diez preguntas, calificadas "
+        "del 0 (Nada) al 4 (Óptimo). Entre más alto es el puntaje de un tema, mejor cumple "
+        "la empresa con la norma en ese tema."
     )
 
     doc.add_paragraph("Tabla 1. Calificación obtenida por criterio evaluado.")
@@ -99,11 +95,7 @@ def construir_documento() -> Document:
     doc.add_paragraph("{% endfor %}")
 
     doc.add_heading("Áreas de oportunidad", level=1)
-    doc.add_paragraph(
-        "A continuación se describen los puntos identificados en los que se considera "
-        "que se puede trabajar para facilitar la implementación y el cumplimiento de la "
-        "NOM-036-1-STPS-2018."
-    )
+    doc.add_paragraph("{{r resultado_global_apertura }}")
     doc.add_paragraph("{{r resultado_global_cierre }}")
 
     doc.add_paragraph("{% if hay_temas %}")
