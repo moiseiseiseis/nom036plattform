@@ -90,6 +90,21 @@ export async function getEvaluacionDetallePanel(
   };
 }
 
+export async function eliminarEvaluacion(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  // `respuesta.evaluacion_id` tiene ON DELETE CASCADE (supabase/migrations) — borrar la
+  // evaluación se lleva sus respuestas sin necesidad de un delete aparte. La empresa no se
+  // toca (puede tener otras evaluaciones, o quedarse sin ninguna; eso no es un error).
+  const resultado = await sql`
+    delete from nom036.evaluacion
+    where id = ${id}
+  `;
+
+  if (resultado.count === 0) {
+    return { ok: false, error: "La evaluación no existe." };
+  }
+  return { ok: true };
+}
+
 export async function marcarRevisado(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
   const resultado = await sql`
     update nom036.evaluacion

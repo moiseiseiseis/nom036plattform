@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { CampoEnlace } from "@/components/CampoEnlace";
 import { obtenerResumenInforme } from "@/lib/informes";
 import { getEvaluacionDetallePanel } from "@/lib/nom036/panel";
-import { marcarRevisadoAction } from "./actions";
+import { eliminarEvaluacionAction, marcarRevisadoAction } from "./actions";
+import { EliminarEvaluacionBoton } from "./EliminarEvaluacionBoton";
 
 const BUCKET_ETIQUETAS: Record<string, string> = {
   inexistente: "Inexistente",
@@ -50,21 +51,24 @@ export default async function DetalleEvaluacionPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <Link href="/panel" className="text-sm text-blue-700 hover:underline">
-          ← Volver al listado
-        </Link>
-        <div className="mt-2 flex items-center gap-3">
-          <h1 className="text-xl font-semibold">{evaluacion.empresa.nombre}</h1>
-          <span
-            className={`rounded-full px-2 py-1 text-xs font-medium ${COLOR_ESTADO[evaluacion.estado] ?? ""}`}
-          >
-            {ETIQUETA_ESTADO[evaluacion.estado] ?? evaluacion.estado}
-          </span>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <Link href="/panel" className="text-sm text-blue-700 hover:underline">
+            ← Volver al listado
+          </Link>
+          <div className="mt-2 flex items-center gap-3">
+            <h1 className="text-xl font-semibold">{evaluacion.empresa.nombre}</h1>
+            <span
+              className={`rounded-full px-2 py-1 text-xs font-medium ${COLOR_ESTADO[evaluacion.estado] ?? ""}`}
+            >
+              {ETIQUETA_ESTADO[evaluacion.estado] ?? evaluacion.estado}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500">
+            {new Date(evaluacion.fecha).toLocaleDateString("es-MX")}
+          </p>
         </div>
-        <p className="text-sm text-gray-500">
-          {new Date(evaluacion.fecha).toLocaleDateString("es-MX")}
-        </p>
+        <EliminarEvaluacionBoton eliminar={eliminarEvaluacionAction.bind(null, evaluacion.id)} />
       </div>
 
       {evaluacion.estado === "pendiente" && (
