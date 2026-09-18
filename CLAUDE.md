@@ -47,7 +47,7 @@ contexto.
 | Generación de documentos | Microservicio Python (`python-docx` / `docxtpl`) |
 | Gráficas (radar, barras, heatmap) | `matplotlib` / `plotly`, generadas server-side e insertadas como imagen |
 | Hosting frontend | Vercel |
-| Hosting microservicio Python | Railway |
+| Hosting microservicio Python | Render (free tier; antes Railway, ver sección 7) |
 
 **Explícitamente fuera de alcance (no construir):**
 - Sistema de roles complejo o multi-tenant.
@@ -148,7 +148,9 @@ Respuesta       (id, evaluacion_id, item_id, nivel_seleccionado)
       validar el pipeline de despliegue desde el día uno. `web/` en
       https://web-liard-psi-30.vercel.app (proyecto `moises-garcias-projects/web`),
       `service/` en https://nom036-service-production.up.railway.app (proyecto
-      `nom036-service`), ambos con `/health` verificado.
+      `nom036-service`), ambos con `/health` verificado. **Actualización 2026-09-17:**
+      el servicio Python se migró a Render por expiración del trial de Railway (ver
+      sección 7); URL vigente: https://nom036-service.onrender.com.
 
 **Entregable:** proyecto vacío mismo desplegado y accesible, con CI/CD básico.
 
@@ -354,6 +356,8 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | Sesión 3 | El esquema `nom036` NO se agrega a "Exposed schemas" de la Data API/PostgREST del proyecto compartido | Evitar tocar la configuración de API del proyecto ajeno ("talleres culturales" ya tiene una web conectada); en su lugar, `web/` y `service/` usan conexión directa a Postgres (`DATABASE_URL`) en vez de `supabase-js`/PostgREST para leer y escribir datos. Supabase Auth (Etapa 5, panel privado) sigue disponible normalmente vía `SUPABASE_SERVICE_ROLE_KEY`, ya que `auth.users` es un esquema estándar aparte, no `nom036` |
 | Sesión 3 | Deploy en cuentas ya existentes: Vercel (team `moises-garcias-projects`, proyecto `web`) y Railway (proyecto `nom036-service`) | Cuentas que el usuario ya tenía configuradas; se reutilizan en vez de crear nuevas |
 | Sesión 5 | `service/` (Railway) usa el connection pooler de Supabase (`aws-0-*.pooler.supabase.com:6543`) para `DATABASE_URL`, igual que `web/` (Vercel), en vez de la conexión directa (`db.<ref>.supabase.co:5432`) | La conexión directa solo resuelve a una IP IPv6, y Railway no tiene salida IPv6 — falla con `Network is unreachable`. Se descubrió al probar el endpoint `/informes/{id}/resumen` de la Etapa 5 en producción; corrige también la suposición original de la Etapa 0 de que la conexión directa era mejor por ser un proceso persistente |
+| 2026-09-17 | Se migra el hosting del microservicio Python de Railway a Render (free tier), vía `render.yaml` en la raíz del repo | El trial de 30 días de Railway expiró y ya no ofrece nivel gratis sin tarjeta; se necesita mantener el costo en $0 hasta el lanzamiento oficial del proyecto. Contrapartida aceptada: el servicio se duerme tras ~15 min sin tráfico y el primer request tras eso tarda ~30-50s (cold start) |
+| 2026-09-17 | Repo publicado en GitHub (`https://github.com/moiseiseiseis/nom036plattform`), rama `master` | Antes solo existía en local; requerido para que Render (deploy vía Blueprint conectado a GitHub) pueda desplegar el servicio |
 
 ---
 
