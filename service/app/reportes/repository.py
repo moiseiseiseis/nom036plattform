@@ -126,6 +126,7 @@ def fetch_datos_evaluacion(conn: psycopg.Connection, evaluacion_id: str) -> Dato
         empresa_turnos=evaluacion["turnos"],
         empresa_descripcion_mmh=evaluacion["descripcion_mmh"],
         criterios=criterios,
+        total_criterios=len(criterios_rows),
         plantillas_apertura_global=plantillas_apertura_global,
         plantillas_cierre_global=plantillas_cierre_global,
     )

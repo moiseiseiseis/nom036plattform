@@ -2,7 +2,7 @@
 para el cierre global de una evaluación."""
 
 from .models import RespuestaItem, ResultadoCriterio, ResultadoGlobal
-from .narrativa import ensamblar_narrativa_criterio
+from .narrativa import construir_cierre_parcial, ensamblar_narrativa_criterio
 from .recomendaciones import (
     RecomendacionesPorItemNivel,
     UMBRAL_HALLAZGO_DEFAULT,
@@ -41,18 +41,32 @@ def evaluar_criterio(
 
 
 def evaluar_global(
-    resultados_criterios: list[ResultadoCriterio], plantilla_cierre: str
+    resultados_criterios: list[ResultadoCriterio], plantilla_cierre: str, total_criterios: int
 ) -> ResultadoGlobal:
+    """`total_criterios` es cuántos criterios integra el instrumento en total
+    (catálogo completo), no cuántos trae `resultados_criterios` (los ya
+    respondidos) — con menos de `total_criterios` respondidos, el cierre se
+    reemplaza por un texto de alcance acotado en vez de usar `plantilla_cierre`
+    (ver `construir_cierre_parcial`, retroalimentación de la validación
+    piloto: no generalizar "el cumplimiento de la empresa" a partir de un
+    subconjunto de criterios)."""
     puntaje, puntaje_maximo, porcentaje, bucket = calcular_global(
         [(r.puntaje, r.puntaje_maximo) for r in resultados_criterios]
     )
     obligatorios, optativos = construir_temas([r.hallazgos for r in resultados_criterios])
+    es_parcial = len(resultados_criterios) < total_criterios
+    cierre = (
+        construir_cierre_parcial(resultados_criterios, total_criterios, bucket, porcentaje)
+        if es_parcial
+        else plantilla_cierre
+    )
     return ResultadoGlobal(
         puntaje=puntaje,
         puntaje_maximo=puntaje_maximo,
         porcentaje=porcentaje,
         bucket=bucket,
-        cierre=plantilla_cierre,
+        es_parcial=es_parcial,
+        cierre=cierre,
         temas_obligatorios=obligatorios,
         temas_optativos=optativos,
     )

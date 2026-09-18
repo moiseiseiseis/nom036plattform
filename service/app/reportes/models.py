@@ -26,5 +26,6 @@ class DatosEvaluacion:
     empresa_turnos: str | None
     empresa_descripcion_mmh: str | None
     criterios: list[DatosCriterio]
+    total_criterios: int  # cuántos integra el instrumento en total, no solo los respondidos
     plantillas_apertura_global: dict[str, str]  # bucket -> texto
     plantillas_cierre_global: dict[str, str]  # bucket -> texto

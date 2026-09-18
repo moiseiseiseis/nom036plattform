@@ -8,6 +8,14 @@ El tratamiento exacto de los valores límite (ej. ¿20% es "minimo" o
 
 BUCKETS = ("inexistente", "minimo", "regular", "aceptable", "optimo")
 
+ETIQUETA_POR_BUCKET = {
+    "inexistente": "Inexistente",
+    "minimo": "Mínimo",
+    "regular": "Regular",
+    "aceptable": "Aceptable",
+    "optimo": "Óptimo",
+}
+
 NIVEL_MAXIMO = 4
 
 

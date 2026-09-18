@@ -13,6 +13,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Mm, Pt, RGBColor
 
+from app.engine.scoring import ETIQUETA_POR_BUCKET
+
 FUENTE = "Calibri"
 
 COLOR_ACENTO_HEX = "1F3A5F"
@@ -23,21 +25,23 @@ COLOR_TEXTO_TENUE = RGBColor(0x59, 0x59, 0x56)
 COLOR_ZEBRA_HEX = "F2F1EE"
 COLOR_BLANCO = RGBColor(0xFF, 0xFF, 0xFF)
 
+# Mismo azul que los encabezados del documento (COLOR_ACENTO) — reutilizado
+# como "color de marca" de las gráficas (`grafica.py`) para que la línea de
+# datos del radar se lea como parte del mismo documento, no como un elemento
+# ajeno en negro.
+COLOR_MARCA_HEX = COLOR_ACENTO_HEX
+
 # Misma paleta de severidad usada en `grafica.py`, para que la clasificación
 # de la tabla 2 y las bandas del radar se lean como el mismo código de color.
+# `ETIQUETA_POR_BUCKET` vive en `engine/scoring.py` (junto al resto de la
+# lógica de bucket) — se reexporta aquí para que quien ya importa colores de
+# `estilos.py` no tenga que ir a buscar las etiquetas a otro paquete.
 COLOR_POR_BUCKET = {
     "inexistente": "B91C1C",
     "minimo": "EB6834",
     "regular": "7A6900",
     "aceptable": "1BAF7A",
     "optimo": "2A78D6",
-}
-ETIQUETA_POR_BUCKET = {
-    "inexistente": "Inexistente",
-    "minimo": "Mínimo",
-    "regular": "Regular",
-    "aceptable": "Aceptable",
-    "optimo": "Óptimo",
 }
 
 # Colores de "temas obligatorios vs. optativos", compartidos con la gráfica

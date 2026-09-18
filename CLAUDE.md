@@ -93,9 +93,24 @@ contexto.
       tratamiento del valor límite exacto es el correcto.
 - [ ] Umbral de nivel de ítem para considerarlo "hallazgo" — hipótesis de trabajo: nivel ≤ 1.
       Implementado como default en `recomendaciones.py` (`UMBRAL_HALLAZGO_DEFAULT = 1`),
-      parametrizable.
+      parametrizable. Retroalimentación de la validación piloto (`retroalimentacion/reporte.txt`,
+      hallazgo 2) señala que en franjas altas (ej. "Aceptable") ningún ítem cruza el umbral y la
+      narrativa del criterio queda solo con la apertura genérica, sin mencionar ningún ítem
+      puntual — a diferencia del informe JASANA de referencia, que siempre cita 1-2 elementos
+      concretos. No se implementó el cambio sugerido (mostrar siempre los 1-2 ítems peor
+      calificados del criterio, cruce o no el umbral) porque cambia qué cuenta como hallazgo
+      para las listas de temas obligatorios/optativos, y este umbral sigue sin confirmación del
+      Dr. Sergio.
 - [ ] Respuestas individuales de los 50 ítems del caso JASANA (para calibrar el umbral con
       precisión, si están disponibles).
+- [ ] Nombre completo y cédula profesional de la persona responsable de la elaboración del
+      informe (NOM-036, numeral 7.4 inciso f) — dato obligatorio del informe, no solo de estilo
+      (`retroalimentacion/reporte.txt`, hallazgo 4). El informe JASANA de referencia firma como
+      "Mtro. Sergio Alberto Valenzuela Gómez"; el motor no puede inventar una cédula profesional
+      real. Ya está soportado por variables de entorno
+      (`INFORME_RESPONSABLE_NOMBRE`/`INFORME_RESPONSABLE_CEDULA`, `generador.py::_responsable`)
+      — mientras no se configuren, el informe sigue firmando como "Equipo de investigación en
+      Ergonomía y Factores Humanos".
 - [x] Para cada ítem: numeral de la NOM-036 correspondiente + recomendación por nivel (0-4) +
       clasificación obligatorio/optativo. **Primera versión** para el Criterio 1, redactada
       junto con el desarrollador con base en el texto oficial de la norma (Capítulos 7 y 8) y
@@ -104,6 +119,12 @@ contexto.
       (derivan del análisis exigido por el Capítulo 7). Sigue pendiente la revisión y
       validación final del Dr. Sergio antes de usarse en un informe real a una empresa.
 - [ ] Campos exactos de "información general de la empresa" a solicitar en el formulario.
+      Confirmado como gap por la retroalimentación de la validación piloto
+      (`retroalimentacion/reporte.txt`, hallazgo 6): el numeral 7.4 a) 2 de la norma pide
+      domicilio completo del centro de trabajo (calle, número, colonia, CP), y el formulario
+      público hoy solo captura `empresa_ubicacion` como texto libre (en la práctica, solo
+      ciudad/municipio) — falta agregar los campos de domicilio al formulario y al esquema
+      (`Empresa`, sección 5) antes de que un informe real cumpla este requisito.
 
 ---
 
@@ -305,11 +326,23 @@ ya usaba `web/`), ver sección 7.
 ### Etapa 6 — Validación piloto y cierre de MVP (Criterio 1)
 **Objetivo:** confirmar que el sistema completo funciona con un caso real o semi-real.
 
-- [ ] Ejecutar el flujo completo con una empresa piloto (real o simulada por el Dr.).
-- [ ] Comparar el informe generado contra lo que el Dr. redactaría manualmente para el mismo
-      set de respuestas.
-- [ ] Ajustar plantillas/umbrales según retroalimentación.
-- [ ] Documentar hallazgos de esta validación en la bitácora del proyecto.
+- [x] Ejecutar el flujo completo con una empresa piloto (real o simulada por el Dr.). Corrido
+      con la empresa "Grupo Modelo" (Criterio 1, datos reales) — ver
+      `retroalimentacion/reporte.txt`.
+- [x] Comparar el informe generado contra lo que el Dr. redactaría manualmente para el mismo
+      set de respuestas. Comparado contra el informe JASANA real y el texto de la
+      NOM-036-1-STPS-2018; 8 hallazgos de redacción documentados en
+      `retroalimentacion/reporte.txt`.
+- [x] Ajustar plantillas/umbrales según retroalimentación. De los 8 hallazgos, 6 ya están
+      implementados (ver sección 7): cierre global de alcance acotado en evaluaciones parciales,
+      mensaje explícito cuando no hay temas obligatorios/optativos, introducción de 3 párrafos,
+      aperturas del Criterio 1 y cierre global homologadas con la etiqueta de bucket, corrección
+      del resaltado de `modo_revision` (`w:shd` sin `w:val`), y soporte de firma con
+      responsable/cédula. 2 quedan pendientes por requerir datos que este proyecto no puede
+      inventar o decisiones del Dr. Sergio: domicilio completo (sección 4) y el umbral de
+      "hallazgo" en franjas altas (sección 4).
+- [x] Documentar hallazgos de esta validación en la bitácora del proyecto. Ver fila de esta
+      sesión en la sección 7 y las referencias a `retroalimentacion/reporte.txt` en la sección 4.
 
 **Entregable:** MVP validado para 1 de 5 criterios — listo para decidir si se replica el
 patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
@@ -358,6 +391,8 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | Sesión 5 | `service/` (Railway) usa el connection pooler de Supabase (`aws-0-*.pooler.supabase.com:6543`) para `DATABASE_URL`, igual que `web/` (Vercel), en vez de la conexión directa (`db.<ref>.supabase.co:5432`) | La conexión directa solo resuelve a una IP IPv6, y Railway no tiene salida IPv6 — falla con `Network is unreachable`. Se descubrió al probar el endpoint `/informes/{id}/resumen` de la Etapa 5 en producción; corrige también la suposición original de la Etapa 0 de que la conexión directa era mejor por ser un proceso persistente |
 | 2026-09-17 | Se migra el hosting del microservicio Python de Railway a Render (free tier), vía `render.yaml` en la raíz del repo | El trial de 30 días de Railway expiró y ya no ofrece nivel gratis sin tarjeta; se necesita mantener el costo en $0 hasta el lanzamiento oficial del proyecto. Contrapartida aceptada: el servicio se duerme tras ~15 min sin tráfico y el primer request tras eso tarda ~30-50s (cold start) |
 | 2026-09-17 | Repo publicado en GitHub (`https://github.com/moiseiseiseis/nom036plattform`), rama `master` | Antes solo existía en local; requerido para que Render (deploy vía Blueprint conectado a GitHub) pueda desplegar el servicio |
+| 2026-09-18 | Pulido visual del `.docx` (tipografía, color de marca, tablas, portada, pie de página con numeración) en `service/app/reportes/estilos.py`; toggle `?revision=true\|false` en `GET /informes/{id}` para descargar la versión de debug o la limpia | El informe seguía usando el formato por defecto de python-docx; el panel solo podía descargar la versión con resaltado de debug, sin forma de bajar la versión "cuasi-final" |
+| 2026-09-18 | Rediseño de las gráficas (`grafica.py`) y ajustes de redacción a partir de retroalimentación real sobre un informe piloto (`retroalimentacion/`, empresa "Grupo Modelo"): cierre global con alcance acotado cuando la evaluación es parcial (`engine/narrativa.py::construir_cierre_parcial`), mensaje explícito si no hay temas obligatorios/optativos, introducción de 3 párrafos, aperturas homologadas con la etiqueta de bucket (`content_v3_retroalimentacion_piloto.sql`, aplicado a la base de datos), y corrección de un bug real de `docxtpl.RichText.add(highlight=...)` (genera `w:shd` sin `w:val`, que Word no pinta) | Es la primera retroalimentación sobre un informe real generado por el motor, no solo contra los datos de referencia JASANA; de los 8 hallazgos, 2 quedan pendientes por requerir datos reales que el proyecto no puede inventar (cédula profesional del responsable, domicilio completo) o una decisión de umbral del Dr. Sergio — ver sección 4. `ETIQUETA_POR_BUCKET` se movió de `reportes/estilos.py` a `engine/scoring.py` en el mismo cambio, para que `engine/` (capa pura, sin dependencias de `reportes/`) pudiera generar el texto de cierre parcial sin invertir la dirección de dependencia del paquete |
 
 ---
 

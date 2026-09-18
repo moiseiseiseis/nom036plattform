@@ -42,6 +42,7 @@ class ResultadoGlobal:
     puntaje_maximo: int
     porcentaje: float
     bucket: str
+    es_parcial: bool
     cierre: str
     temas_obligatorios: list[str] = field(default_factory=list)
     temas_optativos: list[str] = field(default_factory=list)

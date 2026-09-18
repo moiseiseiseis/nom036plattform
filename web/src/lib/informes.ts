@@ -15,6 +15,7 @@ export interface ResumenGlobal {
   puntaje_maximo: number;
   porcentaje: number;
   bucket: string;
+  es_parcial: boolean;
   cierre: string;
   temas_obligatorios: string[];
   temas_optativos: string[];

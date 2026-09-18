@@ -40,6 +40,7 @@ def resumen_informe(evaluacion_id: str) -> dict:
             "puntaje_maximo": resultado_global.puntaje_maximo,
             "porcentaje": round(resultado_global.porcentaje, 1),
             "bucket": resultado_global.bucket,
+            "es_parcial": resultado_global.es_parcial,
             "cierre": resultado_global.cierre,
             "temas_obligatorios": resultado_global.temas_obligatorios,
             "temas_optativos": resultado_global.temas_optativos,

@@ -1,0 +1,122 @@
+# Hallazgos de redacción — informe piloto (Grupo Modelo, Criterio 1)
+
+Comparación entre `informe-...-revision.docx` (salida del motor, solo Criterio 1 con datos reales), `REPORTE_FINAL_JASANA_07.03.26.docx` (informe de referencia, Dr. Valenzuela) y NOM-036-1-STPS-2018. Fecha: 2026-09-18.
+
+## 1. Sobregeneralización en el cierre de "Áreas de oportunidad"
+Texto actual (plantilla fija de la franja "Aceptable" aplicada al cierre global): "En general, la empresa cumple bien con la NOM-036-1-STPS-2018."
+Problema: con 1 de 5 criterios evaluado, esta frase generaliza el cumplimiento de TODA la norma a partir de un solo criterio. Es el hallazgo de mayor prioridad.
+Fix: la plantilla debe verificar cuántos criterios tienen datos antes de emitir una conclusión "en general". Con datos parciales, redactar en alcance acotado: "Con base en el criterio evaluado hasta el momento (Identificación y clasificación de puestos), el nivel de cumplimiento es Aceptable (70%). Los 4 criterios restantes aún no han sido evaluados, por lo que no es posible emitir una conclusión general sobre el cumplimiento de la NOM-036-1-STPS-2018."
+
+## 2. Texto de criterio demasiado genérico frente al modelo de referencia
+Actual: "El trabajo de identificar y clasificar los puestos con manejo de cargas está en buen nivel, con algunos puntos específicos por reforzar."
+Referencia (JASANA, mismo criterio): identifica puntualmente qué está cubierto y qué falta, citando elementos normativos concretos (frecuencia 7.2 d, límites de Tabla 1, pausas activas).
+Fix: el catálogo ítem-nivel debe inyectar 1-2 hallazgos concretos (los ítems peor calificados) incluso en franjas altas como "Aceptable", y citar el numeral de la norma cuando aplique (p. ej. "conforme al numeral 7.2, inciso d)").
+
+## 3. Secciones "Temas obligatorios" / "Temas optativos" vacías
+Los encabezados y su texto introductorio se imprimen, pero no aparece ningún ítem debajo — se ve como error, no como "no hay pendientes".
+Fix: si no hay temas que reportar en una franja, imprimir explícitamente "No se identificaron temas obligatorios pendientes en este criterio" (y análogo para optativos) en vez de dejar la sección en blanco. Revisar el cableado del catálogo para la franja "Aceptable" — no quedó claro si el motor filtra correctamente los ítems que sí deberían aparecer.
+
+## 4. Falta el responsable de la elaboración (NOM 7.4, inciso f)
+La norma exige nombre completo y número de cédula profesional del responsable. El informe del motor firma como "Equipo de investigación en Ergonomía y Factores Humanos" (nombre de equipo, sin persona ni cédula). El informe de referencia sí firma con una persona nombrada (Mtro. Sergio Alberto Valenzuela Gómez).
+Fix: agregar bloque de firma con nombre completo + cédula profesional (y, si se aplicó evaluación específica, los documentos que avalen la capacitación) — es contenido obligatorio del informe, no solo estilo.
+
+## 5. Introducción demasiado breve
+Un solo enunciado genérico vs. los 3 párrafos del modelo (contexto de vigencia, alcance de 3 kg, objetivo del instrumento). Este texto es reutilizable para cualquier empresa (no depende de datos), así que conviene fijarlo como plantilla enriquecida una sola vez.
+
+## 6. Domicilio completo ausente
+7.4 a) 2 pide domicilio completo del centro de trabajo; el informe del motor solo captura municipio ("ubicada en tlajomulco de zúñiga"). Revisar si el formulario de autoevaluación solo pide ciudad y no calle/número/CP.
+
+## 7. Guía de colores sin implementación visible
+El documento explica una leyenda de 5 colores para distinguir origen del texto (dato de empresa, resultado calculado, plantilla fija, catálogo, tema), pero en este export no hay diferenciación de color real en los runs (todo en negro, salvo dos leyendas en gris). O se implementa el resaltado real para las copias de validación piloto, o se retira la leyenda de esta versión.
+
+## 8. Registro / consistencia léxica
+"está en buen nivel" es coloquial comparado con el registro académico del resto del documento y no usa la misma etiqueta que la Tabla 2 ("Aceptable"). Homologar: el texto narrativo debe usar siempre la misma palabra que la clasificación tabulada, para mantener la trazabilidad determinista que el proyecto exige.
+
+---
+
+## Apéndice — Textos de reemplazo listos para plantillas/catálogo
+
+Placeholders entre `{{ }}` para variables del motor. Registro: español académico formal, consistente con el modelo de referencia (Dr. Valenzuela) y con el estándar determinista del proyecto (sin generación libre, todo trazable a una plantilla o catálogo fijo).
+
+### 1. Introducción (plantilla fija, reutilizable para cualquier empresa)
+
+```
+La NOM-036-1-STPS-2018 establece los lineamientos para identificar, analizar, prevenir y controlar los factores de riesgo ergonómico derivados del manejo manual de cargas en los centros de trabajo. Su objetivo es minimizar la exposición de los trabajadores a la manipulación de cargas que puedan afectar su salud musculoesquelética.
+
+Esta norma es aplicable a todo puesto de trabajo en el que se manipulen o transporten objetos con un peso superior a 3 kg, aun cuando la actividad se realice una sola vez al día.
+
+Este documento presenta los resultados de un instrumento de autoevaluación para la identificación de factores de riesgo ergonómico por manejo manual de cargas, aplicado en la empresa {{nombre_empresa}}, con base en los criterios establecidos por la NOM-036-1-STPS-2018.
+```
+
+### 2. Cierre de "Áreas de oportunidad" — informe PARCIAL (menos de 5 criterios con datos)
+
+```
+Este informe presenta resultados únicamente para {{n_evaluados}} de los 5 criterios que integran el instrumento ({{lista_criterios_evaluados}}). Con base en {{este/estos}} criterio(s), el nivel de cumplimiento alcanzado es {{clasificacion}} ({{porcentaje}}%). Dado que aún {{falta/faltan}} {{5 - n_evaluados}} {{criterio/criterios}} por evaluar, no es posible emitir una conclusión general sobre el cumplimiento de la empresa con la NOM-036-1-STPS-2018. Conviene completar la autoevaluación en los criterios restantes antes de definir un plan de acción integral.
+```
+
+Ejemplo ya resuelto para el caso actual (Grupo Modelo, solo Criterio 1):
+
+```
+Este informe presenta resultados únicamente para el Criterio 1 (Identificación y clasificación de los puestos de trabajo ocupacionalmente expuestos), de los 5 que integran el instrumento. Con base en este criterio, el nivel de cumplimiento alcanzado es Aceptable (70%). Dado que aún faltan 4 criterios por evaluar, no es posible emitir una conclusión general sobre el cumplimiento de la empresa con la NOM-036-1-STPS-2018. Conviene completar la autoevaluación en los criterios restantes antes de definir un plan de acción integral.
+```
+
+### 3. Cierre de "Áreas de oportunidad" — informe COMPLETO (5/5 criterios), por franja del promedio global
+
+```
+Óptimo:      "En general, la empresa presenta un nivel de cumplimiento Óptimo con la NOM-036-1-STPS-2018. Se recomienda mantener las prácticas actuales y usar los temas optativos para consolidar la mejora continua."
+Aceptable:   "En general, la empresa presenta un nivel de cumplimiento Aceptable con la NOM-036-1-STPS-2018. Conviene cerrar los temas obligatorios pendientes en los criterios con menor puntaje y usar los temas optativos como oportunidades de mejora continua."
+Regular:     "En general, la empresa presenta un nivel de cumplimiento Regular con la NOM-036-1-STPS-2018. Es necesario atender los temas obligatorios identificados en los criterios con menor puntaje para reducir el riesgo de trastornos músculo-esqueléticos."
+Mínimo:      "En general, la empresa presenta un nivel de cumplimiento Mínimo con la NOM-036-1-STPS-2018. Se recomienda priorizar de inmediato los temas obligatorios señalados, dado que persisten brechas relevantes frente a lo que exige la norma."
+Inexistente: "En general, la empresa no cuenta con los elementos que exige la NOM-036-1-STPS-2018 para el manejo manual de cargas. Es indispensable implementar sin demora los temas obligatorios señalados en este informe."
+```
+
+### 4. Texto de criterio — patrón reutilizable (aplica a los 5 criterios, 5 franjas c/u = 25 plantillas)
+
+Estructura: `[apertura por franja] + [1-2 hallazgos concretos de los ítems peor calificados, con numeral de la NOM] + [opcional: lo que sí funciona]`.
+
+Aperturas por franja para Criterio 1 (ajustar el sustantivo del proceso para criterios 2-5):
+
+```
+Óptimo (36-40):      "El proceso de identificación y clasificación de los puestos con manejo manual de cargas está consolidado."
+Aceptable (28-35):   "El proceso de identificación y clasificación de los puestos con manejo manual de cargas presenta un nivel Aceptable, con puntos específicos por reforzar."
+Regular (20-27):     "El proceso de identificación y clasificación de los puestos con manejo manual de cargas se encuentra en un nivel Regular: existen avances, pero persisten vacíos relevantes."
+Mínimo (12-19):      "El proceso de identificación y clasificación de los puestos con manejo manual de cargas es Mínimo: la mayoría de los elementos que exige el numeral 7.2 de la NOM-036-1-STPS-2018 no están cubiertos."
+Inexistente (0-11):  "No existe un proceso formal de identificación y clasificación de los puestos con manejo manual de cargas, conforme a lo que exige el numeral 7.2 de la NOM-036-1-STPS-2018."
+```
+
+Cláusula de hallazgos concretos (ilustrativa — requiere los 10 puntajes/respuestas reales de Grupo Modelo en Criterio 1 para completarse con precisión; no se debe inventar el contenido):
+
+```
+Se identificaron vacíos en: {{item_a_texto_breve}}{{, y }}{{item_b_texto_breve}}. En particular, no se tiene identificada la frecuencia con que se realiza el manejo de cargas (numeral 7.2, inciso d), y no se ha establecido un límite de peso por trabajador conforme a la Tabla 1 del numeral 8.3, inciso b).
+```
+
+Nota: pásame los 10 ítems/puntajes de Criterio 1 de Grupo Modelo y te devuelvo esta cláusula ya resuelta, sin placeholders.
+
+### 5. Temas obligatorios / optativos — cuando el catálogo no arroja ningún ítem
+
+```
+Obligatorios (vacío): "No se identificaron temas obligatorios pendientes en este criterio, dado el nivel de cumplimiento alcanzado."
+Optativos (vacío):    "No se identificaron temas optativos adicionales para este criterio en esta evaluación."
+```
+
+### 6. Bloque de firma del responsable (reemplaza "Equipo de investigación en Ergonomía y Factores Humanos")
+
+```
+Atentamente,
+
+
+_____________________________
+{{nombre_completo_responsable}}
+Cédula profesional: {{numero_cedula_profesional}}
+{{cargo_o_institucion}} (opcional)
+```
+
+Si en evaluación específica se usó, agregar: "Documentos que avalan la capacitación en análisis de factores de riesgo ergonómico: {{documento_o_constancia}}."
+
+### 7. Domicilio completo (una vez que el formulario capture el dato)
+
+```
+La empresa {{nombre_empresa}} se encuentra ubicada en {{domicilio_completo}} (calle, número, colonia, código postal, municipio y estado). Cuenta con aproximadamente {{num_trabajadores}} trabajadores, con el siguiente esquema de turnos: {{esquema_turnos}}. Su actividad principal es {{giro}}. Las actividades relacionadas con el manejo manual de cargas identificadas son: {{actividades}}.
+```
+
+Nota: esto requiere agregar campos de domicilio (calle/número/colonia/CP) al formulario de autoevaluación; hoy solo captura municipio.

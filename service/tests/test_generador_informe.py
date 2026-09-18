@@ -57,6 +57,7 @@ def _datos_evaluacion_jasana() -> DatosEvaluacion:
         empresa_turnos="Un turno",
         empresa_descripcion_mmh="Levantamiento y transporte de rollos de tela.",
         criterios=[criterio],
+        total_criterios=5,  # instrumento completo; esta evaluación solo respondió el Criterio 1
         plantillas_apertura_global=plantillas_apertura_global,
         plantillas_cierre_global=plantillas_cierre_global,
     )
@@ -90,6 +91,70 @@ def test_generar_informe_produce_docx_valido_y_con_contenido_correcto():
     # obligatorios porque las respuestas de prueba alternan es_obligatorio por paridad).
     assert len(documento.inline_shapes) == 2
 
+    # Evaluación parcial (1 de 5 criterios): el cierre debe acotar el alcance en vez de
+    # generalizar, y la apertura fija ("[PLACEHOLDER] Apertura global...") no debe imprimirse
+    # (retroalimentacion/reporte.txt, hallazgo 1).
+    assert "Este informe presenta resultados únicamente para el Criterio 1" in texto_completo
+    assert "no es posible emitir una conclusión general" in texto_completo
+    assert "[PLACEHOLDER] Apertura global" not in texto_completo
+
+    # Firma por defecto (sin INFORME_RESPONSABLE_NOMBRE configurado).
+    assert "Equipo de investigación en Ergonomía y Factores Humanos" in texto_completo
+
+    # El resaltado de modo_revision debe quedar como `w:shd` válido (con `w:val`), no como el
+    # `<w:shd w:fill="..."/>` incompleto que produce docxtpl.RichText.add(highlight=...) y que
+    # Word no pinta (retroalimentacion/reporte.txt, hallazgo 7).
+    shd_sin_val = [
+        shd
+        for shd in documento.element.body.iter("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}shd")
+        if shd.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val") is None
+    ]
+    assert shd_sin_val == []
+
+
+def test_generar_informe_evaluacion_completa_usa_plantilla_cierre_fija():
+    """Cuando ya están todos los criterios que integra el instrumento
+    (total_criterios == len(criterios)), el cierre vuelve a ser la plantilla
+    fija por bucket en vez del texto de alcance acotado — y sí se imprime la
+    apertura global."""
+    datos = _datos_evaluacion_jasana()
+    datos_completa = DatosEvaluacion(
+        evaluacion_id=datos.evaluacion_id,
+        token_publico=datos.token_publico,
+        estado=datos.estado,
+        empresa_nombre=datos.empresa_nombre,
+        empresa_ubicacion=datos.empresa_ubicacion,
+        empresa_giro=datos.empresa_giro,
+        empresa_num_trabajadores=datos.empresa_num_trabajadores,
+        empresa_turnos=datos.empresa_turnos,
+        empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
+        criterios=datos.criterios,
+        total_criterios=1,  # el único criterio del instrumento en este escenario ya se respondió
+        plantillas_apertura_global=datos.plantillas_apertura_global,
+        plantillas_cierre_global=datos.plantillas_cierre_global,
+    )
+
+    contenido = generar_informe_desde_datos(datos_completa)
+    documento = Document(io.BytesIO(contenido))
+    texto_completo = "\n".join(p.text for p in documento.paragraphs)
+
+    assert "[PLACEHOLDER] Apertura global, bucket regular." in texto_completo
+    assert "[PLACEHOLDER] Cierre global, bucket regular." in texto_completo
+    assert "Este informe presenta resultados únicamente para" not in texto_completo
+
+
+def test_generar_informe_responsable_configurado_por_variable_de_entorno(monkeypatch):
+    monkeypatch.setenv("INFORME_RESPONSABLE_NOMBRE", "Mtro. Sergio Alberto Valenzuela Gómez")
+    monkeypatch.setenv("INFORME_RESPONSABLE_CEDULA", "1234567")
+
+    contenido = generar_informe_desde_datos(_datos_evaluacion_jasana())
+    documento = Document(io.BytesIO(contenido))
+    texto_completo = "\n".join(p.text for p in documento.paragraphs)
+
+    assert "Mtro. Sergio Alberto Valenzuela Gómez" in texto_completo
+    assert "Cédula profesional: 1234567" in texto_completo
+    assert "Equipo de investigación en Ergonomía y Factores Humanos" not in texto_completo
+
 
 def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
     """Con niveles altos en todos los ítems no hay hallazgos, por lo que no
@@ -120,6 +185,7 @@ def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
         empresa_turnos=datos.empresa_turnos,
         empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
         criterios=[criterio_sin_hallazgos],
+        total_criterios=datos.total_criterios,
         plantillas_apertura_global=datos.plantillas_apertura_global,
         plantillas_cierre_global=datos.plantillas_cierre_global,
     )
@@ -127,6 +193,10 @@ def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
     contenido = generar_informe_desde_datos(datos_sin_hallazgos)
     documento = Document(io.BytesIO(contenido))
     assert len(documento.inline_shapes) == 1
+
+    texto_completo = "\n".join(p.text for p in documento.paragraphs)
+    assert "No se identificaron temas obligatorios pendientes en los criterios evaluados." in texto_completo
+    assert "No se identificaron temas optativos adicionales en los criterios evaluados." in texto_completo
 
 
 def test_generar_informe_sin_criterios_lanza_error():
@@ -142,6 +212,7 @@ def test_generar_informe_sin_criterios_lanza_error():
         empresa_turnos=datos.empresa_turnos,
         empresa_descripcion_mmh=datos.empresa_descripcion_mmh,
         criterios=[],
+        total_criterios=datos.total_criterios,
         plantillas_apertura_global=datos.plantillas_apertura_global,
         plantillas_cierre_global=datos.plantillas_cierre_global,
     )

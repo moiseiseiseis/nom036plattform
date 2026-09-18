@@ -1,9 +1,11 @@
 import io
+import os
 from datetime import datetime
 from pathlib import Path
 
 from docx import Document as DocxDocument
 from docx.document import Document as DocxDocumentType
+from docx.oxml.ns import qn
 from docx.shared import Mm
 from docxtpl import DocxTemplate, InlineImage, RichText
 
@@ -33,6 +35,19 @@ MESES_ES = (
 
 def _fecha_generacion_es(momento: datetime) -> str:
     return f"{momento.day} de {MESES_ES[momento.month - 1]} de {momento.year}"
+
+
+# Firma del responsable de la elaboración (NOM-036, numeral 7.4 inciso f):
+# nombre completo + cédula profesional son datos reales de una persona, no
+# contenido que este proyecto pueda inventar — se configuran por variable de
+# entorno y, mientras no estén disponibles, el informe firma como equipo
+# (comportamiento actual) en vez de mostrar un campo vacío o inventado.
+def _responsable() -> tuple[str, str | None]:
+    nombre = os.environ.get("INFORME_RESPONSABLE_NOMBRE")
+    cedula = os.environ.get("INFORME_RESPONSABLE_CEDULA")
+    if not nombre:
+        return "Equipo de investigación en Ergonomía y Factores Humanos", None
+    return nombre, cedula
 
 
 def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
@@ -76,7 +91,9 @@ def calcular_resultados(
 
     _, _, _, bucket_global = calcular_global([(r.puntaje, r.puntaje_maximo) for r in resultados])
     resultado_global = evaluar_global(
-        resultados, plantilla_cierre=datos.plantillas_cierre_global.get(bucket_global, "")
+        resultados,
+        plantilla_cierre=datos.plantillas_cierre_global.get(bucket_global, ""),
+        total_criterios=datos.total_criterios,
     )
     return resultados, resultado_global
 
@@ -122,7 +139,12 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
     resultado_global_apertura = _rt(
         datos.plantillas_apertura_global.get(resultado_global.bucket, ""), color_plantilla
     )
+    # Con evaluación parcial, `resultado_global.cierre` ya es el párrafo
+    # completo con el alcance acotado (`construir_cierre_parcial`) — mostrar
+    # además la apertura fija ("A continuación se detallan...") sería
+    # redundante y no tiene bucket global real del que hablar todavía.
     resultado_global_cierre = _rt(resultado_global.cierre, color_plantilla)
+    responsable_nombre, responsable_cedula = _responsable()
     temas_obligatorios = [_rt(t, color_tema) for t in resultado_global.temas_obligatorios]
     temas_optativos = [_rt(t, color_tema) for t in resultado_global.temas_optativos]
 
@@ -155,6 +177,9 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "hay_temas": hay_temas,
             "es_revision": modo_revision,
             "fecha_generacion": _fecha_generacion_es(datetime.now()),
+            "resultado_global_es_parcial": resultado_global.es_parcial,
+            "responsable_nombre": responsable_nombre,
+            "responsable_cedula": responsable_cedula,
         }
     )
 
@@ -163,6 +188,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
     buffer.seek(0)
 
     documento = DocxDocument(buffer)
+    _normalizar_sombreado_richtext(documento)
     _reemplazar_marcador_con_tabla(
         documento, MARCADOR_TABLA_PUNTAJES, _construir_tabla_puntajes, resultados, modo_revision
     )
@@ -173,6 +199,22 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
     salida = io.BytesIO()
     documento.save(salida)
     return salida.getvalue()
+
+
+def _normalizar_sombreado_richtext(documento: DocxDocumentType) -> None:
+    """Corrige el `w:shd` que genera `docxtpl.RichText.add(highlight=...)`
+    (usado en modo_revision): escribe `<w:shd w:fill="RRGGBB"/>` sin el
+    atributo `w:val`, que el esquema OOXML exige — Word lo trata como
+    inválido y no pinta ningún fondo, por lo que el resaltado de la guía de
+    colores no se veía en los documentos exportados (retroalimentación de la
+    validación piloto, `retroalimentacion/reporte.txt`, hallazgo 7). El
+    sombreado de celda que arma `estilos.sombrear_celda` ya incluye estos
+    atributos y no lo toca este parche."""
+    for shd in documento.element.body.iter(qn("w:shd")):
+        if shd.get(qn("w:val")) is None:
+            shd.set(qn("w:val"), "clear")
+        if shd.get(qn("w:color")) is None:
+            shd.set(qn("w:color"), "auto")
 
 
 def _rt(texto, color_hex: str | None, *, bold: bool = False) -> RichText:

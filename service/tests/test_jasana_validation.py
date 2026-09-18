@@ -72,12 +72,16 @@ def test_global_jasana():
             )
         )
 
-    global_ = evaluar_global(resultados, plantilla_cierre="[PLACEHOLDER] Cierre global.")
+    global_ = evaluar_global(resultados, plantilla_cierre="[PLACEHOLDER] Cierre global.", total_criterios=5)
 
     assert global_.puntaje == 73
     assert global_.puntaje_maximo == 200
     assert global_.porcentaje == 36.5
     assert global_.bucket == "minimo"
+    # Los 5 criterios que integra el instrumento están respondidos: no es una evaluación
+    # parcial, así que el cierre es la plantilla fija tal cual, sin acotar el alcance.
+    assert global_.es_parcial is False
+    assert global_.cierre == "[PLACEHOLDER] Cierre global."
     # Cada hallazgo (nivel <= 1) debe caer en obligatorios u optativos, sin perderse.
     total_hallazgos = sum(len(r.hallazgos) for r in resultados)
     assert len(global_.temas_obligatorios) + len(global_.temas_optativos) == total_hallazgos

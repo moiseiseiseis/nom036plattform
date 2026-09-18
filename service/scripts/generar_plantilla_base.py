@@ -95,13 +95,33 @@ def construir_documento() -> Document:
     doc.add_page_break()
 
     # --- Introducción ------------------------------------------------------
+    # Las 3 plantillas fijas (contexto de vigencia, alcance de 3 kg, objetivo
+    # del instrumento) son texto de retroalimentación de la validación piloto
+    # (`retroalimentacion/reporte.txt`, hallazgo 5, apéndice 1) — reemplazan
+    # el enunciado único anterior, que se quedaba corto frente al modelo de
+    # referencia (informe JASANA real).
     _seccion(doc, "Introducción")
     _parrafo_justificado(
         doc,
-        "La NOM-036-1-STPS-2018 busca identificar y prevenir los riesgos de salud que "
-        "puede causar el manejo manual de cargas en el trabajo. Este documento resume "
-        "los resultados de la autoevaluación que respondió la empresa ",
-        "{{r empresa_nombre }}.",
+        "La NOM-036-1-STPS-2018 establece los lineamientos para identificar, analizar, "
+        "prevenir y controlar los factores de riesgo ergonómico derivados del manejo "
+        "manual de cargas en los centros de trabajo. Su objetivo es minimizar la "
+        "exposición de los trabajadores a la manipulación de cargas que puedan afectar "
+        "su salud musculoesquelética.",
+    )
+    _parrafo_justificado(
+        doc,
+        "Esta norma es aplicable a todo puesto de trabajo en el que se manipulen o "
+        "transporten objetos con un peso superior a 3 kg, aun cuando la actividad se "
+        "realice una sola vez al día.",
+    )
+    _parrafo_justificado(
+        doc,
+        "Este documento presenta los resultados de un instrumento de autoevaluación para "
+        "la identificación de factores de riesgo ergonómico por manejo manual de cargas, "
+        "aplicado en la empresa ",
+        "{{r empresa_nombre }}",
+        ", con base en los criterios establecidos por la NOM-036-1-STPS-2018.",
     )
 
     doc.add_paragraph("{% if es_revision %}")
@@ -158,8 +178,16 @@ def construir_documento() -> Document:
     doc.add_paragraph("{% endfor %}")
 
     # --- Áreas de oportunidad --------------------------------------------
+    # Con evaluación parcial (menos criterios respondidos que los que integra
+    # el instrumento), `resultado_global_cierre` ya trae el párrafo completo
+    # con el alcance acotado (ver `engine/narrativa.py::construir_cierre_parcial`)
+    # — se omite la apertura fija para no ser redundante ni generalizar sobre
+    # un bucket global que con datos parciales no describe a la empresa
+    # completa (retroalimentación de la validación piloto, hallazgo 1).
     _seccion(doc, "Áreas de oportunidad")
+    doc.add_paragraph("{% if not resultado_global_es_parcial %}")
     _parrafo_justificado(doc, "{{r resultado_global_apertura }}")
+    doc.add_paragraph("{% endif %}")
     _parrafo_justificado(doc, "{{r resultado_global_cierre }}")
 
     doc.add_paragraph("{% if hay_temas %}")
@@ -168,28 +196,53 @@ def construir_documento() -> Document:
     _caption(doc, "Figura 2. Proporción de temas de atención obligatoria y optativa.")
     doc.add_paragraph("{% endif %}")
 
+    # Fallback explícito si la lista sale vacía: sin esto, la sección se veía
+    # como un error (encabezado + texto introductorio sin nada debajo) en vez
+    # de leerse como "no hay pendientes" (retroalimentación de la validación
+    # piloto, hallazgo 3).
     _seccion(doc, "Temas obligatorios", nivel=2)
     doc.add_paragraph(
         "Derivados directamente de las exigencias de la NOM-036-1-STPS-2018 para los "
         "temas evaluados con nivel de cumplimiento bajo."
     )
+    doc.add_paragraph("{% if temas_obligatorios %}")
     doc.add_paragraph("{% for tema in temas_obligatorios %}")
     tp = doc.add_paragraph(style="List Bullet")
     tp.add_run("{{ loop.index }}. {{r tema }}")
     doc.add_paragraph("{% endfor %}")
+    doc.add_paragraph("{% else %}")
+    doc.add_paragraph(
+        "No se identificaron temas obligatorios pendientes en los criterios evaluados."
+    )
+    doc.add_paragraph("{% endif %}")
 
     _seccion(doc, "Temas optativos", nivel=2)
     doc.add_paragraph("Buenas prácticas sugeridas, adicionales a lo que exige la norma.")
+    doc.add_paragraph("{% if temas_optativos %}")
     doc.add_paragraph("{% for tema in temas_optativos %}")
     top = doc.add_paragraph(style="List Bullet")
     top.add_run("{{ loop.index }}. {{r tema }}")
     doc.add_paragraph("{% endfor %}")
+    doc.add_paragraph("{% else %}")
+    doc.add_paragraph(
+        "No se identificaron temas optativos adicionales en los criterios evaluados."
+    )
+    doc.add_paragraph("{% endif %}")
 
+    # Nombre completo + cédula profesional del responsable de la elaboración
+    # (NOM-036, numeral 7.4 inciso f) — configurables por variable de entorno
+    # en `generador.py::_responsable`; sin configurar, firma como equipo
+    # (comportamiento anterior) en vez de mostrar un campo vacío
+    # (retroalimentación de la validación piloto, hallazgo 4).
     cierre_regla = doc.add_paragraph()
     estilos.agregar_regla_inferior(cierre_regla, grosor=4)
     doc.add_paragraph("Atentamente,")
-    firma = doc.add_paragraph("Equipo de investigación en Ergonomía y Factores Humanos")
-    firma.runs[0].bold = True
+    doc.add_paragraph()
+    firma = doc.add_paragraph()
+    firma.add_run("{{ responsable_nombre }}").bold = True
+    doc.add_paragraph("{% if responsable_cedula %}")
+    doc.add_paragraph("Cédula profesional: {{ responsable_cedula }}")
+    doc.add_paragraph("{% endif %}")
 
     return doc
 
