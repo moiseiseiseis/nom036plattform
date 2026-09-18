@@ -42,8 +42,13 @@ export async function obtenerResumenInforme(evaluacionId: string): Promise<Resum
   return res.json();
 }
 
-export async function descargarInformeDocx(evaluacionId: string): Promise<Response> {
-  return fetch(`${urlServicioPython()}/informes/${evaluacionId}`, { cache: "no-store" });
+export async function descargarInformeDocx(
+  evaluacionId: string,
+  { revision = true }: { revision?: boolean } = {}
+): Promise<Response> {
+  return fetch(`${urlServicioPython()}/informes/${evaluacionId}?revision=${revision}`, {
+    cache: "no-store",
+  });
 }
 
 /** Igual que `obtenerResumenInforme`, pero nunca lanza — si el servicio de

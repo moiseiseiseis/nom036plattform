@@ -48,16 +48,23 @@ def resumen_informe(evaluacion_id: str) -> dict:
 
 
 @router.get("/{evaluacion_id}")
-def descargar_informe(evaluacion_id: str) -> Response:
+def descargar_informe(evaluacion_id: str, revision: bool = True) -> Response:
+    """`revision=true` (default) resalta el texto por su origen dentro del
+    motor de recomendaciones, para la validación piloto de la Etapa 6;
+    `revision=false` produce el informe "limpio" tal como se entregaría a
+    una empresa real."""
     try:
-        contenido = generar_informe(evaluacion_id)
+        contenido = generar_informe(evaluacion_id, modo_revision=revision)
     except EvaluacionNoEncontrada as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    sufijo = "revision" if revision else "final"
     return Response(
         content=contenido,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": f'attachment; filename="informe-{evaluacion_id}.docx"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="informe-{evaluacion_id}-{sufijo}.docx"'
+        },
     )

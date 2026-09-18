@@ -153,23 +153,35 @@ export default async function DetalleEvaluacionPage({
             </div>
           )}
 
-          <div className="flex gap-3 border-t border-black/5 pt-6">
-            <a
-              href={`/panel/api/informes/${evaluacion.id}`}
-              className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
-            >
-              Descargar informe (.docx)
-            </a>
-            {evaluacion.estado === "completado" && (
-              <form action={marcarRevisadoAction.bind(null, evaluacion.id)}>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
-                >
-                  Marcar como revisado
-                </button>
-              </form>
-            )}
+          <div className="flex flex-col gap-2 border-t border-black/5 pt-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href={`/panel/api/informes/${evaluacion.id}?revision=true`}
+                className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
+              >
+                Descargar informe de revisión (.docx)
+              </a>
+              <a
+                href={`/panel/api/informes/${evaluacion.id}?revision=false`}
+                className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
+              >
+                Descargar informe final (.docx)
+              </a>
+              {evaluacion.estado === "completado" && (
+                <form action={marcarRevisadoAction.bind(null, evaluacion.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
+                  >
+                    Marcar como revisado
+                  </button>
+                </form>
+              )}
+            </div>
+            <p className="text-xs text-gray-500">
+              &ldquo;Revisión&rdquo; resalta el origen del texto para validar contra el criterio
+              del Dr. Sergio; &ldquo;final&rdquo; es la versión limpia para entregar a la empresa.
+            </p>
           </div>
         </div>
       )}
