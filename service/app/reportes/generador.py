@@ -1,4 +1,5 @@
 import io
+from datetime import datetime
 from pathlib import Path
 
 from docx import Document as DocxDocument
@@ -12,6 +13,7 @@ from app.engine.models import ResultadoCriterio, ResultadoGlobal
 from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_puntaje, clasificar_bucket
 
 from . import colores_revision as colores
+from . import estilos
 from .grafica import generar_grafica_radar, generar_grafica_temas
 from .models import DatosEvaluacion
 from .repository import fetch_datos_evaluacion
@@ -21,13 +23,16 @@ PLANTILLA_BASE = Path(__file__).resolve().parent.parent / "templates" / "informe
 MARCADOR_TABLA_PUNTAJES = "[[TABLA_PUNTAJES]]"
 MARCADOR_TABLA_PORCENTAJES = "[[TABLA_PORCENTAJES]]"
 
-BUCKET_ETIQUETAS = {
-    "inexistente": "Inexistente",
-    "minimo": "Mínimo",
-    "regular": "Regular",
-    "aceptable": "Aceptable",
-    "optimo": "Óptimo",
-}
+BUCKET_ETIQUETAS = estilos.ETIQUETA_POR_BUCKET
+
+MESES_ES = (
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+)
+
+
+def _fecha_generacion_es(momento: datetime) -> str:
+    return f"{momento.day} de {MESES_ES[momento.month - 1]} de {momento.year}"
 
 
 def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
@@ -149,6 +154,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "grafica_temas": grafica_temas_imagen,
             "hay_temas": hay_temas,
             "es_revision": modo_revision,
+            "fecha_generacion": _fecha_generacion_es(datetime.now()),
         }
     )
 
@@ -214,6 +220,8 @@ def _construir_tabla_puntajes(
         fila[1].text = f"{r.puntaje}/{r.puntaje_maximo}"
         if modo_revision:
             colores.sombrear_run(fila[1].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
+    estilos.estilizar_tabla(tabla, alineacion_columnas=["l", "c"])
+    estilos.fijar_ancho_columnas(tabla, [110, 50])
     return tabla
 
 
@@ -231,7 +239,12 @@ def _construir_tabla_porcentajes(
         fila[0].text = f"{r.numero}. {r.nombre}"
         fila[1].text = f"{r.porcentaje:.1f}%"
         fila[2].text = BUCKET_ETIQUETAS.get(r.bucket, r.bucket)
+        estilos.colorear_texto(
+            fila[2].paragraphs[0].runs[0], estilos.COLOR_POR_BUCKET.get(r.bucket, estilos.COLOR_TEXTO_TENUE_HEX)
+        )
         if modo_revision:
             colores.sombrear_run(fila[1].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
             colores.sombrear_run(fila[2].paragraphs[0].runs[0], colores.RESULTADO_CALCULADO)
+    estilos.estilizar_tabla(tabla, alineacion_columnas=["l", "c", "c"])
+    estilos.fijar_ancho_columnas(tabla, [85, 45, 30])
     return tabla

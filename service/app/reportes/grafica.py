@@ -11,30 +11,27 @@ from matplotlib.patches import Patch
 
 from app.engine.models import ResultadoCriterio
 
-# Paleta de severidad (0-20/20-40/.../80-100), validada para papel impreso
-# (contraste sobre fondo blanco y separación perceptible con daltonismo —
-# ver contenido/como-se-calculan-los-porcentajes.md para los cortes). Mismo
-# concepto rojo->azul que el instrumento original y el formulario público,
-# en tonos más oscuros/saturados porque aquí el color va sobre papel blanco,
-# no como fondo de un botón.
-COLOR_INEXISTENTE = "#b91c1c"
-COLOR_MINIMO = "#eb6834"
-COLOR_REGULAR = "#7a6900"
-COLOR_ACEPTABLE = "#1baf7a"
-COLOR_OPTIMO = "#2a78d6"
+from .estilos import COLOR_OBLIGATORIO_HEX, COLOR_OPTATIVO_HEX, COLOR_POR_BUCKET, ETIQUETA_POR_BUCKET
 
+# Paleta de severidad (0-20/20-40/.../80-100), validada para papel impreso
+# (contraste sobre fondo blanco y separación perceptible con daltonismo).
+# Mismo concepto rojo->azul que el instrumento original y el formulario
+# público, en tonos más oscuros/saturados porque aquí el color va sobre
+# papel blanco, no como fondo de un botón. Compartida con `estilos.py` para
+# que la clasificación de la tabla 2 use exactamente el mismo código de
+# color que estas bandas.
 BANDAS_SEVERIDAD = (
-    (0, 20, "Inexistente", COLOR_INEXISTENTE),
-    (20, 40, "Mínimo", COLOR_MINIMO),
-    (40, 60, "Regular", COLOR_REGULAR),
-    (60, 80, "Aceptable", COLOR_ACEPTABLE),
-    (80, 100, "Óptimo", COLOR_OPTIMO),
+    (0, 20, ETIQUETA_POR_BUCKET["inexistente"], f"#{COLOR_POR_BUCKET['inexistente']}"),
+    (20, 40, ETIQUETA_POR_BUCKET["minimo"], f"#{COLOR_POR_BUCKET['minimo']}"),
+    (40, 60, ETIQUETA_POR_BUCKET["regular"], f"#{COLOR_POR_BUCKET['regular']}"),
+    (60, 80, ETIQUETA_POR_BUCKET["aceptable"], f"#{COLOR_POR_BUCKET['aceptable']}"),
+    (80, 100, ETIQUETA_POR_BUCKET["optimo"], f"#{COLOR_POR_BUCKET['optimo']}"),
 )
 
 COLOR_LINEA_DATOS = "#0b0b0b"
 
-COLOR_OBLIGATORIO = "#4a3aa7"
-COLOR_OPTATIVO = "#898781"
+COLOR_OBLIGATORIO = f"#{COLOR_OBLIGATORIO_HEX}"
+COLOR_OPTATIVO = f"#{COLOR_OPTATIVO_HEX}"
 
 
 def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
