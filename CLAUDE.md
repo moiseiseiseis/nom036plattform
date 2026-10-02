@@ -78,13 +78,27 @@ contexto.
 
 - [ ] Confirmar escala real: **0-4** (confirmado por imagen del instrumento) — verificar que
       no haya confusión con "0-5" mencionado en conversación inicial.
-- [ ] Lista completa de los 50 ítems (actualmente solo Criterio 1 disponible). Los nombres de
-      los 5 criterios ya están confirmados por el informe JASANA real
-      (`references/REPORTE FINAL JASANA 07.03.26.docx`): (1) Identificación y clasificación de
-      los puestos de trabajo ocupacionalmente expuestos, (2) Uso de equipos auxiliares y
-      condiciones ambientales, (3) Capacitación, adiestramiento y vigilancia a la salud,
-      (4) Difusión, registro y políticas en materia de Ergonomía, (5) Medidas de prevención y
-      control. Faltan los ítems 2-5 (solo Criterio 1 disponible por imagen del instrumento).
+- [x] Lista completa de los 50 ítems. Recibida del Dr. Sergio: `references/Formato de Pre
+      Diagnóstico NOM 036-1-STPS-2018 versión 22.09.26.xlsx` (hoja "Diagnóstico B"). Los 40
+      ítems de los Criterios 2-5 ya están cargados en `nom036.item` vía
+      `supabase/seed_etapa7_items_criterios_2_a_5.sql` (solo el texto de la pregunta — numeral
+      NOM y es_obligatorio quedan en NULL/default, pendientes de cruzar contra el texto oficial
+      de la norma, igual que se hizo para el Criterio 1). El nombre del Criterio 4 se corrigió
+      a "Difusión y promoción de la salud" (el nombre tomado antes del informe JASANA,
+      "Difusión, registro y políticas en materia de Ergonomía", no coincide con el instrumento
+      oficial — este último es la fuente más directa). Los nombres de los otros 4 criterios sí
+      coinciden con los ya confirmados: (1) Identificación y clasificación de los puestos de
+      trabajo ocupacionalmente expuestos, (2) Uso de equipos auxiliares y condiciones
+      ambientales, (3) Capacitación, adiestramiento y vigilancia a la salud, (5) Medidas de
+      prevención y control.
+      **Dos erratas del archivo original, no corregidas al cargar (ver comentario en el script
+      de seed) — confirmar con el Dr. Sergio antes de usarlas en el formulario público:**
+      ítem 1.7 ("...con Manejo manual de Cargas (MMC", falta cerrar el paréntesis) e ítem 5.9
+      ("...síntomas musculoesqueléticos que estén posiblemente  con el manejo manual de
+      cargas", parece faltar una palabra como "relacionados").
+      **Sigue pendiente:** recomendaciones por ítem × nivel (160 filas) y plantillas de
+      apertura/cierre por bucket (20 filas) de los Criterios 2-5 — el trabajo de contenido más
+      grande que falta antes de la Etapa 7.
 - [ ] Cortes de porcentaje exactos por bucket — hipótesis de trabajo: quintiles de 20%,
       validada contra los datos del caso JASANA: 42.5%→Regular, 70%→Aceptable, 22.5%→Mínimo
       (x2), 25%→Mínimo (tabla 2 del informe real). Consistente con franjas de 20 puntos.
@@ -353,6 +367,10 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 **Objetivo:** cobertura total del instrumento de 50 ítems.
 
 - [ ] Recibir y cargar contenido (ítems + recomendaciones + plantillas) de los Criterios 2-5.
+      Ítems: [x] cargados (sección 4). Recomendaciones por ítem × nivel y plantillas de
+      apertura/cierre: [ ] pendientes — requieren cruzar cada ítem contra el texto oficial de
+      la NOM-036 (numeral + obligatorio/optativo) antes de redactarlas, igual que se hizo para
+      el Criterio 1 (`content_v1_criterio1.sql`).
 - [ ] Extender formulario público a los 50 ítems.
 - [ ] Extender generación de gráficas (radar completo de 5 ejes, heatmap de 50 ítems).
 - [ ] Prueba de extremo a extremo con el caso JASANA completo, comparando el informe generado
@@ -393,6 +411,9 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | 2026-09-17 | Repo publicado en GitHub (`https://github.com/moiseiseiseis/nom036plattform`), rama `master` | Antes solo existía en local; requerido para que Render (deploy vía Blueprint conectado a GitHub) pueda desplegar el servicio |
 | 2026-09-18 | Pulido visual del `.docx` (tipografía, color de marca, tablas, portada, pie de página con numeración) en `service/app/reportes/estilos.py`; toggle `?revision=true\|false` en `GET /informes/{id}` para descargar la versión de debug o la limpia | El informe seguía usando el formato por defecto de python-docx; el panel solo podía descargar la versión con resaltado de debug, sin forma de bajar la versión "cuasi-final" |
 | 2026-09-18 | Rediseño de las gráficas (`grafica.py`) y ajustes de redacción a partir de retroalimentación real sobre un informe piloto (`retroalimentacion/`, empresa "Grupo Modelo"): cierre global con alcance acotado cuando la evaluación es parcial (`engine/narrativa.py::construir_cierre_parcial`), mensaje explícito si no hay temas obligatorios/optativos, introducción de 3 párrafos, aperturas homologadas con la etiqueta de bucket (`content_v3_retroalimentacion_piloto.sql`, aplicado a la base de datos), y corrección de un bug real de `docxtpl.RichText.add(highlight=...)` (genera `w:shd` sin `w:val`, que Word no pinta) | Es la primera retroalimentación sobre un informe real generado por el motor, no solo contra los datos de referencia JASANA; de los 8 hallazgos, 2 quedan pendientes por requerir datos reales que el proyecto no puede inventar (cédula profesional del responsable, domicilio completo) o una decisión de umbral del Dr. Sergio — ver sección 4. `ETIQUETA_POR_BUCKET` se movió de `reportes/estilos.py` a `engine/scoring.py` en el mismo cambio, para que `engine/` (capa pura, sin dependencias de `reportes/`) pudiera generar el texto de cierre parcial sin invertir la dirección de dependencia del paquete |
+| 2026-09-18 | Se agrega el catálogo completo de `nom036.criterio` (5 filas) aunque solo el Criterio 1 tuviera ítems, y un botón de borrado permanente de evaluaciones en el panel (`/panel/evaluaciones/[id]`, con confirmación en cliente) | `repository.py` calcula `total_criterios` como `count(*)` de esa tabla para detectar evaluaciones parciales (sección anterior); con una sola fila, `es_parcial` nunca se activaba fuera de los tests. El borrado usa el `ON DELETE CASCADE` ya existente en `respuesta.evaluacion_id`, sin tocar la empresa — para limpiar evaluaciones de prueba mal capturadas sin editar la base a mano |
+| 2026-09-18 | Vercel (`web/`) no tiene activado el auto-deploy por GitHub — a diferencia de Render (`service/`), que sí despliega solo con cada push a `master`. Hubo que correr `vercel --prod` manualmente para publicar varios commits de esta sesión | Se descubrió al verificar en producción un cambio ya pusheado que no aparecía en el panel. Pendiente: conectar el repo de GitHub al proyecto de Vercel (Project Settings → Git) para que no vuelva a pasar |
+| 2026-10-02 | Se reciben y cargan los 50 ítems completos del instrumento (`references/Formato de Pre Diagnóstico NOM 036-1-STPS-2018 versión 22.09.26.xlsx`) — los 40 de los Criterios 2-5 vía `supabase/seed_etapa7_items_criterios_2_a_5.sql`. Se corrige el nombre del Criterio 4 a "Difusión y promoción de la salud" (el instrumento oficial no coincide con el nombre tomado antes del informe JASANA) | Desbloquea la pregunta abierta más grande de la sección 4. Solo se cargó el texto de la pregunta — numeral NOM, `es_obligatorio`, recomendaciones por ítem × nivel y plantillas de apertura/cierre de estos 4 criterios siguen pendientes (ver sección 4), es el trabajo de contenido más grande que queda antes de cerrar la Etapa 7. Durante esta sesión el proyecto Supabase compartido ("talleres culturales") se pausó por inactividad (plan free) y el pooler de Postgres tardó unos minutos en volver a registrar el tenant después de reactivarlo manualmente — si vuelve a pasar, no es una base de datos rota, solo esperar o revisar el dashboard de Supabase |
 
 ---
 
