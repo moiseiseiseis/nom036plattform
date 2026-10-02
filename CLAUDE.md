@@ -397,12 +397,15 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
       criterios completos (sección 4). Avanzado criterio por criterio a lo largo de varias
       sesiones, no todo de un tirón. Sigue pendiente la revisión y validación final del Dr.
       Sergio sobre todo el contenido (es contenido de trabajo, igual que el del Criterio 1).
-- [ ] Extender formulario público a los 50 ítems. El formulario (`web/src/lib/nom036/evaluaciones.ts`)
-      sigue filtrando explícitamente `where c.numero = 1` — el contenido ya está listo en la
-      base de datos, pero la UI de autoevaluación todavía no lo usa.
-- [x] Extender generación de gráficas: radar completo de 5 ejes — verificado con un informe de
-      5 criterios completos (sección 7, entrada 2026-10-02), ya no degenerado. [ ] Heatmap de
-      50 ítems: pendiente, no existe todavía.
+- [x] Extender formulario público a los 50 ítems. `getEvaluacionPorToken`
+      (`web/src/lib/nom036/evaluaciones.ts`) ya no filtra `where c.numero = 1` — trae los 5
+      criterios agrupados, y `EvaluacionForm.tsx` renderiza un `<fieldset>` por criterio.
+      Verificado levantando el servidor de desarrollo contra la base real: 5 secciones, 50
+      grupos de radio buttons únicos, sin errores de servidor.
+- [x] Extender generación de gráficas: radar completo de 5 ejes y heatmap de 50 ítems, ambos
+      verificados con un informe de 5 criterios completos (sección 7, entrada 2026-10-02). El
+      heatmap es "Figura 2" del informe (`grafica.py::generar_heatmap_items`): una fila por
+      criterio, una columna por ítem, mismo color de severidad 0-4 que el resto del documento.
 - [ ] Prueba de extremo a extremo con el caso JASANA completo, comparando el informe generado
       contra el informe real ya analizado.
 
@@ -448,6 +451,7 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 3 (`supabase/content_criterio3.sql`), mismo registro que el Criterio 2. Por primera vez se marcan ítems como optativos (`es_obligatorio = false`: 3.4, 3.8, 3.10) en vez de obligatorios | Hasta este criterio, todos los ítems cargados (1 y 2) eran obligatorios por derivar de un numeral puntual — estos 3 ítems de Criterio 3 no tienen ese respaldo directo (técnica de empuje/tracción, difusión de hábitos posturales, bienestar general), así que es la primera vez que el sistema puede repartir hallazgos entre "Temas obligatorios" y "Temas optativos" con contenido real, no solo con la paridad sintética de los tests. Verificado generando un criterio de prueba con hallazgos en ambas categorías. El ítem 3.9 pide reforzar la capacitación "cada año", pero el numeral 10.3 de la norma dice "cada dos años" — se redactó con el límite real de la norma; queda para que el Dr. Sergio confirme cuál debe prevalecer (sección 4) |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 4, "Difusión y promoción de la salud" (`supabase/content_criterio4.sql`) | A diferencia de los Criterios 1-3, este criterio no mapea a un solo capítulo de la norma (no existe un "Capítulo de difusión" en la NOM-036-1-STPS-2018): 5 de sus 10 ítems (4.1, 4.2, 4.3, 4.6, 4.10) quedaron sin numeral y marcados optativos, por ser prácticas de gestión sin un requisito puntual que las respalde, en vez de forzar una cita imprecisa. El ítem 4.6 (auditorías) es un caso distinto: sí tiene un numeral exacto (11.1), pero ese numeral dice textualmente que el patrón "tendrá la opción" de contratar una unidad de verificación — es la propia norma la que lo define como voluntario, no una interpretación nuestra. Verificado con un criterio de prueba (5 obligatorios + 5 optativos, reparto correcto) |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 5, "Medidas de prevención y control" (`supabase/content_criterio5.sql`) — con esto, los 5 criterios del instrumento completo ya tienen contenido real | Es el criterio que mapea más directo a la norma desde el Criterio 1 (Capítulos 7, 8, 9.2 y 10.1); solo 2 de 10 ítems quedaron optativos. El ítem 5.7 (Cuestionario Nórdico de Kuorinka) es un caso nuevo: tiene numeral exacto (9.2), pero ese numeral dice que la detección de síntomas "se podrá" realizar con esa herramienta — la vigilancia a la salud en sí es obligatoria, pero este instrumento específico es una opción entre varias, no la única. Se generó por primera vez un informe con los 5 criterios completos (datos sintéticos, contenido real de la base): el radar deja de ser degenerado (5 ejes), `es_parcial` da `False`, y se ejercitó por primera vez con datos reales la plantilla de cierre "informe completo" que quedó lista desde la retroalimentación piloto pero nunca se había podido probar. Pendiente de aquí en adelante (Etapa 7): extender el formulario público a los 50 ítems (sigue filtrado a Criterio 1), el heatmap de 50 ítems, y la prueba de extremo a extremo contra el caso JASANA completo |
+| 2026-10-02 | Se extiende el formulario público a los 50 ítems y se agrega un heatmap por ítem como nueva "Figura 2" del informe (`grafica.py::generar_heatmap_items`, `engine/scoring.py::ETIQUETA_POR_NIVEL`) | Con el contenido de los 5 criterios ya cargado, el formulario y las gráficas eran lo único que seguía limitado a Criterio 1. El heatmap usa la misma paleta de severidad que el radar y la Tabla 2 (0=rojo…4=azul), pero con la etiqueta de NIVEL de un ítem ("Nada", no "Inexistente" — esa es la etiqueta de BUCKET, un concepto distinto aunque comparta color), por eso se creó `ETIQUETA_POR_NIVEL` en vez de reutilizar `ETIQUETA_POR_BUCKET`. La dona de temas pasa a ser "Figura 3". Verificado contra la base real: formulario con 5 fieldsets y 50 radio-groups sin errores de servidor; heatmap con 1 fila (caso actual de evaluaciones reales) y con 5 filas (caso sintético) |
 
 ---
 

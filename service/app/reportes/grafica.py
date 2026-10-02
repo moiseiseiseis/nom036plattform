@@ -1,6 +1,7 @@
 """Generación de las gráficas del informe (radar de cumplimiento por
-criterio y dona de temas obligatorios/optativos), como PNG en memoria listos
-para `docxtpl.InlineImage`. No tocan la base de datos.
+criterio, mapa de calor por ítem y dona de temas obligatorios/optativos),
+como PNG en memoria listos para `docxtpl.InlineImage`. No tocan la base de
+datos.
 
 Rediseño de retroalimentación de la validación piloto
 (`retroalimentacion/grafica.py`, `retroalimentacion/reporte.txt` hallazgo 7 y
@@ -30,9 +31,10 @@ import matplotlib.font_manager as fm
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import ListedColormap
 
 from app.engine.models import ResultadoCriterio
-from app.engine.scoring import BUCKETS, clasificar_bucket
+from app.engine.scoring import BUCKETS, ETIQUETA_POR_NIVEL, clasificar_bucket
 
 from .estilos import (
     COLOR_MARCA_HEX,
@@ -41,6 +43,7 @@ from .estilos import (
     COLOR_POR_BUCKET,
     ETIQUETA_POR_BUCKET,
 )
+from .models import DatosCriterio
 
 logger = logging.getLogger(__name__)
 
@@ -221,7 +224,101 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
 
 
 # ---------------------------------------------------------------------------
-# Figura 2 — dona de temas obligatorios / optativos
+# Figura 2 — mapa de calor por ítem
+# ---------------------------------------------------------------------------
+def generar_heatmap_items(criterios: list[DatosCriterio]) -> bytes:
+    """Una fila por criterio, una columna por ítem dentro del criterio —
+    mismo color por nivel (0-4) que las franjas de severidad del radar y la
+    Tabla 2 (`BUCKETS`/`COLOR_POR_BUCKET`), porque la escala de nivel de un
+    ítem y la de franja de cumplimiento comparten los mismos 5 puntos de
+    corte (ver `engine/scoring.py::ETIQUETA_POR_NIVEL` vs
+    `ETIQUETA_POR_BUCKET` — incluso con el mismo color, la etiqueta de
+    nivel 0 es "Nada", no "Inexistente").
+
+    A diferencia del radar, aquí no hay caso "degenerado": con 1 criterio
+    disponible dibuja 1 fila de 10 columnas; con los 5 completos, 5 filas.
+    """
+    if not criterios:
+        raise ValueError("Se requiere al menos un criterio para generar el mapa de calor")
+
+    ordenados = sorted(criterios, key=lambda c: c.numero)
+    filas = [
+        [r.nivel for r in sorted(dc.respuestas, key=lambda r: r.numero)] for dc in ordenados
+    ]
+    etiquetas_fila = [f"C{dc.numero}" for dc in ordenados]
+    n_filas = len(filas)
+    n_cols = max(len(fila) for fila in filas)
+
+    matriz = np.full((n_filas, n_cols), np.nan)
+    for i, fila in enumerate(filas):
+        for j, nivel in enumerate(fila):
+            matriz[i, j] = nivel
+
+    # Presupuesto de altura en pulgadas: franjas fijas de encabezado/leyenda +
+    # una franja por fila, para que 1 criterio y 5 criterios se vean
+    # proporcionados en vez de una sola figura de altura fija.
+    ALTO_FILA = 0.55
+    ALTO_ENCABEZADO = 0.55
+    ALTO_LEYENDA = 0.7
+    alto_total = ALTO_ENCABEZADO + ALTO_FILA * n_filas + ALTO_LEYENDA
+
+    fig = plt.figure(figsize=(9.2, alto_total), dpi=200)
+    fig.patch.set_facecolor(SURFACE)
+
+    y0 = ALTO_LEYENDA / alto_total
+    alto_ax = (ALTO_FILA * n_filas) / alto_total
+    ax = fig.add_axes((0.1, y0, 0.88, alto_ax))
+    ax.set_facecolor(SURFACE)
+
+    cmap = ListedColormap([COLOR_BANDA[b] for b in BUCKETS])
+    cmap.set_bad(color=GRID)
+    matriz_enmascarada = np.ma.masked_invalid(matriz)
+    ax.imshow(matriz_enmascarada, cmap=cmap, vmin=0, vmax=4, aspect="auto")
+
+    for i in range(n_filas):
+        for j in range(n_cols):
+            if not np.isnan(matriz[i, j]):
+                ax.text(
+                    j, i, str(int(matriz[i, j])), ha="center", va="center", color="white",
+                    fontsize=11, fontweight="bold",
+                )
+
+    ax.set_xticks(range(n_cols))
+    ax.set_xticklabels([str(i + 1) for i in range(n_cols)], fontsize=9.5, color=INK_MUTED)
+    ax.xaxis.tick_top()
+    ax.set_yticks(range(n_filas))
+    ax.set_yticklabels(etiquetas_fila, fontsize=10.5, color=INK, fontweight="medium")
+
+    ax.set_xticks(np.arange(-0.5, n_cols, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, n_filas, 1), minor=True)
+    ax.grid(which="minor", color=SURFACE, linewidth=3)
+    ax.tick_params(which="both", length=0)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    ax.set_title("Nivel de respuesta por ítem", fontsize=13, fontweight="bold", color=INK, pad=22)
+
+    leg_ax = fig.add_axes((0.06, 0.0, 0.9, (ALTO_LEYENDA * 0.8) / alto_total))
+    leg_ax.axis("off")
+    n_niveles = len(BUCKETS)
+    for i, bucket in enumerate(BUCKETS):
+        x0 = i / n_niveles
+        leg_ax.add_patch(
+            mpatches.FancyBboxPatch(
+                (x0 + 0.01, 0.33), 0.023, 0.34, boxstyle="round,pad=0,rounding_size=0.05",
+                transform=leg_ax.transAxes, facecolor=COLOR_BANDA[bucket], edgecolor="none",
+            )
+        )
+        leg_ax.text(
+            x0 + 0.05, 0.49, f"{i} · {ETIQUETA_POR_NIVEL[i]}", transform=leg_ax.transAxes,
+            fontsize=8.8, color=INK_MUTED, va="center",
+        )
+
+    return _fig_a_bytes(fig)
+
+
+# ---------------------------------------------------------------------------
+# Figura 3 — dona de temas obligatorios / optativos
 # ---------------------------------------------------------------------------
 def generar_grafica_temas(num_obligatorios: int, num_optativos: int) -> bytes:
     """Se llama solo si `num_obligatorios + num_optativos > 0` (ver

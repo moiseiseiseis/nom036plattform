@@ -16,6 +16,18 @@ ETIQUETA_POR_BUCKET = {
     "optimo": "Óptimo",
 }
 
+# Etiquetas del nivel de respuesta de un ítem (glosario, CLAUDE.md sección 3)
+# — mismo orden y color que BUCKETS/ETIQUETA_POR_BUCKET, pero con nombres
+# distintos: un ítem en nivel 0 es "Nada", no "Inexistente" (esa palabra es
+# la clasificación de un % de cumplimiento, no la de una respuesta puntual).
+ETIQUETA_POR_NIVEL = {
+    0: "Nada",
+    1: "Mínimo",
+    2: "Regular",
+    3: "Aceptable",
+    4: "Óptimo",
+}
+
 NIVEL_MAXIMO = 4
 
 

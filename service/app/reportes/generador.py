@@ -16,7 +16,7 @@ from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_pu
 
 from . import colores_revision as colores
 from . import estilos
-from .grafica import generar_grafica_radar, generar_grafica_temas
+from .grafica import generar_grafica_radar, generar_grafica_temas, generar_heatmap_items
 from .models import DatosEvaluacion
 from .repository import fetch_datos_evaluacion
 
@@ -106,6 +106,9 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
 
     tpl = DocxTemplate(str(PLANTILLA_BASE))
     grafica_imagen = InlineImage(tpl, io.BytesIO(generar_grafica_radar(resultados)), width=Mm(140))
+    grafica_heatmap = InlineImage(
+        tpl, io.BytesIO(generar_heatmap_items(datos.criterios)), width=Mm(155)
+    )
 
     # El marcador `{{r ... }}` de la plantilla solo acepta objetos RichText
     # (necesita aislar el tag en su propio run de XML para insertar texto
@@ -168,6 +171,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "empresa_turnos": empresa_turnos,
             "empresa_descripcion_mmh": empresa_descripcion_mmh,
             "grafica_radar": grafica_imagen,
+            "grafica_heatmap": grafica_heatmap,
             "criterios": criterios_ctx,
             "resultado_global_apertura": resultado_global_apertura,
             "resultado_global_cierre": resultado_global_cierre,

@@ -168,6 +168,13 @@ def construir_documento() -> Document:
     img_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     _caption(doc, "Figura 1. Porcentaje de cumplimiento por criterio, sobre las 5 franjas de severidad.")
 
+    img_heatmap_p = doc.add_paragraph("{{ grafica_heatmap }}")
+    img_heatmap_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    _caption(
+        doc,
+        "Figura 2. Nivel de respuesta (0-4) de cada ítem, agrupado por criterio evaluado.",
+    )
+
     # --- Resultados por criterio ---------------------------------------------
     _seccion(doc, "Resultados por criterio")
     doc.add_paragraph("{% for c in criterios %}")
@@ -193,7 +200,7 @@ def construir_documento() -> Document:
     doc.add_paragraph("{% if hay_temas %}")
     img_temas_p = doc.add_paragraph("{{ grafica_temas }}")
     img_temas_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    _caption(doc, "Figura 2. Proporción de temas de atención obligatoria y optativa.")
+    _caption(doc, "Figura 3. Proporción de temas de atención obligatoria y optativa.")
     doc.add_paragraph("{% endif %}")
 
     # Fallback explícito si la lista sale vacía: sin esto, la sección se veía

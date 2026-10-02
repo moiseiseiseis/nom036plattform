@@ -87,9 +87,10 @@ def test_generar_informe_produce_docx_valido_y_con_contenido_correcto():
     assert tabla_porcentajes.rows[1].cells[1].text == "42.5%"
     assert tabla_porcentajes.rows[1].cells[2].text == "Regular"
 
-    # Gráfica de radar + gráfica de temas obligatorios/optativos (hay 3 hallazgos, todos
-    # obligatorios porque las respuestas de prueba alternan es_obligatorio por paridad).
-    assert len(documento.inline_shapes) == 2
+    # Radar + mapa de calor por ítem (siempre) + dona de temas obligatorios/optativos (hay 3
+    # hallazgos, todos obligatorios porque las respuestas de prueba alternan es_obligatorio
+    # por paridad).
+    assert len(documento.inline_shapes) == 3
 
     # Evaluación parcial (1 de 5 criterios): el cierre debe acotar el alcance en vez de
     # generalizar, y la apertura fija ("[PLACEHOLDER] Apertura global...") no debe imprimirse
@@ -158,8 +159,8 @@ def test_generar_informe_responsable_configurado_por_variable_de_entorno(monkeyp
 
 def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
     """Con niveles altos en todos los ítems no hay hallazgos, por lo que no
-    hay temas obligatorios ni optativos que graficar — solo debe insertarse
-    la gráfica de radar."""
+    hay temas obligatorios ni optativos que graficar — deben insertarse el
+    radar y el mapa de calor (siempre), pero no la dona de temas."""
     datos = _datos_evaluacion_jasana()
     criterio_sin_hallazgos = DatosCriterio(
         id=datos.criterios[0].id,
@@ -192,7 +193,7 @@ def test_generar_informe_sin_hallazgos_omite_grafica_de_temas():
 
     contenido = generar_informe_desde_datos(datos_sin_hallazgos)
     documento = Document(io.BytesIO(contenido))
-    assert len(documento.inline_shapes) == 1
+    assert len(documento.inline_shapes) == 2
 
     texto_completo = "\n".join(p.text for p in documento.paragraphs)
     assert "No se identificaron temas obligatorios pendientes en los criterios evaluados." in texto_completo
