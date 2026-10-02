@@ -96,26 +96,35 @@ contexto.
       ítem 1.7 ("...con Manejo manual de Cargas (MMC", falta cerrar el paréntesis) e ítem 5.9
       ("...síntomas musculoesqueléticos que estén posiblemente  con el manejo manual de
       cargas", parece faltar una palabra como "relacionados").
-      **Sigue pendiente:** recomendaciones por ítem × nivel y plantillas de apertura por bucket
-      del Criterio 5 — el trabajo de contenido más grande que falta antes de la Etapa 7, yendo
-      criterio por criterio (decisión de sesión, ver sección 7). Criterios 2, 3 y 4 ya se
-      cargaron: `supabase/content_criterio2.sql`, `content_criterio3.sql` y
-      `content_criterio4.sql` (numeral NOM por ítem, 50 recomendaciones, apertura por bucket
-      cada uno). El Criterio 3 es el primero con ítems marcados `es_obligatorio = false` (3.4,
-      3.8, 3.10 — técnica específica de empuje/tracción, difusión de hábitos posturales y
-      bienestar general; no derivan de un numeral puntual, a diferencia del resto). También
-      tiene una inconsistencia entre el ítem 3.9 ("cada año") y el numeral 10.3 de la norma
-      ("cada dos años") — se redactó la recomendación con el límite real de la norma; confirmar
-      con el Dr. Sergio cuál debe prevalecer. El Criterio 4 ("Difusión y promoción de la
-      salud") no mapea a un solo capítulo de la norma — 5 de sus 10 ítems (4.1, 4.2, 4.3, 4.6,
-      4.10) quedaron `es_obligatorio = false` por ser prácticas de gestión sin un numeral
-      puntual que las respalde (el ítem 4.6, auditorías, es un caso aparte: sí tiene numeral
-      exacto, 11.1, pero la propia norma lo define como voluntario — "tendrá la opción de
-      contratar..."). No se cargaron plantillas de "cierre" por criterio para los Criterios 2,
-      3 y 4 —
-      `repository.py` nunca las lee (solo `tipo = 'apertura'` por criterio); las que existen
-      para el Criterio 1 desde `content_v1_criterio1.sql` son contenido inerte, no vale la pena
-      repetirlo.
+      **Contenido completo de los 5 criterios** (numeral NOM por ítem, 50 recomendaciones y
+      apertura por bucket cada uno): `supabase/content_criterio2.sql`, `content_criterio3.sql`,
+      `content_criterio4.sql` y `content_criterio5.sql` (Criterio 1 desde
+      `content_v1_criterio1.sql`/`content_v2_lenguaje_simple.sql`/`content_v3_...`). Avanzado
+      criterio por criterio (decisión de sesión, ver sección 7), no todo de un tirón. El
+      Criterio 3 es el primero con ítems marcados `es_obligatorio = false` (3.4, 3.8, 3.10 —
+      técnica específica de empuje/tracción, difusión de hábitos posturales y bienestar
+      general; no derivan de un numeral puntual, a diferencia del resto). También tiene una
+      inconsistencia entre el ítem 3.9 ("cada año") y el numeral 10.3 de la norma ("cada dos
+      años") — se redactó la recomendación con el límite real de la norma; confirmar con el Dr.
+      Sergio cuál debe prevalecer. El Criterio 4 ("Difusión y promoción de la salud") no mapea
+      a un solo capítulo de la norma — 5 de sus 10 ítems (4.1, 4.2, 4.3, 4.6, 4.10) quedaron
+      `es_obligatorio = false` por ser prácticas de gestión sin un numeral puntual que las
+      respalde (el ítem 4.6, auditorías, es un caso aparte: sí tiene numeral exacto, 11.1, pero
+      la propia norma lo define como voluntario — "tendrá la opción de contratar..."). El
+      Criterio 5 ("Medidas de prevención y control") es el que mapea más limpio a la norma
+      desde el Criterio 1 (Capítulos 7, 8, 9.2 y 10.1); solo 2 de sus 10 ítems quedaron
+      optativos (5.7 Cuestionario Nórdico de Kuorinka — el numeral 9.2 dice textualmente que
+      "se podrá" aplicar, es una herramienta opcional dentro de una vigilancia que sí es
+      obligatoria —, y 5.8 reportes de mejora continua, sin numeral). No se cargaron plantillas
+      de "cierre" por criterio para los Criterios 2-5 — `repository.py` nunca las lee (solo
+      `tipo = 'apertura'` por criterio); las que existen para el Criterio 1 desde
+      `content_v1_criterio1.sql` son contenido inerte, no vale la pena repetirlo.
+      **Verificado por primera vez un informe con los 5 criterios completos** (datos
+      sintéticos, contenido real de la base): el radar ya no es degenerado (5 ejes, en vez del
+      único eje que mostraba con solo Criterio 1), `es_parcial` da `False` como corresponde, y
+      el cierre global usa por primera vez la plantilla "informe completo" de
+      `content_v3_retroalimentacion_piloto.sql` en vez del texto de alcance acotado — hasta
+      ahora esa ruta de código nunca se había ejercitado con datos reales.
 - [ ] Cortes de porcentaje exactos por bucket — hipótesis de trabajo: quintiles de 20%,
       validada contra los datos del caso JASANA: 42.5%→Regular, 70%→Aceptable, 22.5%→Mínimo
       (x2), 25%→Mínimo (tabla 2 del informe real). Consistente con franjas de 20 puntos.
@@ -383,15 +392,17 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 ### Etapa 7 — Expansión a los 5 criterios completos
 **Objetivo:** cobertura total del instrumento de 50 ítems.
 
-- [ ] Recibir y cargar contenido (ítems + recomendaciones + plantillas) de los Criterios 2-5.
-      Ítems: [x] cargados (sección 4). Criterios 2, 3 y 4: [x] recomendaciones + apertura
-      cargadas (`content_criterio2.sql`, `content_criterio3.sql`, `content_criterio4.sql`).
-      Criterio 5: [ ] pendiente — se avanza uno a la vez (no todos de un tirón), cruzando cada
-      ítem contra el texto oficial de la NOM-036 (numeral + obligatorio/optativo) antes de
-      redactar sus recomendaciones, igual que se hizo para el Criterio 1
-      (`content_v1_criterio1.sql`).
-- [ ] Extender formulario público a los 50 ítems.
-- [ ] Extender generación de gráficas (radar completo de 5 ejes, heatmap de 50 ítems).
+- [x] Recibir y cargar contenido (ítems + recomendaciones + plantillas) de los Criterios 2-5.
+      Ítems, numeral NOM, obligatorio/optativo, recomendaciones y apertura por bucket de los 5
+      criterios completos (sección 4). Avanzado criterio por criterio a lo largo de varias
+      sesiones, no todo de un tirón. Sigue pendiente la revisión y validación final del Dr.
+      Sergio sobre todo el contenido (es contenido de trabajo, igual que el del Criterio 1).
+- [ ] Extender formulario público a los 50 ítems. El formulario (`web/src/lib/nom036/evaluaciones.ts`)
+      sigue filtrando explícitamente `where c.numero = 1` — el contenido ya está listo en la
+      base de datos, pero la UI de autoevaluación todavía no lo usa.
+- [x] Extender generación de gráficas: radar completo de 5 ejes — verificado con un informe de
+      5 criterios completos (sección 7, entrada 2026-10-02), ya no degenerado. [ ] Heatmap de
+      50 ítems: pendiente, no existe todavía.
 - [ ] Prueba de extremo a extremo con el caso JASANA completo, comparando el informe generado
       contra el informe real ya analizado.
 
@@ -436,6 +447,7 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 2 (`supabase/content_criterio2.sql`: numeral NOM por ítem, 50 recomendaciones, apertura por bucket), siguiendo el mismo registro homologado que `content_v3_retroalimentacion_piloto.sql` dejó para el Criterio 1. Se decide avanzar los Criterios 3-5 uno a la vez (no todos juntos) | Petición explícita del usuario, para poder revisar cada criterio antes de seguir con el siguiente. De paso se confirma que `repository.py` nunca lee `plantilla_bucket` con `tipo='cierre'` a nivel criterio (ver sección 4) — las filas de "cierre" del Criterio 1 son contenido inerte desde `content_v1_criterio1.sql`; no se repitió ese patrón para el Criterio 2. El ítem 2.6 (señalización de rampas) no tiene un numeral exacto en la norma, así que sus recomendaciones no citan ninguno, en vez de forzar uno impreciso |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 3 (`supabase/content_criterio3.sql`), mismo registro que el Criterio 2. Por primera vez se marcan ítems como optativos (`es_obligatorio = false`: 3.4, 3.8, 3.10) en vez de obligatorios | Hasta este criterio, todos los ítems cargados (1 y 2) eran obligatorios por derivar de un numeral puntual — estos 3 ítems de Criterio 3 no tienen ese respaldo directo (técnica de empuje/tracción, difusión de hábitos posturales, bienestar general), así que es la primera vez que el sistema puede repartir hallazgos entre "Temas obligatorios" y "Temas optativos" con contenido real, no solo con la paridad sintética de los tests. Verificado generando un criterio de prueba con hallazgos en ambas categorías. El ítem 3.9 pide reforzar la capacitación "cada año", pero el numeral 10.3 de la norma dice "cada dos años" — se redactó con el límite real de la norma; queda para que el Dr. Sergio confirme cuál debe prevalecer (sección 4) |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 4, "Difusión y promoción de la salud" (`supabase/content_criterio4.sql`) | A diferencia de los Criterios 1-3, este criterio no mapea a un solo capítulo de la norma (no existe un "Capítulo de difusión" en la NOM-036-1-STPS-2018): 5 de sus 10 ítems (4.1, 4.2, 4.3, 4.6, 4.10) quedaron sin numeral y marcados optativos, por ser prácticas de gestión sin un requisito puntual que las respalde, en vez de forzar una cita imprecisa. El ítem 4.6 (auditorías) es un caso distinto: sí tiene un numeral exacto (11.1), pero ese numeral dice textualmente que el patrón "tendrá la opción" de contratar una unidad de verificación — es la propia norma la que lo define como voluntario, no una interpretación nuestra. Verificado con un criterio de prueba (5 obligatorios + 5 optativos, reparto correcto) |
+| 2026-10-02 | Se redacta y carga el contenido real del Criterio 5, "Medidas de prevención y control" (`supabase/content_criterio5.sql`) — con esto, los 5 criterios del instrumento completo ya tienen contenido real | Es el criterio que mapea más directo a la norma desde el Criterio 1 (Capítulos 7, 8, 9.2 y 10.1); solo 2 de 10 ítems quedaron optativos. El ítem 5.7 (Cuestionario Nórdico de Kuorinka) es un caso nuevo: tiene numeral exacto (9.2), pero ese numeral dice que la detección de síntomas "se podrá" realizar con esa herramienta — la vigilancia a la salud en sí es obligatoria, pero este instrumento específico es una opción entre varias, no la única. Se generó por primera vez un informe con los 5 criterios completos (datos sintéticos, contenido real de la base): el radar deja de ser degenerado (5 ejes), `es_parcial` da `False`, y se ejercitó por primera vez con datos reales la plantilla de cierre "informe completo" que quedó lista desde la retroalimentación piloto pero nunca se había podido probar. Pendiente de aquí en adelante (Etapa 7): extender el formulario público a los 50 ítems (sigue filtrado a Criterio 1), el heatmap de 50 ítems, y la prueba de extremo a extremo contra el caso JASANA completo |
 
 ---
 
