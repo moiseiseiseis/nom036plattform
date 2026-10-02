@@ -1,6 +1,6 @@
 import "server-only";
 import { sql } from "@/lib/db";
-import type { DatosGeneralesInput, EvaluacionConDetalle, Item } from "./types";
+import type { CriterioConItems, DatosGeneralesInput, EvaluacionConDetalle } from "./types";
 
 export async function getEvaluacionPorToken(
   token: string
@@ -32,13 +32,25 @@ export async function getEvaluacionPorToken(
   const evaluacion = evaluaciones[0];
   if (!evaluacion) return null;
 
-  const items = await sql<Item[]>`
-    select i.id, i.numero, i.texto_pregunta
+  const filas = await sql<
+    { criterio_numero: number; criterio_nombre: string; id: string; numero: number; texto_pregunta: string }[]
+  >`
+    select c.numero as criterio_numero, c.nombre as criterio_nombre,
+           i.id, i.numero, i.texto_pregunta
     from nom036.item i
     join nom036.criterio c on c.id = i.criterio_id
-    where c.numero = 1
-    order by i.numero
+    order by c.orden, i.numero
   `;
+
+  const criterios: CriterioConItems[] = [];
+  for (const fila of filas) {
+    let criterio = criterios.find((c) => c.numero === fila.criterio_numero);
+    if (!criterio) {
+      criterio = { numero: fila.criterio_numero, nombre: fila.criterio_nombre, items: [] };
+      criterios.push(criterio);
+    }
+    criterio.items.push({ id: fila.id, numero: fila.numero, texto_pregunta: fila.texto_pregunta });
+  }
 
   return {
     id: evaluacion.id,
@@ -53,7 +65,7 @@ export async function getEvaluacionPorToken(
       turnos: evaluacion.turnos,
       descripcion_mmh: evaluacion.descripcion_mmh,
     },
-    items_criterio1: items,
+    criterios,
   };
 }
 

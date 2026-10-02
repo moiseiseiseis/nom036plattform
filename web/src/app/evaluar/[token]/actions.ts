@@ -36,7 +36,7 @@ export async function enviarEvaluacion(
     const nivelRaw = formData.get(`nivel_${itemId}`);
     const nivel = nivelRaw === null ? NaN : Number(nivelRaw);
     if (!Number.isInteger(nivel) || nivel < 0 || nivel > 4) {
-      return { error: "Responde los 10 ítems del cuestionario antes de enviar." };
+      return { error: "Responde todos los ítems del cuestionario antes de enviar." };
     }
     respuestas.push({ item_id: itemId, nivel });
   }

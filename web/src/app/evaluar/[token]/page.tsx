@@ -49,7 +49,7 @@ export default async function EvaluarPage({
           nivel que mejor describe la situación actual, del 0 (Nada) al 4 (Óptimo).
         </p>
       </header>
-      <EvaluacionForm token={token} empresa={evaluacion.empresa} items={evaluacion.items_criterio1} />
+      <EvaluacionForm token={token} empresa={evaluacion.empresa} criterios={evaluacion.criterios} />
     </main>
   );
 }

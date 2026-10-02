@@ -16,12 +16,18 @@ export interface Item {
   texto_pregunta: string;
 }
 
+export interface CriterioConItems {
+  numero: number;
+  nombre: string;
+  items: Item[];
+}
+
 export interface EvaluacionConDetalle {
   id: string;
   token_publico: string;
   estado: EstadoEvaluacion;
   empresa: Empresa;
-  items_criterio1: Item[];
+  criterios: CriterioConItems[];
 }
 
 export interface DatosGeneralesInput {

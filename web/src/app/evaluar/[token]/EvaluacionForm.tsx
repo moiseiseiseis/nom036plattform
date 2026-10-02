@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { Empresa, Item } from "@/lib/nom036/types";
+import type { CriterioConItems, Empresa } from "@/lib/nom036/types";
 import { enviarEvaluacion, type EnviarEvaluacionState } from "./actions";
 
 const NIVELES = [
@@ -20,13 +20,14 @@ const CAMPO =
 export function EvaluacionForm({
   token,
   empresa,
-  items,
+  criterios,
 }: {
   token: string;
   empresa: Empresa;
-  items: Item[];
+  criterios: CriterioConItems[];
 }) {
-  const accion = enviarEvaluacion.bind(null, token, items.map((item) => item.id));
+  const todosLosItemIds = criterios.flatMap((criterio) => criterio.items.map((item) => item.id));
+  const accion = enviarEvaluacion.bind(null, token, todosLosItemIds);
   const [state, formAction, pending] = useActionState(accion, ESTADO_INICIAL);
 
   return (
@@ -100,45 +101,49 @@ export function EvaluacionForm({
         </label>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-6 rounded-2xl border border-black/10 bg-white p-4 shadow-sm sm:p-6">
-        <legend className="px-1 text-lg font-semibold">
-          Criterio 1 — Identificación y clasificación de los puestos de trabajo
-          ocupacionalmente expuestos
-        </legend>
+      {criterios.map((criterio) => (
+        <fieldset
+          key={criterio.numero}
+          className="flex flex-col gap-6 rounded-2xl border border-black/10 bg-white p-4 shadow-sm sm:p-6"
+        >
+          <legend className="px-1 text-lg font-semibold">
+            Criterio {criterio.numero} — {criterio.nombre}
+          </legend>
 
-        {items.map((item, index) => (
-          <div
-            key={item.id}
-            className={`flex flex-col gap-3 ${index > 0 ? "border-t border-black/5 pt-6" : ""}`}
-          >
-            <p className="font-medium">
-              <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
-                {item.numero}
-              </span>
-              {item.texto_pregunta}
-            </p>
-            <div className="grid grid-cols-5 gap-2">
-              {NIVELES.map((nivel) => (
-                <label key={nivel.valor} className="relative flex flex-col items-center gap-1">
-                  <input
-                    type="radio"
-                    name={`nivel_${item.id}`}
-                    value={nivel.valor}
-                    required
-                    className="peer sr-only"
-                  />
-                  <span
-                    className={`flex h-10 w-full items-center justify-center rounded-md text-sm font-semibold text-white ring-offset-2 transition peer-checked:scale-105 peer-checked:ring-2 peer-focus-visible:ring-2 hover:opacity-90 ${nivel.color}`}
-                  >
-                    {nivel.valor}
-                  </span>
-                  <span className="text-center text-xs text-gray-500">{nivel.etiqueta}</span>
-                </label>
-              ))}
+          {criterio.items.map((item, index) => (
+            <div
+              key={item.id}
+              className={`flex flex-col gap-3 ${index > 0 ? "border-t border-black/5 pt-6" : ""}`}
+            >
+              <p className="font-medium">
+                <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
+                  {item.numero}
+                </span>
+                {item.texto_pregunta}
+              </p>
+              <div className="grid grid-cols-5 gap-2">
+                {NIVELES.map((nivel) => (
+                  <label key={nivel.valor} className="relative flex flex-col items-center gap-1">
+                    <input
+                      type="radio"
+                      name={`nivel_${item.id}`}
+                      value={nivel.valor}
+                      required
+                      className="peer sr-only"
+                    />
+                    <span
+                      className={`flex h-10 w-full items-center justify-center rounded-md text-sm font-semibold text-white ring-offset-2 transition peer-checked:scale-105 peer-checked:ring-2 peer-focus-visible:ring-2 hover:opacity-90 ${nivel.color}`}
+                    >
+                      {nivel.valor}
+                    </span>
+                    <span className="text-center text-xs text-gray-500">{nivel.etiqueta}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </fieldset>
+          ))}
+        </fieldset>
+      ))}
 
       {state.error && (
         <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
