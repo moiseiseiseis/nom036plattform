@@ -97,10 +97,16 @@ contexto.
       ("...síntomas musculoesqueléticos que estén posiblemente  con el manejo manual de
       cargas", parece faltar una palabra como "relacionados").
       **Sigue pendiente:** recomendaciones por ítem × nivel y plantillas de apertura por bucket
-      de los Criterios 3-5 — el trabajo de contenido más grande que falta antes de la Etapa 7,
-      yendo criterio por criterio (decisión de sesión, ver sección 7). Criterio 2 ya se cargó:
-      `supabase/content_criterio2.sql` (numeral NOM por ítem, 50 recomendaciones, apertura por
-      bucket). No se cargaron plantillas de "cierre" por criterio para el Criterio 2 —
+      de los Criterios 4-5 — el trabajo de contenido más grande que falta antes de la Etapa 7,
+      yendo criterio por criterio (decisión de sesión, ver sección 7). Criterios 2 y 3 ya se
+      cargaron: `supabase/content_criterio2.sql` y `content_criterio3.sql` (numeral NOM por
+      ítem, 50 recomendaciones, apertura por bucket cada uno). El Criterio 3 es el primero con
+      ítems marcados `es_obligatorio = false` (3.4, 3.8, 3.10 — técnica específica de
+      empuje/tracción, difusión de hábitos posturales y bienestar general; no derivan de un
+      numeral puntual, a diferencia del resto). También tiene una inconsistencia entre el ítem
+      3.9 ("cada año") y el numeral 10.3 de la norma ("cada dos años") — se redactó la
+      recomendación con el límite real de la norma; confirmar con el Dr. Sergio cuál debe
+      prevalecer. No se cargaron plantillas de "cierre" por criterio para los Criterios 2 y 3 —
       `repository.py` nunca las lee (solo `tipo = 'apertura'` por criterio); las que existen
       para el Criterio 1 desde `content_v1_criterio1.sql` son contenido inerte, no vale la pena
       repetirlo.
@@ -372,11 +378,11 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 **Objetivo:** cobertura total del instrumento de 50 ítems.
 
 - [ ] Recibir y cargar contenido (ítems + recomendaciones + plantillas) de los Criterios 2-5.
-      Ítems: [x] cargados (sección 4). Criterio 2: [x] recomendaciones + apertura cargadas
-      (`content_criterio2.sql`). Criterios 3-5: [ ] pendientes — se avanza uno a la vez (no
-      todos de un tirón), cruzando cada ítem contra el texto oficial de la NOM-036 (numeral +
-      obligatorio/optativo) antes de redactar sus recomendaciones, igual que se hizo para
-      el Criterio 1 (`content_v1_criterio1.sql`).
+      Ítems: [x] cargados (sección 4). Criterios 2 y 3: [x] recomendaciones + apertura
+      cargadas (`content_criterio2.sql`, `content_criterio3.sql`). Criterios 4-5: [ ]
+      pendientes — se avanza uno a la vez (no todos de un tirón), cruzando cada ítem contra el
+      texto oficial de la NOM-036 (numeral + obligatorio/optativo) antes de redactar sus
+      recomendaciones, igual que se hizo para el Criterio 1 (`content_v1_criterio1.sql`).
 - [ ] Extender formulario público a los 50 ítems.
 - [ ] Extender generación de gráficas (radar completo de 5 ejes, heatmap de 50 ítems).
 - [ ] Prueba de extremo a extremo con el caso JASANA completo, comparando el informe generado
@@ -421,6 +427,7 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | 2026-09-18 | Vercel (`web/`) no tiene activado el auto-deploy por GitHub — a diferencia de Render (`service/`), que sí despliega solo con cada push a `master`. Hubo que correr `vercel --prod` manualmente para publicar varios commits de esta sesión | Se descubrió al verificar en producción un cambio ya pusheado que no aparecía en el panel. Pendiente: conectar el repo de GitHub al proyecto de Vercel (Project Settings → Git) para que no vuelva a pasar |
 | 2026-10-02 | Se reciben y cargan los 50 ítems completos del instrumento (`references/Formato de Pre Diagnóstico NOM 036-1-STPS-2018 versión 22.09.26.xlsx`) — los 40 de los Criterios 2-5 vía `supabase/seed_etapa7_items_criterios_2_a_5.sql`. Se corrige el nombre del Criterio 4 a "Difusión y promoción de la salud" (el instrumento oficial no coincide con el nombre tomado antes del informe JASANA) | Desbloquea la pregunta abierta más grande de la sección 4. Solo se cargó el texto de la pregunta — numeral NOM, `es_obligatorio`, recomendaciones por ítem × nivel y plantillas de apertura/cierre de estos 4 criterios siguen pendientes (ver sección 4), es el trabajo de contenido más grande que queda antes de cerrar la Etapa 7. Durante esta sesión el proyecto Supabase compartido ("talleres culturales") se pausó por inactividad (plan free) y el pooler de Postgres tardó unos minutos en volver a registrar el tenant después de reactivarlo manualmente — si vuelve a pasar, no es una base de datos rota, solo esperar o revisar el dashboard de Supabase |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 2 (`supabase/content_criterio2.sql`: numeral NOM por ítem, 50 recomendaciones, apertura por bucket), siguiendo el mismo registro homologado que `content_v3_retroalimentacion_piloto.sql` dejó para el Criterio 1. Se decide avanzar los Criterios 3-5 uno a la vez (no todos juntos) | Petición explícita del usuario, para poder revisar cada criterio antes de seguir con el siguiente. De paso se confirma que `repository.py` nunca lee `plantilla_bucket` con `tipo='cierre'` a nivel criterio (ver sección 4) — las filas de "cierre" del Criterio 1 son contenido inerte desde `content_v1_criterio1.sql`; no se repitió ese patrón para el Criterio 2. El ítem 2.6 (señalización de rampas) no tiene un numeral exacto en la norma, así que sus recomendaciones no citan ninguno, en vez de forzar uno impreciso |
+| 2026-10-02 | Se redacta y carga el contenido real del Criterio 3 (`supabase/content_criterio3.sql`), mismo registro que el Criterio 2. Por primera vez se marcan ítems como optativos (`es_obligatorio = false`: 3.4, 3.8, 3.10) en vez de obligatorios | Hasta este criterio, todos los ítems cargados (1 y 2) eran obligatorios por derivar de un numeral puntual — estos 3 ítems de Criterio 3 no tienen ese respaldo directo (técnica de empuje/tracción, difusión de hábitos posturales, bienestar general), así que es la primera vez que el sistema puede repartir hallazgos entre "Temas obligatorios" y "Temas optativos" con contenido real, no solo con la paridad sintética de los tests. Verificado generando un criterio de prueba con hallazgos en ambas categorías. El ítem 3.9 pide reforzar la capacitación "cada año", pero el numeral 10.3 de la norma dice "cada dos años" — se redactó con el límite real de la norma; queda para que el Dr. Sergio confirme cuál debe prevalecer (sección 4) |
 
 ---
 
