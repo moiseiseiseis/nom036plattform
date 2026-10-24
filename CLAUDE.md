@@ -158,7 +158,24 @@ contexto.
       `supabase/content_v1_criterio1.sql`. Los 10 ítems se clasificaron como obligatorios
       (derivan del análisis exigido por el Capítulo 7). Sigue pendiente la revisión y
       validación final del Dr. Sergio antes de usarse en un informe real a una empresa.
-- [ ] Campos exactos de "información general de la empresa" a solicitar en el formulario.
+- [x] **Revisión del Dr. Sergio sobre los 5 criterios (octubre de 2026), aplicada.** Fuente de
+      verdad del contenido: `retroalimentacion/criterios-valoraciones-separadas.md` — cada nivel
+      tiene ahora una *descripción* (formulario) separada de la *recomendación* (informe).
+      Cargado a la base con `supabase/content_v4_valoraciones_separadas.sql`, que se GENERA con
+      `service/scripts/generar_sql_valoraciones.py` (no editar el SQL a mano: se corrige el .md
+      y se regenera). Los pendientes que dejó esa revisión los delegó el Dr. al equipo; se
+      resolvieron el 2026-10-24, verificados contra el texto de la norma — ver sección 0 de
+      `retroalimentacion/pendientes-revision-dr-sergio.md`. Esto cierra varios puntos de esta
+      sección: erratas de 1.7 y 5.9 corregidas; 3.9 queda en "cada año" (decisión del Dr., más
+      estricta que el "cada dos años" del 10.3); el Criterio 4 se llama "Difusión y registro de
+      políticas y estrategias ergonómicas" (como en el artículo publicado); 2.6 pasa a optativo,
+      3.4 a obligatorio (10.1 c y d); 5.2 pasa a citar la evaluación específica (7.1 c, 4.9) para
+      no duplicar al 1.4; el tratamiento del valor frontera de las franjas queda confirmado
+      (límite inferior incluido).
+- [x] Campos exactos de "información general de la empresa" a solicitar en el formulario.
+      **Resuelto 2026-10-24:** el formulario pide domicilio estructurado (calle y número,
+      colonia, CP, municipio, estado), que el servidor compone en `empresa.ubicacion` — así el
+      informe y el panel lo muestran completo sin cambiar el esquema ni el generador.
       Confirmado como gap por la retroalimentación de la validación piloto
       (`retroalimentacion/reporte.txt`, hallazgo 6): el numeral 7.4 a) 2 de la norma pide
       domicilio completo del centro de trabajo (calle, número, colonia, CP), y el formulario
@@ -418,7 +435,8 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 
 - [ ] Revisión de seguridad básica: HTTPS, rate limiting en endpoints públicos, expiración de
       tokens, logs de auditoría (quién generó/aprobó cada informe).
-- [ ] Pulido de UI del formulario público (accesibilidad, responsive).
+- [x] Pulido de UI del formulario público (accesibilidad, responsive). Rediseño completo el
+      2026-10-24 (ver sección 7).
 - [ ] Manual breve de uso del panel para el equipo del Dr.
 - [ ] Preparar material de la plataforma para la sección de metodología del artículo
       académico.
@@ -452,6 +470,7 @@ patrón a los 4 criterios restantes o se ajusta el modelo antes de escalar.
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 4, "Difusión y promoción de la salud" (`supabase/content_criterio4.sql`) | A diferencia de los Criterios 1-3, este criterio no mapea a un solo capítulo de la norma (no existe un "Capítulo de difusión" en la NOM-036-1-STPS-2018): 5 de sus 10 ítems (4.1, 4.2, 4.3, 4.6, 4.10) quedaron sin numeral y marcados optativos, por ser prácticas de gestión sin un requisito puntual que las respalde, en vez de forzar una cita imprecisa. El ítem 4.6 (auditorías) es un caso distinto: sí tiene un numeral exacto (11.1), pero ese numeral dice textualmente que el patrón "tendrá la opción" de contratar una unidad de verificación — es la propia norma la que lo define como voluntario, no una interpretación nuestra. Verificado con un criterio de prueba (5 obligatorios + 5 optativos, reparto correcto) |
 | 2026-10-02 | Se redacta y carga el contenido real del Criterio 5, "Medidas de prevención y control" (`supabase/content_criterio5.sql`) — con esto, los 5 criterios del instrumento completo ya tienen contenido real | Es el criterio que mapea más directo a la norma desde el Criterio 1 (Capítulos 7, 8, 9.2 y 10.1); solo 2 de 10 ítems quedaron optativos. El ítem 5.7 (Cuestionario Nórdico de Kuorinka) es un caso nuevo: tiene numeral exacto (9.2), pero ese numeral dice que la detección de síntomas "se podrá" realizar con esa herramienta — la vigilancia a la salud en sí es obligatoria, pero este instrumento específico es una opción entre varias, no la única. Se generó por primera vez un informe con los 5 criterios completos (datos sintéticos, contenido real de la base): el radar deja de ser degenerado (5 ejes), `es_parcial` da `False`, y se ejercitó por primera vez con datos reales la plantilla de cierre "informe completo" que quedó lista desde la retroalimentación piloto pero nunca se había podido probar. Pendiente de aquí en adelante (Etapa 7): extender el formulario público a los 50 ítems (sigue filtrado a Criterio 1), el heatmap de 50 ítems, y la prueba de extremo a extremo contra el caso JASANA completo |
 | 2026-10-02 | Se extiende el formulario público a los 50 ítems y se agrega un heatmap por ítem como nueva "Figura 2" del informe (`grafica.py::generar_heatmap_items`, `engine/scoring.py::ETIQUETA_POR_NIVEL`) | Con el contenido de los 5 criterios ya cargado, el formulario y las gráficas eran lo único que seguía limitado a Criterio 1. El heatmap usa la misma paleta de severidad que el radar y la Tabla 2 (0=rojo…4=azul), pero con la etiqueta de NIVEL de un ítem ("Nada", no "Inexistente" — esa es la etiqueta de BUCKET, un concepto distinto aunque comparta color), por eso se creó `ETIQUETA_POR_NIVEL` en vez de reutilizar `ETIQUETA_POR_BUCKET`. La dona de temas pasa a ser "Figura 3". Verificado contra la base real: formulario con 5 fieldsets y 50 radio-groups sin errores de servidor; heatmap con 1 fila (caso actual de evaluaciones reales) y con 5 filas (caso sintético) |
+| 2026-10-24 | Formulario público rediseñado como asistente de una pregunta por pantalla (`EvaluacionForm.tsx`): bienvenida → datos generales → portada de cada sección → pregunta con las 5 opciones y la descripción de cada nivel (avance automático al elegir, atajos 0-4/Enter) → resumen editable → envío. Borrador en `localStorage` (`borrador.ts`), que se borra en `/gracias`. Nueva columna `recomendacion.descripcion_nivel` (migración `20261024000001`). El Server Action recibe un objeto (no `FormData`) e inserta las 50 respuestas en un solo `insert` | Petición del Dr. Sergio de una autoevaluación "relativamente dinámica" y del usuario de que no se sienta como un formulario larguísimo. Sin opción "No aplica": cambiaría el denominador del porcentaje del instrumento validado. El borrador es solo local (decisión 1.6 de `pendientes-revision-dr-sergio.md`); si se necesita retomar desde otro dispositivo, habría que guardarlo en la base. Probado con Playwright de punta a punta en 390×844 y 1440×900 (validación, recarga a medio camino, teclado, edición desde el resumen, envío y persistencia), sin errores de consola. Pendiente: que el informe use "descripción + recomendación" por hallazgo (decisión 1.5) |
 
 ---
 

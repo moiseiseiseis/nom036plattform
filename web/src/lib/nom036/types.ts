@@ -10,10 +10,19 @@ export interface Empresa {
   descripcion_mmh: string | null;
 }
 
+export interface NivelItem {
+  nivel: number;
+  // Descripción del nivel que ve el autoevaluador — la recomendación del
+  // informe vive en la misma fila de nom036.recomendacion pero no se expone
+  // en el formulario público.
+  descripcion: string | null;
+}
+
 export interface Item {
   id: string;
   numero: number;
   texto_pregunta: string;
+  niveles: NivelItem[];
 }
 
 export interface CriterioConItems {

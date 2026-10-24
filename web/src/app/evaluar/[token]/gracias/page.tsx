@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getEvaluacionPorToken } from "@/lib/nom036/evaluaciones";
+import { LimpiarBorrador } from "../LimpiarBorrador";
 
 export default async function GraciasPage({
   params,
@@ -23,6 +24,7 @@ export default async function GraciasPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-4 px-4 text-center">
+      <LimpiarBorrador token={token} />
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
         <svg
           viewBox="0 0 24 24"

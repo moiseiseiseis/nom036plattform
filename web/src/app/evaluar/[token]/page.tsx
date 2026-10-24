@@ -38,17 +38,7 @@ export default async function EvaluarPage({
   }
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
-      <header className="flex flex-col gap-2 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-        <p className="text-xs font-semibold tracking-wide text-blue-700 uppercase">
-          Autoevaluación
-        </p>
-        <h1 className="text-2xl font-semibold">NOM-036-1-STPS-2018</h1>
-        <p className="text-gray-600">
-          Responde con la información real de tu empresa. Para cada afirmación, elige el
-          nivel que mejor describe la situación actual, del 0 (Nada) al 4 (Óptimo).
-        </p>
-      </header>
+    <main className="mx-auto flex w-full max-w-2xl flex-col px-4 pb-6">
       <EvaluacionForm token={token} empresa={evaluacion.empresa} criterios={evaluacion.criterios} />
     </main>
   );
