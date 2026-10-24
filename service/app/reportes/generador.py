@@ -12,6 +12,7 @@ from docxtpl import DocxTemplate, InlineImage, RichText
 from app.db import get_connection
 from app.engine.engine import evaluar_criterio, evaluar_global
 from app.engine.models import ResultadoCriterio, ResultadoGlobal
+from app.engine.narrativa import como_continuacion
 from app.engine.scoring import calcular_global, calcular_porcentaje, calcular_puntaje, clasificar_bucket
 
 from . import colores_revision as colores
@@ -86,6 +87,8 @@ def calcular_resultados(
                 respuestas=dc.respuestas,
                 recomendaciones=dc.recomendaciones,
                 plantilla_apertura=dc.plantillas_apertura.get(bucket, ""),
+                descripciones=dc.descripciones,
+                plantilla_implicacion=dc.plantillas_implicacion.get(bucket, ""),
             )
         )
 
@@ -121,7 +124,10 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
 
     empresa_nombre = _rt(datos.empresa_nombre, color_empresa, bold=True)
     empresa_ubicacion = _rt(datos.empresa_ubicacion or "no especificada", color_empresa)
-    empresa_giro = _rt(datos.empresa_giro or "no especificado", color_empresa)
+    # Giro, turnos y actividades van a media oración en la plantilla ("…su
+    # actividad principal es fabricación de…"); la empresa los captura con
+    # mayúscula inicial.
+    empresa_giro = _rt(como_continuacion(datos.empresa_giro or "no especificado"), color_empresa)
     empresa_num_trabajadores = _rt(
         datos.empresa_num_trabajadores
         if datos.empresa_num_trabajadores is not None
@@ -129,8 +135,11 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
         color_empresa,
         bold=True,
     )
-    empresa_turnos = _rt(datos.empresa_turnos or "no especificados", color_empresa)
-    empresa_descripcion_mmh = _rt(datos.empresa_descripcion_mmh or "no especificadas", color_empresa)
+    empresa_turnos = _rt(como_continuacion(datos.empresa_turnos or "turnos no especificados"), color_empresa)
+    empresa_descripcion_mmh = _rt(
+        como_continuacion((datos.empresa_descripcion_mmh or "no especificadas").rstrip(".")),
+        color_empresa,
+    )
     criterios_ctx = [
         {
             "numero": r.numero,
@@ -232,13 +241,14 @@ def _rt(texto, color_hex: str | None, *, bold: bool = False) -> RichText:
 def _narrativa_rt(
     resultado: ResultadoCriterio, color_plantilla: str | None, color_recomendacion: str | None
 ) -> RichText:
-    """Narrativa de un criterio con la plantilla de apertura y los hallazgos
-    resaltados con colores distintos, reproduciendo exactamente el mismo
-    ensamblado de `narrativa.ensamblar_narrativa_criterio`."""
+    """Narrativa de un criterio con el texto fijo por franja (apertura,
+    implicación) y las observaciones por ítem resaltados con colores
+    distintos, a partir de los mismos segmentos que arma
+    `narrativa.ensamblar_narrativa_criterio`."""
     rt = RichText()
-    rt.add(resultado.plantilla_apertura, highlight=color_plantilla)
-    for h in resultado.hallazgos:
-        rt.add(f" {h.texto_recomendacion}", highlight=color_recomendacion)
+    for i, segmento in enumerate(resultado.segmentos):
+        color = color_plantilla if segmento.origen == "plantilla" else color_recomendacion
+        rt.add(segmento.texto if i == 0 else f" {segmento.texto}", highlight=color)
     return rt
 
 

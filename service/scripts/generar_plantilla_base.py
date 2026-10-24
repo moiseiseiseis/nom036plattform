@@ -109,11 +109,17 @@ def construir_documento() -> Document:
         "exposición de los trabajadores a la manipulación de cargas que puedan afectar "
         "su salud musculoesquelética.",
     )
+    # Fechas y alcance tomados del texto oficial (DOF 23/11/2018, Transitorios
+    # y numerales 2 y 2.1): el texto anterior, heredado del informe JASANA,
+    # decía "aun cuando la actividad se realice una sola vez al día", lo
+    # contrario de lo que dice el numeral 2 ("más de una vez al día").
     _parrafo_justificado(
         doc,
-        "Esta norma es aplicable a todo puesto de trabajo en el que se manipulen o "
-        "transporten objetos con un peso superior a 3 kg, aun cuando la actividad se "
-        "realice una sola vez al día.",
+        "La norma entró en vigor el 2 de enero de 2020, y desde el 4 de enero de 2023 son "
+        "exigibles también el análisis de los factores de riesgo ergonómico y el programa de "
+        "ergonomía. Aplica en todos los centros de trabajo donde existan trabajadores que "
+        "realicen manejo manual de cargas de forma cotidiana (más de una vez al día), "
+        "considerando como carga todo objeto con una masa de 3 kg o más.",
     )
     _parrafo_justificado(
         doc,
@@ -144,18 +150,24 @@ def construir_documento() -> Document:
     p.add_run(" se encuentra ubicada en {{r empresa_ubicacion }}. Cuenta con aproximadamente ")
     p.add_run("{{r empresa_num_trabajadores }}")
     p.add_run(
-        " trabajadores, con el siguiente esquema de turnos: {{r empresa_turnos }}. Su giro "
-        "es {{r empresa_giro }}. Las actividades relacionadas con el manejo manual de "
-        "cargas identificadas son: {{r empresa_descripcion_mmh }}."
+        " trabajadores, organizados en {{r empresa_turnos }}, y su actividad principal es "
+        "{{r empresa_giro }}."
+    )
+    _parrafo_justificado(
+        doc,
+        "Como actividades relacionadas con el manejo manual de cargas, la empresa reporta "
+        "las siguientes: {{r empresa_descripcion_mmh }}.",
     )
 
     # --- Resultados de la evaluación ----------------------------------------
     _seccion(doc, "Resultados de la evaluación")
     _parrafo_justificado(
         doc,
-        "El cuestionario se divide en temas. Cada tema tiene diez preguntas, calificadas "
-        "del 0 (Nada) al 4 (Óptimo). Entre más alto es el puntaje de un tema, mejor cumple "
-        "la empresa con la norma en ese tema.",
+        "El instrumento de autoevaluación se divide en cinco criterios, cada uno integrado "
+        "por diez ítems que se califican en una escala del 0 (Nada) al 4 (Óptimo). La "
+        "calificación máxima de cada criterio es de 40 puntos: entre mayor sea el puntaje, "
+        "mayor es el grado de cumplimiento de la NOM-036-1-STPS-2018 en ese criterio. Los "
+        "resultados se presentan en las tablas 1 y 2 y en las figuras 1 y 2.",
     )
 
     doc.add_paragraph("Tabla 1. Calificación obtenida por criterio evaluado.")
@@ -163,6 +175,14 @@ def construir_documento() -> Document:
 
     doc.add_paragraph("Tabla 2. Porcentaje de cumplimiento por criterio evaluado.")
     doc.add_paragraph(MARCADOR_TABLA_PORCENTAJES)
+    _parrafo_justificado(
+        doc,
+        "La calificación de cada criterio se convirtió en porcentaje para facilitar su "
+        "interpretación, y cada porcentaje se clasificó en una de cinco franjas de 20 puntos "
+        "(Inexistente, Mínimo, Regular, Aceptable y Óptimo). Estos resultados reflejan el "
+        "grado de cumplimiento percibido por la persona que respondió la autoevaluación, por "
+        "lo que conviene corroborarlos en el centro de trabajo.",
+    )
 
     img_p = doc.add_paragraph("{{ grafica_radar }}")
     img_p.alignment = WD_ALIGN_PARAGRAPH.CENTER

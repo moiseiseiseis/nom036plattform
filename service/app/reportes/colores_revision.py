@@ -33,13 +33,14 @@ LEYENDA = (
     ),
     (
         "Plantilla fija",
-        "Texto de apertura o cierre que depende solo de la franja de severidad — el mismo "
-        "para cualquier empresa que caiga en ella.",
+        "Texto de apertura, implicación o cierre que depende solo de la franja de "
+        "severidad — el mismo para cualquier empresa que caiga en ella.",
         PLANTILLA_FIJA,
     ),
     (
-        "Recomendación de catálogo",
-        "Texto elegido del catálogo ítem-nivel según la respuesta específica de la empresa.",
+        "Texto de catálogo por ítem",
+        "Descripción del nivel respondido en un ítem, elegida del catálogo ítem-nivel según "
+        "la respuesta específica de la empresa.",
         RECOMENDACION_CATALOGO,
     ),
     (

@@ -2,7 +2,12 @@
 para el cierre global de una evaluación."""
 
 from .models import RespuestaItem, ResultadoCriterio, ResultadoGlobal
-from .narrativa import construir_cierre_parcial, ensamblar_narrativa_criterio
+from .narrativa import (
+    DescripcionesPorItemNivel,
+    construir_cierre_parcial,
+    ensamblar_narrativa_criterio,
+    texto_narrativa,
+)
 from .recomendaciones import (
     RecomendacionesPorItemNivel,
     UMBRAL_HALLAZGO_DEFAULT,
@@ -20,12 +25,20 @@ def evaluar_criterio(
     recomendaciones: RecomendacionesPorItemNivel,
     plantilla_apertura: str,
     umbral_hallazgo: int = UMBRAL_HALLAZGO_DEFAULT,
+    descripciones: DescripcionesPorItemNivel | None = None,
+    plantilla_implicacion: str = "",
 ) -> ResultadoCriterio:
     puntaje, puntaje_maximo = calcular_puntaje([r.nivel for r in respuestas])
     porcentaje = calcular_porcentaje(puntaje, puntaje_maximo)
     bucket = clasificar_bucket(porcentaje)
     hallazgos = identificar_hallazgos(respuestas, recomendaciones, umbral_hallazgo)
-    narrativa = ensamblar_narrativa_criterio(plantilla_apertura, hallazgos)
+    segmentos = ensamblar_narrativa_criterio(
+        plantilla_apertura,
+        respuestas,
+        descripciones or {},
+        plantilla_implicacion,
+        umbral_hallazgo,
+    )
     return ResultadoCriterio(
         criterio_id=criterio_id,
         numero=numero,
@@ -34,9 +47,10 @@ def evaluar_criterio(
         puntaje_maximo=puntaje_maximo,
         porcentaje=porcentaje,
         bucket=bucket,
-        narrativa=narrativa,
+        narrativa=texto_narrativa(segmentos),
         plantilla_apertura=plantilla_apertura,
         hallazgos=hallazgos,
+        segmentos=segmentos,
     )
 
 

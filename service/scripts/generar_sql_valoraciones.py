@@ -33,7 +33,9 @@ RE_CRITERIO = re.compile(r"^## Criterio (\d+) — (.+)$")
 RE_ITEM = re.compile(r"^### Ítem (\d+)\.(\d+) — (.+) — (Obligatorio|Optativo)$")
 RE_PREGUNTA = re.compile(r"^\*\*Pregunta:\*\* (.+)$")
 RE_NIVEL = re.compile(r"^\| ([0-4]) — [^|]+ \| (.+) \| (.+) \|$")
-RE_FRANJA = re.compile(r"^\| (Inexistente|Mínimo|Regular|Aceptable|Óptimo) \([^)]*\) \| (.+) \|$")
+RE_FRANJA = re.compile(
+    r"^\| (Inexistente|Mínimo|Regular|Aceptable|Óptimo) \([^)]*\) \| (.+?) \| (.+) \|$"
+)
 
 
 def _numeral(texto: str) -> str | None:
@@ -48,7 +50,9 @@ def parsear(md: str) -> list[dict]:
     for linea in md.splitlines():
         linea = linea.rstrip()
         if m := RE_CRITERIO.match(linea):
-            criterios.append({"numero": int(m[1]), "nombre": m[2], "items": [], "aperturas": {}})
+            criterios.append(
+                {"numero": int(m[1]), "nombre": m[2], "items": [], "aperturas": {}, "implicaciones": {}}
+            )
             item = None
         elif m := RE_ITEM.match(linea):
             item = {
@@ -65,6 +69,7 @@ def parsear(md: str) -> list[dict]:
             item["niveles"][int(m[1])] = (m[2].strip(), m[3].strip())
         elif m := RE_FRANJA.match(linea):
             criterios[-1]["aperturas"][BUCKET_POR_FRANJA[m[1]]] = m[2].strip()
+            criterios[-1]["implicaciones"][BUCKET_POR_FRANJA[m[1]]] = m[3].strip()
     return criterios
 
 
@@ -77,6 +82,8 @@ def validar(criterios: list[dict]) -> None:
             errores.append(f"criterio {c['numero']}: se esperaban los ítems 1 a 10")
         if set(c["aperturas"]) != set(BUCKET_POR_FRANJA.values()):
             errores.append(f"criterio {c['numero']}: faltan aperturas")
+        if set(c["implicaciones"]) != set(BUCKET_POR_FRANJA.values()):
+            errores.append(f"criterio {c['numero']}: faltan implicaciones")
         for i in c["items"]:
             if not i["pregunta"]:
                 errores.append(f"ítem {c['numero']}.{i['numero']}: sin pregunta")
@@ -101,8 +108,9 @@ def generar_sql(criterios: list[dict]) -> str:
         "-- Contenido revisado por el Dr. Sergio (octubre de 2026) y decisiones del",
         "-- 2026-10-24 (retroalimentacion/pendientes-revision-dr-sergio.md, sección 0):",
         "-- texto de las preguntas, numeral NOM, obligatorio/optativo, descripción del",
-        "-- nivel (formulario), recomendación (informe), apertura por franja y nombre",
-        "-- de los criterios. Requiere la migración 20261024000001.",
+        "-- nivel (formulario), recomendación (informe), apertura e implicación por",
+        "-- franja y nombre de los criterios. Requiere las migraciones 20261024000001",
+        "-- y 20261024000002.",
         "",
         "begin;",
         "",
@@ -129,12 +137,16 @@ def generar_sql(criterios: list[dict]) -> str:
                     "on conflict (item_id, nivel) do update "
                     "set texto = excluded.texto, descripcion_nivel = excluded.descripcion_nivel;"
                 )
-        out.append(f"delete from nom036.plantilla_bucket where criterio_id = {crit} and tipo = 'apertura';")
-        for bucket, texto in c["aperturas"].items():
-            out.append(
-                "insert into nom036.plantilla_bucket (criterio_id, bucket, tipo, texto) "
-                f"values ({crit}, '{bucket}', 'apertura', {q(texto)});"
-            )
+        out.append(
+            f"delete from nom036.plantilla_bucket where criterio_id = {crit} "
+            "and tipo in ('apertura', 'implicacion');"
+        )
+        for tipo, textos in (("apertura", c["aperturas"]), ("implicacion", c["implicaciones"])):
+            for bucket, texto in textos.items():
+                out.append(
+                    "insert into nom036.plantilla_bucket (criterio_id, bucket, tipo, texto) "
+                    f"values ({crit}, '{bucket}', '{tipo}', {q(texto)});"
+                )
         out.append("")
     out.append("commit;")
     return "\n".join(out) + "\n"

@@ -30,6 +30,20 @@ El Dr. Sergio delegó estas decisiones al equipo de desarrollo. Cada una se veri
 
 ---
 
+## 0.1 Para revisión del Dr. — cambios a la redacción del informe (2026-10-24)
+
+Al comparar un informe generado con las mismas puntuaciones del caso JASANA (17, 28, 9, 9 y 10 de 40) contra el informe JASANA real, el generado resultaba una lista de recomendaciones más que un diagnóstico. Se cambió:
+
+- **Párrafo de cada criterio:** ahora sigue la estructura del informe JASANA: apertura según la franja, aspectos favorables (descripción de hasta 2 ítems con nivel 3-4), aspectos por atender (descripción de hasta 3 ítems con nivel 0-1, más el total si son más) y una **implicación** (por qué importa). Las recomendaciones ya no van en este párrafo, solo en "Áreas de oportunidad". En las franjas altas, sin ítems en nivel 0-1, se citan los de nivel 2 como "puntos por reforzar".
+- **25 implicaciones nuevas** (5 criterios × 5 franjas), redactadas en el registro del informe JASANA. Están en la columna "Implicación" de las tablas de apertura de `criterios-valoraciones-separadas.md`. **Requieren su revisión.**
+- **16 recomendaciones reescritas** porque no se entendían fuera de contexto (p. ej. "Se recomienda incluir este gasto…" → "…incluir la adquisición de equipos auxiliares de carga…").
+- **Dos errores de la introducción corregidos contra el DOF**, ambos heredados del informe JASANA:
+  - Decía que la norma aplica "aun cuando la actividad se realice una sola vez al día"; el numeral 2 dice lo contrario: aplica al manejo de cargas "de forma cotidiana (más de una vez al día)".
+  - El informe JASANA dice que la norma entró en vigor en su totalidad el 31 de marzo de 2024. El texto oficial dice: vigencia desde el 2 de enero de 2020, y desde el 4 de enero de 2023 para el Capítulo 7 y los numerales 5.1, 8.3 b) 2), 8.4 y 8.5. Se usaron las fechas del DOF. **Confirmar si la fecha de 2024 viene de alguna publicación posterior** que no esté en `references/`.
+- **Nuevo párrafo en Resultados:** aclara que el porcentaje refleja el cumplimiento *percibido por quien respondió* y conviene corroborarlo en sitio, como lo hace el informe JASANA.
+
+---
+
 ## 1. Decisiones que afectan a todo el instrumento
 
 **1.1 Rangos de las franjas de apertura.** En los 5 criterios, los rangos se traslapan en los valores frontera (Inexistente 0–20 %, Mínimo 20–40 %, Regular 40–60 %, Aceptable 60–80 %, Óptimo 80–100 %). El motor necesita saber a qué franja corresponde exactamente un 20 %, 40 %, 60 % u 80 %.

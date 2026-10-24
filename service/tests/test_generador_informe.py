@@ -37,6 +37,11 @@ def _datos_evaluacion_jasana() -> DatosEvaluacion:
         respuestas=respuestas,
         recomendaciones=recomendaciones,
         plantillas_apertura=plantillas_apertura,
+        descripciones={
+            (r.item_id, r.nivel): f"[PLACEHOLDER] Descripción ítem {r.numero} nivel {r.nivel}."
+            for r in respuestas
+        },
+        plantillas_implicacion={"regular": "[PLACEHOLDER] Implicación criterio 1, bucket regular."},
     )
     plantillas_apertura_global = {
         bucket: f"[PLACEHOLDER] Apertura global, bucket {bucket}."
@@ -73,11 +78,16 @@ def test_generar_informe_produce_docx_valido_y_con_contenido_correcto():
 
     assert "Empresa de Prueba" in texto_completo
     assert "Guadalajara, Jalisco" in texto_completo
-    assert "Criterio 1.-" in texto_completo
-    # Los 3 ítems con nivel <= 1 (umbral de hallazgo) deben aparecer en la narrativa.
-    assert "ítem 2 nivel 1" in texto_completo
-    assert "ítem 6 nivel 1" in texto_completo
-    assert "ítem 9 nivel 1" in texto_completo
+    # El párrafo del criterio describe la situación (descripción del nivel de los 3 ítems
+    # con nivel <= 1) y cierra con la implicación; las recomendaciones de esos ítems van en
+    # las Áreas de oportunidad, no en el párrafo.
+    parrafo_criterio = next(p.text for p in documento.paragraphs if p.text.startswith("Criterio 1.-"))
+    assert "Descripción ítem 2 nivel 1" in parrafo_criterio
+    assert "Descripción ítem 6 nivel 1" in parrafo_criterio
+    assert "Descripción ítem 9 nivel 1" in parrafo_criterio
+    assert parrafo_criterio.endswith("[PLACEHOLDER] Implicación criterio 1, bucket regular.")
+    assert "Recomendación ítem" not in parrafo_criterio
+    assert "Recomendación ítem 2 nivel 1" in texto_completo
 
     assert len(documento.tables) == 2
     tabla_puntajes = documento.tables[0]

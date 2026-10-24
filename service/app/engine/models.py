@@ -23,6 +23,17 @@ class Hallazgo:
 
 
 @dataclass(frozen=True)
+class SegmentoNarrativa:
+    """Una frase del párrafo narrativo de un criterio. `origen` distingue el
+    texto fijo por franja ("plantilla": apertura e implicación) del texto que
+    depende de la respuesta a un ítem ("observacion": la descripción del
+    nivel respondido) — el generador los resalta distinto en modo revisión."""
+
+    texto: str
+    origen: str
+
+
+@dataclass(frozen=True)
 class ResultadoCriterio:
     criterio_id: str
     numero: int
@@ -34,6 +45,7 @@ class ResultadoCriterio:
     narrativa: str
     plantilla_apertura: str
     hallazgos: list[Hallazgo] = field(default_factory=list)
+    segmentos: list[SegmentoNarrativa] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

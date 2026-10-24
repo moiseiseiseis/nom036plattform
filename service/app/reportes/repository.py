@@ -65,26 +65,38 @@ def fetch_datos_evaluacion(conn: psycopg.Connection, evaluacion_id: str) -> Dato
 
             cur.execute(
                 """
-                select rec.item_id, rec.nivel, rec.texto
+                select rec.item_id, rec.nivel, rec.texto, rec.descripcion_nivel
                 from nom036.recomendacion rec
                 join nom036.item i on i.id = rec.item_id
                 where i.criterio_id = %s
                 """,
                 (criterio["id"],),
             )
+            filas_recomendacion = cur.fetchall()
             recomendaciones = {
-                (str(row["item_id"]), row["nivel"]): row["texto"] for row in cur.fetchall()
+                (str(row["item_id"]), row["nivel"]): row["texto"] for row in filas_recomendacion
+            }
+            descripciones = {
+                (str(row["item_id"]), row["nivel"]): row["descripcion_nivel"]
+                for row in filas_recomendacion
+                if row["descripcion_nivel"]
             }
 
             cur.execute(
                 """
-                select bucket, texto
+                select tipo, bucket, texto
                 from nom036.plantilla_bucket
-                where criterio_id = %s and tipo = 'apertura'
+                where criterio_id = %s and tipo in ('apertura', 'implicacion')
                 """,
                 (criterio["id"],),
             )
-            plantillas_apertura = {row["bucket"]: row["texto"] for row in cur.fetchall()}
+            plantillas = cur.fetchall()
+            plantillas_apertura = {
+                row["bucket"]: row["texto"] for row in plantillas if row["tipo"] == "apertura"
+            }
+            plantillas_implicacion = {
+                row["bucket"]: row["texto"] for row in plantillas if row["tipo"] == "implicacion"
+            }
 
             criterios.append(
                 DatosCriterio(
@@ -94,6 +106,8 @@ def fetch_datos_evaluacion(conn: psycopg.Connection, evaluacion_id: str) -> Dato
                     respuestas=respuestas,
                     recomendaciones=recomendaciones,
                     plantillas_apertura=plantillas_apertura,
+                    descripciones=descripciones,
+                    plantillas_implicacion=plantillas_implicacion,
                 )
             )
 

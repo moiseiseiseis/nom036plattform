@@ -103,7 +103,7 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se ha ajustado la distribución de los procesos o materiales para evitar posturas forzadas o traslados innecesarios. | Se recomienda revisar y reorganizar las áreas con manejo manual de cargas. |
+| 0 — Nada | No se ha ajustado la distribución de los procesos o materiales para evitar posturas forzadas o traslados innecesarios. | Se recomienda revisar y reorganizar las áreas con manejo manual de cargas para evitar posturas forzadas y traslados innecesarios. |
 | 1 — Mínimo | Se han hecho algunos ajustes puntuales en la distribución de procesos o materiales, sin un plan general. | Se recomienda evaluar de forma integral la distribución de las áreas con manejo manual de cargas. |
 | 2 — Regular | Se han reubicado procesos o materiales en algunas áreas con manejo manual de cargas, pero en otras persisten posturas forzadas o traslados innecesarios. | Se recomienda reubicar procesos o materiales en las áreas con manejo manual de cargas donde persisten posturas forzadas o traslados innecesarios. |
 | 3 — Aceptable | Se han reubicado procesos o materiales en la mayoría de las áreas con manejo manual de cargas para evitar posturas forzadas o traslados innecesarios. | Se recomienda completar la reubicación de procesos o materiales en todas las áreas con manejo manual de cargas. |
@@ -134,15 +134,15 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 | 4 — Óptimo | Se controla y queda documentado que ningún trabajador excede los límites de masa total por jornada. | Se recomienda mantener documentado el control de la masa acumulada por trabajador. |
 
 ### Apertura del Criterio 1 (por franja de cumplimiento)
-Introduce el párrafo narrativo del criterio en el informe, antes de concatenar los hallazgos.
+Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
 
-| Franja | Apertura |
-|---|---|
-| Inexistente (0 a menos de 20 %) | No existe un proceso formal de identificación y clasificación de los puestos de trabajo con manejo manual de cargas, conforme a lo que exige el numeral 7.2 de la NOM-036-1-STPS-2018. |
-| Mínimo (20 a menos de 40 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas es Mínimo: la mayoría de los elementos que exige el numeral 7.2 de la NOM-036-1-STPS-2018 no están cubiertos. |
-| Regular (40 a menos de 60 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas se encuentra en un nivel Regular: existen avances, pero persisten vacíos relevantes. |
-| Aceptable (60 a menos de 80 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas presenta un nivel Aceptable, con puntos específicos por reforzar. |
-| Óptimo (80 a 100 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas está consolidado. |
+| Franja | Apertura | Implicación |
+|---|---|---|
+| Inexistente (0 a menos de 20 %) | No existe un proceso formal de identificación y clasificación de los puestos de trabajo con manejo manual de cargas, conforme a lo que exige el numeral 7.2 de la NOM-036-1-STPS-2018. | Sin una identificación de las tareas y de los puestos expuestos, la empresa no puede estimar el nivel de riesgo ni decidir dónde aplicar medidas de control, por lo que cualquier acción preventiva carece de un punto de partida. |
+| Mínimo (20 a menos de 40 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas es Mínimo: la mayoría de los elementos que exige el numeral 7.2 de la NOM-036-1-STPS-2018 no están cubiertos. | Mientras no se conozca con precisión qué trabajadores están expuestos, con qué cargas y con qué frecuencia, las medidas de control que se adopten difícilmente atenderán los puestos de mayor riesgo. |
+| Regular (40 a menos de 60 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas se encuentra en un nivel Regular: existen avances, pero persisten vacíos relevantes. | Completar esta información es la base para estimar el riesgo de cada puesto de trabajo y priorizar las medidas de control con criterios objetivos. |
+| Aceptable (60 a menos de 80 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas presenta un nivel Aceptable, con puntos específicos por reforzar. | Atender los aspectos pendientes permitirá contar con un análisis de riesgo completo y actualizado de todos los puestos de trabajo con manejo manual de cargas. |
+| Óptimo (80 a 100 %) | El proceso de identificación y clasificación de los puestos de trabajo con manejo manual de cargas está consolidado. | Conviene mantener esta información actualizada, en especial cuando cambien los procesos o las condiciones de trabajo. |
 
 ---
 
@@ -155,7 +155,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | No se cuenta con ningún equipo auxiliar (carretillas, diablos, patines) para el manejo cotidiano de cargas. | Se recomienda incorporar equipos auxiliares manuales cuando el peso o la longitud de la carga dificulten su transporte. |
-| 1 — Mínimo | Se cuenta con algunos equipos auxiliares, pero no se usan de manera regular. | Se recomienda extender su uso a todas las tareas con manejo manual de cargas que lo requieran. |
+| 1 — Mínimo | Se cuenta con algunos equipos auxiliares, pero no se usan de manera regular. | Se recomienda extender el uso de los equipos auxiliares disponibles a todas las tareas con manejo manual de cargas que lo requieran. |
 | 2 — Regular | Se utilizan equipos auxiliares en algunos puestos de trabajo con manejo manual de cargas, pero no en todos. | Se recomienda incorporar equipos auxiliares en todos los puestos de trabajo con manejo manual de cargas que lo requieran. |
 | 3 — Aceptable | Se utilizan equipos auxiliares en la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener el uso de equipos auxiliares e incorporarlos en los puestos de trabajo con manejo manual de cargas que aún no cuentan con ellos. |
 | 4 — Óptimo | Se utilizan equipos auxiliares (carretillas, diablos, patines) en todos los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener el uso de equipos auxiliares en todos los puestos de trabajo con manejo manual de cargas. |
@@ -178,8 +178,8 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se conoce la capacidad de carga de los equipos auxiliares que se utilizan. | Se recomienda identificar y verificar la capacidad nominal de cada equipo, para no excederla. |
-| 1 — Mínimo | Se tiene una idea aproximada de la capacidad de los equipos auxiliares, pero no está verificada ni documentada. | Se recomienda confirmar y registrar la capacidad nominal de cada equipo. |
+| 0 — Nada | No se conoce la capacidad de carga de los equipos auxiliares que se utilizan. | Se recomienda identificar y verificar la capacidad nominal de cada equipo auxiliar, para no excederla. |
+| 1 — Mínimo | Se tiene una idea aproximada de la capacidad de los equipos auxiliares, pero no está verificada ni documentada. | Se recomienda confirmar y registrar la capacidad nominal de cada equipo auxiliar. |
 | 2 — Regular | Se conoce la capacidad de carga de algunos equipos auxiliares, pero no de todos los que se utilizan. | Se recomienda identificar la capacidad de carga de todos los equipos auxiliares que se utilizan. |
 | 3 — Aceptable | Se conoce la capacidad de carga de la mayoría de los equipos auxiliares utilizados. | Se recomienda completar y mantener actualizado el registro de la capacidad de carga de los equipos auxiliares. |
 | 4 — Óptimo | Se conoce la capacidad nominal de cada equipo auxiliar utilizado y se verifica que no se exceda. | Se recomienda mantener la verificación de que no se exceda la capacidad nominal de los equipos auxiliares. |
@@ -269,15 +269,15 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 | 4 — Óptimo | Se controla y queda documentado que ningún trabajador excede los límites de masa total por jornada en el transporte de materiales, con o sin equipo auxiliar. | Se recomienda mantener documentado el control de la masa total transportada por trabajador. |
 
 ### Apertura del Criterio 2 (por franja de cumplimiento)
-Introduce el párrafo narrativo del criterio en el informe, antes de concatenar los hallazgos.
+Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
 
-| Franja | Apertura |
-|---|---|
-| Inexistente (0 a menos de 20 %) | No existe un proceso formal de uso de equipos auxiliares ni de control de las condiciones ambientales en el manejo manual de cargas, conforme a lo que exige el numeral 8.3 de la NOM-036-1-STPS-2018. |
-| Mínimo (20 a menos de 40 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de las medidas que exige el numeral 8.3 de la NOM-036-1-STPS-2018 no están cubiertas. |
-| Regular (40 a menos de 60 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. |
-| Aceptable (60 a menos de 80 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. |
-| Óptimo (80 a 100 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas están consolidados. |
+| Franja | Apertura | Implicación |
+|---|---|---|
+| Inexistente (0 a menos de 20 %) | No existe un proceso formal de uso de equipos auxiliares ni de control de las condiciones ambientales en el manejo manual de cargas, conforme a lo que exige el numeral 8.3 de la NOM-036-1-STPS-2018. | Sin equipos auxiliares ni control de las condiciones del entorno, el esfuerzo físico recae por completo en los trabajadores, lo que incrementa la probabilidad de lesiones musculoesqueléticas y de accidentes durante el traslado de cargas. |
+| Mínimo (20 a menos de 40 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de las medidas que exige el numeral 8.3 de la NOM-036-1-STPS-2018 no están cubiertas. | La falta de equipos auxiliares adecuados y de condiciones seguras en pisos, pasillos y rutas de traslado expone a los trabajadores a esfuerzos innecesarios y a riesgos de caídas o golpes. |
+| Regular (40 a menos de 60 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. | Las mejoras en este rubro suelen tener un efecto inmediato en la reducción del esfuerzo físico, por lo que conviene atender los pendientes de manera prioritaria. |
+| Aceptable (60 a menos de 80 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. | Atender estos puntos permitirá que el uso de los equipos auxiliares se traduzca en una reducción efectiva y sostenida del esfuerzo de los trabajadores. |
+| Óptimo (80 a 100 %) | El uso de equipos auxiliares y el control de las condiciones ambientales en el manejo manual de cargas están consolidados. | Conviene mantener las rutinas de revisión de los equipos y de las áreas de tránsito para que estas condiciones se conserven en el tiempo. |
 
 ---
 
@@ -325,7 +325,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se capacita al personal de almacén en técnicas seguras de empuje y tracción de cargas. | Se recomienda incluir este tema en la capacitación cuando el personal realice estas actividades. |
+| 0 — Nada | No se capacita al personal de almacén en técnicas seguras de empuje y tracción de cargas. | Se recomienda incluir las técnicas seguras de empuje y tracción en la capacitación del personal de almacén que realiza estas actividades. |
 | 1 — Mínimo | Se han dado indicaciones informales sobre empuje y tracción de cargas, sin que formen parte de la capacitación formal. | Se recomienda incorporar las técnicas seguras de empuje y tracción a la capacitación formal. |
 | 2 — Regular | Se capacita en técnicas seguras de empuje y tracción a una parte del personal de almacén, pero no a todo el que realiza estas actividades. | Se recomienda extender la capacitación en técnicas seguras de empuje y tracción a todo el personal de almacén que realiza estas actividades. |
 | 3 — Aceptable | Se capacita en técnicas seguras de empuje y tracción a la mayoría del personal de almacén. | Se recomienda completar la capacitación en técnicas seguras de empuje y tracción con el personal de almacén que aún no la ha recibido. |
@@ -349,8 +349,8 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se realizan evaluaciones médicas periódicas al personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda establecer un seguimiento clínico al menos anual, o antes si se presentan signos o síntomas. |
-| 1 — Mínimo | Se realizan evaluaciones médicas al personal ocupacionalmente expuesto al manejo manual de cargas de forma esporádica, sin una periodicidad establecida. | Se recomienda formalizar un programa de seguimiento clínico. |
+| 0 — Nada | No se realizan evaluaciones médicas periódicas al personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda establecer un seguimiento clínico del personal ocupacionalmente expuesto al manejo manual de cargas, al menos anual, o antes si se presentan signos o síntomas. |
+| 1 — Mínimo | Se realizan evaluaciones médicas al personal ocupacionalmente expuesto al manejo manual de cargas de forma esporádica, sin una periodicidad establecida. | Se recomienda formalizar un programa de seguimiento clínico del personal ocupacionalmente expuesto al manejo manual de cargas. |
 | 2 — Regular | Se realizan evaluaciones médicas periódicas a una parte del personal ocupacionalmente expuesto al manejo manual de cargas, pero no a todo. | Se recomienda extender las evaluaciones médicas periódicas a todo el personal ocupacionalmente expuesto al manejo manual de cargas. |
 | 3 — Aceptable | Se realizan evaluaciones médicas periódicas a la mayoría del personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda completar las evaluaciones médicas periódicas con el personal ocupacionalmente expuesto al manejo manual de cargas que aún no las recibe. |
 | 4 — Óptimo | Se realizan evaluaciones médicas periódicas a todo el personal ocupacionalmente expuesto al manejo manual de cargas, con seguimiento clínico al menos anual. | Se recomienda mantener el seguimiento clínico, al menos anual, del personal ocupacionalmente expuesto al manejo manual de cargas. |
@@ -373,9 +373,9 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se promueven hábitos posturales saludables en el entorno laboral. | Se recomienda implementar campañas, charlas, carteles o trípticos informativos sobre el tema. |
+| 0 — Nada | No se promueven hábitos posturales saludables en el entorno laboral. | Se recomienda implementar campañas, charlas, carteles o trípticos informativos sobre hábitos posturales saludables. |
 | 1 — Mínimo | Se han realizado algunas acciones aisladas de promoción de hábitos posturales, sin continuidad. | Se recomienda dar continuidad a las acciones de promoción de hábitos posturales saludables. |
-| 2 — Regular | Se promueven hábitos posturales saludables en algunas áreas de la organización, pero no en todas. | Se recomienda extender estas acciones a toda la organización. |
+| 2 — Regular | Se promueven hábitos posturales saludables en algunas áreas de la organización, pero no en todas. | Se recomienda extender la promoción de hábitos posturales saludables a toda la organización. |
 | 3 — Aceptable | Se promueven hábitos posturales saludables en la mayor parte de la organización, a través de distintos medios. | Se recomienda extender la promoción de hábitos posturales saludables a toda la organización. |
 | 4 — Óptimo | Se promueven de forma constante hábitos posturales saludables en toda la organización, a través de campañas, charlas, carteles y trípticos. | Se recomienda mantener la promoción constante de hábitos posturales saludables. |
 
@@ -397,22 +397,22 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se contempla ningún programa para el bienestar físico ni psicológico del personal en las actividades que implican esfuerzo físico. | Se recomienda incorporar este enfoque en los programas de ergonomía o de salud en el trabajo. |
+| 0 — Nada | No se contempla ningún programa para el bienestar físico ni psicológico del personal en las actividades que implican esfuerzo físico. | Se recomienda incorporar el bienestar físico y psicológico del personal en los programas de ergonomía o de salud en el trabajo. |
 | 1 — Mínimo | El bienestar físico y psicológico del personal se contempla de forma informal, sin acciones concretas. | Se recomienda definir acciones concretas para el bienestar físico y psicológico del personal. |
 | 2 — Regular | Se implementa de manera irregular algún programa para el bienestar físico y psicológico del personal, solo en algunas de las actividades con esfuerzo físico. | Se recomienda extender el programa de bienestar físico y psicológico a todas las actividades con esfuerzo físico. |
 | 3 — Aceptable | Se contempla el bienestar físico y psicológico del personal en la mayoría de las actividades con esfuerzo físico. | Se recomienda extender el enfoque de bienestar físico y psicológico a todas las actividades con esfuerzo físico. |
 | 4 — Óptimo | Se contempla de forma integral el bienestar físico y psicológico del personal en todas las actividades con esfuerzo físico. | Se recomienda mantener el enfoque integral de bienestar físico y psicológico del personal. |
 
 ### Apertura del Criterio 3 (por franja de cumplimiento)
-Introduce el párrafo narrativo del criterio en el informe, antes de concatenar los hallazgos.
+Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
 
-| Franja | Apertura |
-|---|---|
-| Inexistente (0 a menos de 20 %) | No existe un proceso formal de capacitación, adiestramiento ni vigilancia a la salud del personal con tareas de manejo manual de cargas, conforme a lo que exige la NOM-036-1-STPS-2018 en sus Capítulos 9 y 10. |
-| Mínimo (20 a menos de 40 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de las medidas que exigen los Capítulos 9 y 10 de la NOM-036-1-STPS-2018 no están cubiertas. |
-| Regular (40 a menos de 60 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. |
-| Aceptable (60 a menos de 80 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. |
-| Óptimo (80 a 100 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas están consolidados. |
+| Franja | Apertura | Implicación |
+|---|---|---|
+| Inexistente (0 a menos de 20 %) | No existe un proceso formal de capacitación, adiestramiento ni vigilancia a la salud del personal con tareas de manejo manual de cargas, conforme a lo que exige la NOM-036-1-STPS-2018 en sus Capítulos 9 y 10. | Sin capacitación ni vigilancia a la salud, los trabajadores desconocen cómo protegerse y los primeros signos de un trastorno musculoesquelético pasan inadvertidos, incluso cuando existen ayudas mecánicas o ajustes en el entorno laboral. |
+| Mínimo (20 a menos de 40 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de las medidas que exigen los Capítulos 9 y 10 de la NOM-036-1-STPS-2018 no están cubiertas. | La falta de capacitación teórico-práctica y de seguimiento médico periódico puede incrementar el riesgo de lesiones o enfermedades, incluso cuando existen ayudas mecánicas o ajustes en el entorno laboral. |
+| Regular (40 a menos de 60 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. | Formalizar y extender estos programas permitirá que el personal aplique prácticas seguras de manera consistente y que los problemas de salud se detecten a tiempo. |
+| Aceptable (60 a menos de 80 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. | Completar la cobertura de la capacitación y del seguimiento médico asegurará que ningún trabajador expuesto quede fuera de estas medidas. |
+| Óptimo (80 a 100 %) | La capacitación, el adiestramiento y la vigilancia a la salud del personal con tareas de manejo manual de cargas están consolidados. | Conviene mantener la periodicidad de la capacitación y del seguimiento médico, y actualizarlos cuando cambien los procesos o se incorpore personal nuevo. |
 
 ---
 
@@ -424,7 +424,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No existe ninguna política interna por escrito en materia de prevención de riesgos ergonómicos. | Se recomienda documentar una política interna que establezca el compromiso de la organización con la prevención de estos riesgos. |
+| 0 — Nada | No existe ninguna política interna por escrito en materia de prevención de riesgos ergonómicos. | Se recomienda documentar una política interna que establezca el compromiso de la organización con la prevención de los riesgos ergonómicos. |
 | 1 — Mínimo | Existen algunos lineamientos informales sobre el tema, sin que estén documentados como política interna. | Se recomienda formalizar por escrito los lineamientos como una política interna de prevención de riesgos ergonómicos. |
 | 2 — Regular | Existe una política interna por escrito, pero se desconoce si cubre todos los aspectos de la prevención de riesgos ergonómicos. | Se recomienda revisar la política interna de prevención de riesgos ergonómicos y completarla. |
 | 3 — Aceptable | Existe una política interna por escrito que cubre la mayoría de los aspectos de la prevención de riesgos ergonómicos. | Se recomienda completar y mantener actualizada la política interna de prevención de riesgos ergonómicos. |
@@ -436,7 +436,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se ha designado a ningún responsable del cumplimiento de la NOM-036-1-STPS-2018. | Se recomienda asignar esta responsabilidad a una persona o área específica. |
+| 0 — Nada | No se ha designado a ningún responsable del cumplimiento de la NOM-036-1-STPS-2018. | Se recomienda asignar a una persona o área específica la responsabilidad del cumplimiento de la NOM-036-1-STPS-2018. |
 | 1 — Mínimo | Hay una persona que atiende el tema de manera informal, sin que esté designada oficialmente. | Se recomienda designar oficialmente a un responsable del cumplimiento de la NOM-036-1-STPS-2018. |
 | 2 — Regular | Se ha designado a un responsable, pero sus funciones no están claramente definidas. | Se recomienda definir con claridad las funciones y el alcance del responsable del cumplimiento de la norma. |
 | 3 — Aceptable | Se ha designado a un responsable con funciones claras para el cumplimiento de la norma. | Se recomienda formalizar la designación del responsable y mantenerla vigente. |
@@ -448,8 +448,8 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se destina presupuesto para la adquisición de equipos auxiliares de carga. | Se recomienda asignar un presupuesto específico para este fin. |
-| 1 — Mínimo | Se destina presupuesto de forma esporádica, sin planearlo con anticipación. | Se recomienda incluir este gasto en la planeación presupuestal. |
+| 0 — Nada | No se destina presupuesto para la adquisición de equipos auxiliares de carga. | Se recomienda asignar un presupuesto específico para la adquisición de equipos auxiliares de carga. |
+| 1 — Mínimo | Se destina presupuesto de forma esporádica, sin planearlo con anticipación. | Se recomienda incluir la adquisición de equipos auxiliares de carga en la planeación presupuestal. |
 | 2 — Regular | Se destina presupuesto para algunos equipos auxiliares de carga, pero no de forma consistente para todas las necesidades identificadas. | Se recomienda ampliar el presupuesto para cubrir todas las necesidades identificadas de equipos auxiliares de carga. |
 | 3 — Aceptable | Se destina presupuesto para la mayoría de las necesidades identificadas de equipos auxiliares de carga. | Se recomienda cubrir con presupuesto todas las necesidades identificadas de equipos auxiliares de carga. |
 | 4 — Óptimo | Se destina y ejerce presupuesto de forma planeada para la adquisición de equipos auxiliares de carga. | Se recomienda mantener la planeación presupuestal para la adquisición de equipos auxiliares de carga. |
@@ -460,7 +460,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se mantienen registros de los diagnósticos, programas ni acciones en materia de ergonomía. | Se recomienda llevar estos registros, conforme a lo que exige la norma. |
+| 0 — Nada | No se mantienen registros de los diagnósticos, programas ni acciones en materia de ergonomía. | Se recomienda llevar registros de los diagnósticos, programas y acciones en ergonomía, conforme a lo que exige la norma. |
 | 1 — Mínimo | Existen algunos registros informales, que no necesariamente están actualizados ni completos. | Se recomienda formalizar los registros de diagnósticos, programas y acciones en ergonomía y mantenerlos al día. |
 | 2 — Regular | Se mantienen registros de algunos diagnósticos, programas o acciones en ergonomía, pero no de todos. | Se recomienda registrar todos los diagnósticos, programas y acciones en ergonomía. |
 | 3 — Aceptable | Se mantienen registros actualizados de la mayoría de los diagnósticos, programas y acciones en ergonomía. | Se recomienda completar y mantener al día los registros de diagnósticos, programas y acciones en ergonomía. |
@@ -484,7 +484,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se han realizado auditorías internas ni externas sobre el cumplimiento de la NOM-036-1-STPS-2018. | Se recomienda considerar una auditoría, interna o a través de una unidad de verificación acreditada. |
+| 0 — Nada | No se han realizado auditorías internas ni externas sobre el cumplimiento de la NOM-036-1-STPS-2018. | Se recomienda considerar una auditoría del cumplimiento de la NOM-036-1-STPS-2018, interna o a través de una unidad de verificación acreditada. |
 | 1 — Mínimo | Se ha realizado alguna revisión informal del cumplimiento, sin que sea propiamente una auditoría. | Se recomienda realizar una auditoría formal de cumplimiento normativo. |
 | 2 — Regular | Se han realizado auditorías de cumplimiento en algunos temas o áreas, pero no de forma integral. | Se recomienda ampliar el alcance de las auditorías a todos los temas de cumplimiento normativo. |
 | 3 — Aceptable | Se han realizado auditorías internas o externas que cubren la mayoría de los temas de cumplimiento normativo. | Se recomienda realizar auditorías de forma periódica y con alcance integral. |
@@ -498,7 +498,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 |---|---|---|
 | 0 — Nada | No se ha comunicado al personal la importancia de esta norma ni los riesgos del manejo manual de cargas. | Se recomienda informar a los trabajadores sobre las posibles alteraciones a la salud, mediante carteles, pláticas, boletines u otro medio. |
 | 1 — Mínimo | La importancia de la norma se ha comunicado de forma aislada, sin que sea una práctica constante. | Se recomienda establecer una comunicación regular sobre la norma y los riesgos del manejo manual de cargas. |
-| 2 — Regular | Se comunica la importancia de esta norma en algunas áreas de la organización, pero no en todas. | Se recomienda extender esta comunicación a toda la organización. |
+| 2 — Regular | Se comunica la importancia de esta norma en algunas áreas de la organización, pero no en todas. | Se recomienda extender a toda la organización la comunicación sobre la importancia de la norma y los riesgos del manejo manual de cargas. |
 | 3 — Aceptable | Se comunica la importancia de esta norma a la mayoría del personal, a través de distintos medios, como carteles, folletos o pláticas. | Se recomienda extender la comunicación sobre la importancia de la norma a todo el personal. |
 | 4 — Óptimo | Se informa de forma constante a todo el personal sobre las posibles alteraciones a la salud derivadas del manejo manual de cargas, mediante carteles, pláticas y boletines. | Se recomienda mantener la comunicación constante sobre las alteraciones a la salud derivadas del manejo manual de cargas. |
 
@@ -539,15 +539,15 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 | 4 — Óptimo | Existe una cultura consolidada de prevención y ergonomía en toda la organización. | Se recomienda mantener la cultura de prevención y ergonomía mediante acciones continuas. |
 
 ### Apertura del Criterio 4 (por franja de cumplimiento)
-Introduce el párrafo narrativo del criterio en el informe, antes de concatenar los hallazgos.
+Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
 
-| Franja | Apertura |
-|---|---|
-| Inexistente (0 a menos de 20 %) | No existe un proceso formal de difusión ni de registro de políticas y estrategias ergonómicas dentro de la organización. |
-| Mínimo (20 a menos de 40 %) | La difusión y el registro de políticas y estrategias ergonómicas se encuentran en un nivel Mínimo: la mayoría de las acciones de comunicación, registro y seguimiento no están cubiertas. |
-| Regular (40 a menos de 60 %) | La difusión y el registro de políticas y estrategias ergonómicas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. |
-| Aceptable (60 a menos de 80 %) | La difusión y el registro de políticas y estrategias ergonómicas presentan un nivel Aceptable, con puntos específicos por reforzar. |
-| Óptimo (80 a 100 %) | La difusión y el registro de políticas y estrategias ergonómicas están consolidados. |
+| Franja | Apertura | Implicación |
+|---|---|---|
+| Inexistente (0 a menos de 20 %) | No existe un proceso formal de difusión ni de registro de políticas y estrategias ergonómicas dentro de la organización. | Sin políticas formales, responsables designados ni registros, no existe el andamiaje de gestión necesario para sostener las acciones preventivas, y los avances operativos que se logren resultan difíciles de mantener en el tiempo. |
+| Mínimo (20 a menos de 40 %) | La difusión y el registro de políticas y estrategias ergonómicas se encuentran en un nivel Mínimo: la mayoría de las acciones de comunicación, registro y seguimiento no están cubiertas. | Sin un sistema de gestión en materia de ergonomía (políticas, responsables, registros y comunicación), las acciones preventivas dependen de iniciativas aisladas y difícilmente se sostienen en el tiempo. |
+| Regular (40 a menos de 60 %) | La difusión y el registro de políticas y estrategias ergonómicas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. | Fortalecer la gestión en este rubro permitirá dar continuidad a las acciones preventivas y demostrar su cumplimiento ante una inspección o una unidad de verificación. |
+| Aceptable (60 a menos de 80 %) | La difusión y el registro de políticas y estrategias ergonómicas presentan un nivel Aceptable, con puntos específicos por reforzar. | Completar estos elementos de gestión permitirá documentar y demostrar el cumplimiento de la norma de forma integral. |
+| Óptimo (80 a 100 %) | La difusión y el registro de políticas y estrategias ergonómicas están consolidados. | Conviene mantener vigentes las políticas, los registros y los canales de comunicación, y revisarlos periódicamente. |
 
 ---
 
@@ -595,7 +595,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se han implementado medidas administrativas, como rotación de puestos de trabajo o pausas activas. | Se recomienda adoptar alguna de estas medidas cuando el análisis de riesgo lo indique. |
+| 0 — Nada | No se han implementado medidas administrativas, como rotación de puestos de trabajo o pausas activas. | Se recomienda adoptar medidas administrativas, como la rotación de puestos de trabajo o las pausas activas, cuando el análisis de riesgo lo indique. |
 | 1 — Mínimo | Se aplican medidas administrativas de forma informal u ocasional, sin un criterio establecido. | Se recomienda formalizar las medidas administrativas con un criterio establecido. |
 | 2 — Regular | Se implementan medidas administrativas en algunos puestos de trabajo con manejo manual de cargas, pero no en todos los que lo requieren. | Se recomienda extender las medidas administrativas a todos los puestos de trabajo con manejo manual de cargas que lo requieren. |
 | 3 — Aceptable | Se implementan medidas administrativas en la mayoría de los puestos de trabajo con manejo manual de cargas que lo requieren. | Se recomienda extender las medidas administrativas a todos los puestos de trabajo con manejo manual de cargas que lo requieren. |
@@ -607,7 +607,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se cuenta con ningún programa formal de ergonomía. | Se recomienda elaborar uno que incluya los puestos de trabajo sujetos al programa, las medidas de control, las fechas programadas, el responsable de su ejecución y la evaluación posterior. |
+| 0 — Nada | No se cuenta con ningún programa formal de ergonomía. | Se recomienda elaborar un programa de ergonomía que incluya los puestos de trabajo sujetos al programa, las medidas de control, las fechas programadas, el responsable de su ejecución y la evaluación posterior. |
 | 1 — Mínimo | Existe un programa informal que no cumple con todos los elementos que exige la norma. | Se recomienda formalizar el programa de ergonomía con todos los elementos que exige la norma. |
 | 2 — Regular | El programa de ergonomía existe, pero le faltan elementos como el cronograma o el responsable asignado. | Se recomienda completar el programa de ergonomía con el cronograma, el responsable asignado y los demás elementos faltantes. |
 | 3 — Aceptable | El programa de ergonomía cuenta con la mayoría de sus elementos (puestos de trabajo, medidas, fechas, responsable). | Se recomienda completar y mantener actualizado el programa de ergonomía. |
@@ -619,9 +619,9 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se da ningún seguimiento a los casos de trastornos musculoesqueléticos en el personal. | Se recomienda dar seguimiento clínico a estos casos, conforme al programa de vigilancia a la salud. |
+| 0 — Nada | No se da ningún seguimiento a los casos de trastornos musculoesqueléticos en el personal. | Se recomienda dar seguimiento clínico a los casos de trastornos musculoesqueléticos, conforme al programa de vigilancia a la salud. |
 | 1 — Mínimo | El seguimiento a los casos de trastornos musculoesqueléticos se realiza de manera informal, sin un procedimiento establecido. | Se recomienda establecer un procedimiento de seguimiento de los casos de trastornos musculoesqueléticos. |
-| 2 — Regular | Se da seguimiento a algunos casos de trastornos musculoesqueléticos, pero se desconoce si se atiende a todos. | Se recomienda extender este seguimiento a todos los casos identificados. |
+| 2 — Regular | Se da seguimiento a algunos casos de trastornos musculoesqueléticos, pero se desconoce si se atiende a todos. | Se recomienda extender el seguimiento a todos los casos de trastornos musculoesqueléticos identificados. |
 | 3 — Aceptable | Se da seguimiento a la mayoría de los casos de trastornos musculoesqueléticos identificados. | Se recomienda dar seguimiento a todos los casos de trastornos musculoesqueléticos identificados. |
 | 4 — Óptimo | Se da un seguimiento completo y oportuno a todos los casos de trastornos musculoesqueléticos identificados. | Se recomienda mantener el seguimiento completo y oportuno de los casos de trastornos musculoesqueléticos. |
 
@@ -655,7 +655,7 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se capacita al personal para autodetectar síntomas musculoesqueléticos relacionados con el manejo manual de cargas. | Se recomienda incluir este tema en la capacitación, junto con los efectos a la salud de la exposición a estos factores de riesgo. |
+| 0 — Nada | No se capacita al personal para autodetectar síntomas musculoesqueléticos relacionados con el manejo manual de cargas. | Se recomienda incluir la autodetección de síntomas musculoesqueléticos en la capacitación, junto con los efectos a la salud de la exposición a los factores de riesgo ergonómico. |
 | 1 — Mínimo | Se ha dado información aislada sobre la autodetección de síntomas musculoesqueléticos, sin que forme parte de la capacitación formal. | Se recomienda incorporar la autodetección de síntomas musculoesqueléticos a la capacitación formal. |
 | 2 — Regular | Se capacita en autodetección de síntomas musculoesqueléticos a una parte del personal ocupacionalmente expuesto al manejo manual de cargas, pero no a todo. | Se recomienda extender la capacitación en autodetección de síntomas a todo el personal ocupacionalmente expuesto al manejo manual de cargas. |
 | 3 — Aceptable | Se capacita en autodetección de síntomas musculoesqueléticos a la mayoría del personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda completar la capacitación en autodetección de síntomas con el personal ocupacionalmente expuesto que aún no la ha recibido. |
@@ -674,14 +674,14 @@ Introduce el párrafo narrativo del criterio en el informe, antes de concatenar 
 | 4 — Óptimo | El programa de ergonomía describe con claridad las medidas de prevención y control para todos los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener actualizado el programa de ergonomía. |
 
 ### Apertura del Criterio 5 (por franja de cumplimiento)
-Introduce el párrafo narrativo del criterio en el informe, antes de concatenar los hallazgos.
+Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
 
-| Franja | Apertura |
-|---|---|
-| Inexistente (0 a menos de 20 %) | No existe un proceso formal de medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas, conforme a lo que exige el Capítulo 8 de la NOM-036-1-STPS-2018. |
-| Mínimo (20 a menos de 40 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de los elementos que exige el Capítulo 8 de la NOM-036-1-STPS-2018 no están cubiertos. |
-| Regular (40 a menos de 60 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. |
-| Aceptable (60 a menos de 80 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. |
-| Óptimo (80 a 100 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas están consolidadas. |
+| Franja | Apertura | Implicación |
+|---|---|---|
+| Inexistente (0 a menos de 20 %) | No existe un proceso formal de medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas, conforme a lo que exige el Capítulo 8 de la NOM-036-1-STPS-2018. | Sin un diagnóstico ni medidas de control, los riesgos por manejo manual de cargas permanecen sin atender y la empresa no cuenta con un programa que oriente su corrección. |
+| Mínimo (20 a menos de 40 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas se encuentran en un nivel Mínimo: la mayoría de los elementos que exige el Capítulo 8 de la NOM-036-1-STPS-2018 no están cubiertos. | Las acciones aisladas, sin un programa de ergonomía estructurado ni un ciclo de mejora continua, difícilmente aseguran que las medidas se implementen, se les dé seguimiento y se evalúe su efectividad. |
+| Regular (40 a menos de 60 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas se encuentran en un nivel Regular: existen avances, pero persisten vacíos relevantes. | Integrar las medidas existentes en un programa de ergonomía con responsables y fechas permitirá dar seguimiento a su implementación y evaluar su efectividad. |
+| Aceptable (60 a menos de 80 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas presentan un nivel Aceptable, con puntos específicos por reforzar. | Completar el programa de ergonomía y su seguimiento permitirá cerrar el ciclo de mejora continua que exige la norma. |
+| Óptimo (80 a 100 %) | Las medidas de prevención y control de los factores de riesgo ergonómico por manejo manual de cargas están consolidadas. | Conviene mantener el ciclo de evaluación y mejora continua para conservar la efectividad de las medidas implementadas. |
 
 ---

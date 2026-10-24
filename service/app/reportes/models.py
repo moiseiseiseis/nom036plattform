@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.engine.models import RespuestaItem
+from app.engine.narrativa import DescripcionesPorItemNivel
 from app.engine.recomendaciones import RecomendacionesPorItemNivel
 
 
@@ -12,6 +13,8 @@ class DatosCriterio:
     respuestas: list[RespuestaItem]
     recomendaciones: RecomendacionesPorItemNivel
     plantillas_apertura: dict[str, str]  # bucket -> texto
+    descripciones: DescripcionesPorItemNivel = field(default_factory=dict)
+    plantillas_implicacion: dict[str, str] = field(default_factory=dict)  # bucket -> texto
 
 
 @dataclass(frozen=True)
