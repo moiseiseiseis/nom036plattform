@@ -1,5 +1,7 @@
 import io
 import os
+import re
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 
@@ -99,9 +101,25 @@ def _secciones_instrumento(datos: DatosEvaluacion) -> str:
     return "; ".join(nombres[:-1]) + f", y {nombres[-1]}"
 
 
-def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
+def nombre_archivo_informe(empresa_nombre: str, modo_revision: bool = False) -> str:
+    """"Peñas & Hijos, S.A." → "Informe-prediagnostico-empresarial-Penas-Hijos-S-A.docx".
+    Sin acentos ni símbolos, para que el nombre no se altere al descargarlo o
+    enviarlo por correo. La versión de revisión se distingue para que nunca se
+    confunda con la que se entrega a la empresa."""
+    sin_acentos = unicodedata.normalize("NFKD", empresa_nombre)
+    ascii_ = sin_acentos.encode("ascii", "ignore").decode("ascii")
+    empresa = re.sub(r"[^A-Za-z0-9]+", "-", ascii_).strip("-")
+    partes = ["Informe-prediagnostico-empresarial"]
+    if empresa:
+        partes.append(empresa)
+    if modo_revision:
+        partes.append("revision")
+    return "-".join(partes) + ".docx"
+
+
+def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> tuple[bytes, str]:
     """Punto de entrada usado por la API: trae los datos de la evaluación de
-    la base de datos y produce el `.docx` final.
+    la base de datos y produce el `.docx` final y su nombre de archivo.
 
     `modo_revision` resalta el texto por su origen (dato de la empresa,
     resultado calculado, plantilla fija, recomendación de catálogo) para
@@ -110,7 +128,8 @@ def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
     a una empresa."""
     with get_connection() as conn:
         datos = fetch_datos_evaluacion(conn, evaluacion_id)
-    return generar_informe_desde_datos(datos, modo_revision=modo_revision)
+    contenido = generar_informe_desde_datos(datos, modo_revision=modo_revision)
+    return contenido, nombre_archivo_informe(datos.empresa_nombre, modo_revision)
 
 
 def calcular_resultados(

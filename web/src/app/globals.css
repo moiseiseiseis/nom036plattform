@@ -27,6 +27,28 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Aviso de que el servicio de informes tarda: ver `CargaServicio.tsx`. */
+@keyframes texto-inicial {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes aviso-tardio {
+  to {
+    visibility: visible;
+  }
+}
+
+.texto-inicial {
+  animation: texto-inicial 0s linear 4s forwards;
+}
+
+.aviso-tardio {
+  visibility: hidden;
+  animation: aviso-tardio 0s linear 4s forwards;
+}
+
 /* Transición entre pantallas del formulario de autoevaluación. */
 @keyframes paso-entrar {
   from {

@@ -28,6 +28,10 @@ export interface ResumenInforme {
   global: ResumenGlobal;
 }
 
+// Más que el despertar del plan gratuito de Render (30-50 s), para no dar por
+// caído un servicio que solo estaba dormido.
+const MS_LIMITE_RESUMEN = 75_000;
+
 function urlServicioPython(): string {
   const baseUrl = process.env.PYTHON_SERVICE_URL;
   if (!baseUrl) throw new Error("Falta configurar PYTHON_SERVICE_URL");
@@ -37,6 +41,7 @@ function urlServicioPython(): string {
 export async function obtenerResumenInforme(evaluacionId: string): Promise<ResumenInforme | null> {
   const res = await fetch(`${urlServicioPython()}/informes/${evaluacionId}/resumen`, {
     cache: "no-store",
+    signal: AbortSignal.timeout(MS_LIMITE_RESUMEN),
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Error al obtener el resumen del informe (status ${res.status})`);

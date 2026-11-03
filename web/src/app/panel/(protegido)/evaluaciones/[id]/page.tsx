@@ -1,9 +1,13 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BotonEnviar } from "@/components/BotonEnviar";
 import { CampoEnlace } from "@/components/CampoEnlace";
-import { obtenerResumenInforme } from "@/lib/informes";
+import { CargaServicio } from "@/components/CargaServicio";
+import { obtenerResumenInformeSeguro } from "@/lib/informes";
 import { getEvaluacionDetallePanel } from "@/lib/nom036/panel";
 import { eliminarEvaluacionAction, marcarRevisadoAction } from "./actions";
+import { BotonDescarga } from "./BotonDescarga";
 import { EliminarEvaluacionBoton } from "./EliminarEvaluacionBoton";
 
 const BUCKET_ETIQUETAS: Record<string, string> = {
@@ -47,7 +51,6 @@ export default async function DetalleEvaluacionPage({
   }
 
   const tieneResultados = evaluacion.estado === "completado" || evaluacion.estado === "revisado";
-  const resumen = tieneResultados ? await obtenerResumenInforme(evaluacion.id) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,113 +85,123 @@ export default async function DetalleEvaluacionPage({
         </div>
       )}
 
-      {tieneResultados && resumen === null && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          No se pudo obtener el resultado calculado del servicio de informes.
+      {tieneResultados && (
+        <Suspense fallback={<CargaServicio texto="Calculando resultados…" />}>
+          <SeccionResultados evaluacionId={evaluacion.id} estado={evaluacion.estado} />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+
+// Depende del servicio de informes, que puede estar dormido: va en su propio
+// Suspense para que el encabezado y las acciones de la página salgan de inmediato.
+async function SeccionResultados({
+  evaluacionId,
+  estado,
+}: {
+  evaluacionId: string;
+  estado: string;
+}) {
+  const resumen = await obtenerResumenInformeSeguro(evaluacionId);
+
+  if (!resumen) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        No se pudo obtener el resultado calculado del servicio de informes. Recarga la página para
+        intentarlo de nuevo.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+      <div>
+        <h2 className="text-lg font-semibold">Resultados</h2>
+        <p
+          className={`mt-1 text-2xl font-semibold ${COLOR_BUCKET[resumen.global.bucket] ?? ""}`}
+        >
+          {resumen.global.porcentaje}% · {BUCKET_ETIQUETAS[resumen.global.bucket] ?? resumen.global.bucket}
+        </p>
+        <p className="text-sm text-gray-500">
+          {resumen.global.puntaje}/{resumen.global.puntaje_maximo} puntos en total
+        </p>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-black/10 text-gray-500">
+              <th className="py-2 pr-4">Criterio</th>
+              <th className="py-2 pr-4">Puntaje</th>
+              <th className="py-2 pr-4">%</th>
+              <th className="py-2">Clasificación</th>
+            </tr>
+          </thead>
+          <tbody>
+            {resumen.criterios.map((c) => (
+              <tr key={c.numero} className="border-b border-black/5">
+                <td className="py-2 pr-4">
+                  {c.numero}. {c.nombre}
+                </td>
+                <td className="py-2 pr-4">
+                  {c.puntaje}/{c.puntaje_maximo}
+                </td>
+                <td className="py-2 pr-4">{c.porcentaje}%</td>
+                <td className={`py-2 font-medium ${COLOR_BUCKET[c.bucket] ?? ""}`}>
+                  {BUCKET_ETIQUETAS[c.bucket] ?? c.bucket}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+        {resumen.global.cierre}
+      </div>
+
+      {resumen.global.temas_obligatorios.length > 0 && (
+        <div>
+          <h3 className="font-medium">Temas obligatorios</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+            {resumen.global.temas_obligatorios.map((tema, i) => (
+              <li key={i}>{tema}</li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {resumen && (
-        <div className="flex flex-col gap-6 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-          <div>
-            <h2 className="text-lg font-semibold">Resultados</h2>
-            <p
-              className={`mt-1 text-2xl font-semibold ${COLOR_BUCKET[resumen.global.bucket] ?? ""}`}
+      {resumen.global.temas_optativos.length > 0 && (
+        <div>
+          <h3 className="font-medium">Temas optativos</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+            {resumen.global.temas_optativos.map((tema, i) => (
+              <li key={i}>{tema}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-start gap-3 border-t border-black/5 pt-6">
+        <BotonDescarga
+          href={`/panel/api/informes/${evaluacionId}?revision=false`}
+          nombreRespaldo="Informe-prediagnostico-empresarial.docx"
+          className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
+        >
+          Descargar informe (.docx)
+        </BotonDescarga>
+        {estado === "completado" && (
+          <form action={marcarRevisadoAction.bind(null, evaluacionId)}>
+            <BotonEnviar
+              textoPendiente="Guardando…"
+              className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
             >
-              {resumen.global.porcentaje}% · {BUCKET_ETIQUETAS[resumen.global.bucket] ?? resumen.global.bucket}
-            </p>
-            <p className="text-sm text-gray-500">
-              {resumen.global.puntaje}/{resumen.global.puntaje_maximo} puntos en total
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-black/10 text-gray-500">
-                  <th className="py-2 pr-4">Criterio</th>
-                  <th className="py-2 pr-4">Puntaje</th>
-                  <th className="py-2 pr-4">%</th>
-                  <th className="py-2">Clasificación</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resumen.criterios.map((c) => (
-                  <tr key={c.numero} className="border-b border-black/5">
-                    <td className="py-2 pr-4">
-                      {c.numero}. {c.nombre}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {c.puntaje}/{c.puntaje_maximo}
-                    </td>
-                    <td className="py-2 pr-4">{c.porcentaje}%</td>
-                    <td className={`py-2 font-medium ${COLOR_BUCKET[c.bucket] ?? ""}`}>
-                      {BUCKET_ETIQUETAS[c.bucket] ?? c.bucket}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
-            {resumen.global.cierre}
-          </div>
-
-          {resumen.global.temas_obligatorios.length > 0 && (
-            <div>
-              <h3 className="font-medium">Temas obligatorios</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
-                {resumen.global.temas_obligatorios.map((tema, i) => (
-                  <li key={i}>{tema}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {resumen.global.temas_optativos.length > 0 && (
-            <div>
-              <h3 className="font-medium">Temas optativos</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
-                {resumen.global.temas_optativos.map((tema, i) => (
-                  <li key={i}>{tema}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-2 border-t border-black/5 pt-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <a
-                href={`/panel/api/informes/${evaluacion.id}?revision=true`}
-                className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800"
-              >
-                Descargar informe de revisión (.docx)
-              </a>
-              <a
-                href={`/panel/api/informes/${evaluacion.id}?revision=false`}
-                className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
-              >
-                Descargar informe final (.docx)
-              </a>
-              {evaluacion.estado === "completado" && (
-                <form action={marcarRevisadoAction.bind(null, evaluacion.id)}>
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-50"
-                  >
-                    Marcar como revisado
-                  </button>
-                </form>
-              )}
-            </div>
-            <p className="text-xs text-gray-500">
-              &ldquo;Revisión&rdquo; resalta el origen del texto para validar contra el criterio
-              del Dr. Sergio; &ldquo;final&rdquo; es la versión limpia para entregar a la empresa.
-            </p>
-          </div>
-        </div>
-      )}
+              Marcar como revisado
+            </BotonEnviar>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

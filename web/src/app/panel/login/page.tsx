@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Spinner } from "@/components/Spinner";
 import { iniciarSesion, type LoginState } from "./actions";
 
 const ESTADO_INICIAL: LoginState = { error: null };
@@ -47,8 +48,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-lg bg-black px-4 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-4 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 disabled:opacity-50"
           >
+            {pending && <Spinner />}
             {pending ? "Entrando…" : "Entrar"}
           </button>
         </form>

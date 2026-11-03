@@ -11,7 +11,7 @@ import pytest
 from docx import Document
 
 from app.engine.models import RespuestaItem
-from app.reportes.generador import generar_informe_desde_datos
+from app.reportes.generador import generar_informe_desde_datos, nombre_archivo_informe
 from app.reportes.models import DatosCriterio, DatosEvaluacion
 
 NIVELES_CRITERIO_1 = [2, 1, 2, 2, 2, 1, 2, 2, 1, 2]  # suma 17/40, igual que JASANA
@@ -166,6 +166,25 @@ def test_generar_informe_evaluacion_completa_usa_plantilla_cierre_fija():
     assert "[PLACEHOLDER] Apertura global, bucket regular." in texto_completo
     assert "[PLACEHOLDER] Cierre global, bucket regular." in texto_completo
     assert "Este informe presenta resultados únicamente para" not in texto_completo
+
+
+@pytest.mark.parametrize(
+    ("empresa", "esperado"),
+    [
+        ("Grupo Modelo", "Informe-prediagnostico-empresarial-Grupo-Modelo.docx"),
+        ("Peñas & Hijos, S.A.", "Informe-prediagnostico-empresarial-Penas-Hijos-S-A.docx"),
+        ("***", "Informe-prediagnostico-empresarial.docx"),
+    ],
+)
+def test_nombre_archivo_informe(empresa, esperado):
+    assert nombre_archivo_informe(empresa) == esperado
+
+
+def test_nombre_archivo_informe_distingue_la_version_de_revision():
+    assert (
+        nombre_archivo_informe("Grupo Modelo", modo_revision=True)
+        == "Informe-prediagnostico-empresarial-Grupo-Modelo-revision.docx"
+    )
 
 
 def test_generar_informe_responsable_configurado_por_variable_de_entorno(monkeypatch):

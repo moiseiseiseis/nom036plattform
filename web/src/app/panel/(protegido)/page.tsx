@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { obtenerResumenInformeSeguro, type ResumenInforme } from "@/lib/informes";
+import { CargaServicio } from "@/components/CargaServicio";
+import { obtenerResumenInformeSeguro } from "@/lib/informes";
 import { listarEvaluaciones } from "@/lib/nom036/panel";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -33,14 +35,6 @@ const COLOR_BUCKET: Record<string, string> = {
 export default async function ListadoEvaluacionesPage() {
   const evaluaciones = await listarEvaluaciones();
 
-  const resumenes = new Map<string, ResumenInforme | null>(
-    await Promise.all(
-      evaluaciones
-        .filter((ev) => ev.estado !== "pendiente")
-        .map(async (ev) => [ev.id, await obtenerResumenInformeSeguro(ev.id)] as const)
-    )
-  );
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -71,7 +65,6 @@ export default async function ListadoEvaluacionesPage() {
             </thead>
             <tbody>
               {evaluaciones.map((ev) => {
-                const resumen = resumenes.get(ev.id);
                 return (
                   <tr key={ev.id} className="border-b border-black/5 transition-colors last:border-0 hover:bg-gray-50">
                     <td className="py-3 pr-4 pl-6 font-medium">{ev.empresa_nombre}</td>
@@ -85,12 +78,10 @@ export default async function ListadoEvaluacionesPage() {
                     <td className="py-3 pr-4">
                       {ev.estado === "pendiente" ? (
                         <span className="text-gray-400">Sin responder</span>
-                      ) : resumen ? (
-                        <span className={`font-medium ${COLOR_BUCKET[resumen.global.bucket] ?? ""}`}>
-                          {resumen.global.porcentaje}% · {BUCKET_ETIQUETAS[resumen.global.bucket] ?? resumen.global.bucket}
-                        </span>
                       ) : (
-                        <span className="text-gray-400">No disponible</span>
+                        <Suspense fallback={<CargaServicio compacto texto="Calculando…" />}>
+                          <ResultadoGlobal evaluacionId={ev.id} />
+                        </Suspense>
                       )}
                     </td>
                     <td className="py-3 pr-4 text-gray-500">
@@ -112,5 +103,19 @@ export default async function ListadoEvaluacionesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Depende del servicio de informes, que puede estar dormido: va en su propio
+// Suspense para que la lista, que solo lee la base de datos, salga de inmediato.
+async function ResultadoGlobal({ evaluacionId }: { evaluacionId: string }) {
+  const resumen = await obtenerResumenInformeSeguro(evaluacionId);
+  if (!resumen) {
+    return <span className="text-gray-400">No disponible</span>;
+  }
+  return (
+    <span className={`font-medium ${COLOR_BUCKET[resumen.global.bucket] ?? ""}`}>
+      {resumen.global.porcentaje}% · {BUCKET_ETIQUETAS[resumen.global.bucket] ?? resumen.global.bucket}
+    </span>
   );
 }

@@ -13,7 +13,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     );
   }
 
-  const sufijo = revision ? "revision" : "final";
   const contenido = await respuesta.arrayBuffer();
   return new NextResponse(contenido, {
     status: 200,
@@ -22,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "Content-Disposition":
         respuesta.headers.get("content-disposition") ??
-        `attachment; filename="informe-${id}-${sufijo}.docx"`,
+        'attachment; filename="Informe-prediagnostico-empresarial.docx"',
     },
   });
 }

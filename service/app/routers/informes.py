@@ -55,17 +55,14 @@ def descargar_informe(evaluacion_id: str, revision: bool = True) -> Response:
     `revision=false` produce el informe "limpio" tal como se entregaría a
     una empresa real."""
     try:
-        contenido = generar_informe(evaluacion_id, modo_revision=revision)
+        contenido, nombre_archivo = generar_informe(evaluacion_id, modo_revision=revision)
     except EvaluacionNoEncontrada as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    sufijo = "revision" if revision else "final"
     return Response(
         content=contenido,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={
-            "Content-Disposition": f'attachment; filename="informe-{evaluacion_id}-{sufijo}.docx"'
-        },
+        headers={"Content-Disposition": f'attachment; filename="{nombre_archivo}"'},
     )
