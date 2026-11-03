@@ -93,11 +93,18 @@ INK_MUTED = "#6B7280"  # texto secundario / ejes
 GRID = "#E4E4E1"  # gris recesivo para líneas de referencia
 SURFACE = "#FFFFFF"
 
-# Saturación de las bandas de severidad. 0.13 (primer mockup) se sentía
-# "disuelto"; 0.24 mantiene la línea de datos legible encima y se ve más
-# vivo. Súbelo/bájalo aquí si al imprimir se ve muy fuerte o muy pálido — es
-# el único número que controla ese balance.
-ALPHA_BANDAS = 0.24
+# Bandas del radar: colores vivos del semáforo del instrumento, a petición del
+# Dr. Los de `estilos.py` son oscuros para que el texto de la Tabla 2 sea
+# legible, y con transparencia el amarillo se veía olivo. Súbelo/bájalo aquí si
+# al imprimir se ve muy fuerte o muy pálido.
+COLOR_BANDA_RADAR = {
+    "inexistente": "#E53935",
+    "minimo": "#FB8C00",
+    "regular": "#FDD835",
+    "aceptable": "#66BB6A",
+    "optimo": "#42A5F5",
+}
+ALPHA_BANDAS = 0.85
 
 
 def _wrap(texto: str, ancho: int = 14) -> str:
@@ -143,7 +150,7 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
 
     fig = plt.figure(figsize=(7.8, 9.0), dpi=200)
     fig.patch.set_facecolor(SURFACE)
-    ax = fig.add_axes((0.14, 0.155, 0.72, 0.72), polar=True)
+    ax = fig.add_axes((0.17, 0.19, 0.66, 0.66), polar=True)
     ax.set_facecolor(SURFACE)
     ax.set_theta_offset(np.pi / 2)
     ax.set_theta_direction(-1)
@@ -154,7 +161,7 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
         bottom = i * 20
         height = 20 - (ring_gap if i < len(BUCKETS) - 1 else 0)
         ax.bar(
-            0, height, width=2 * np.pi, bottom=bottom, color=COLOR_BANDA[bucket],
+            0, height, width=2 * np.pi, bottom=bottom, color=COLOR_BANDA_RADAR[bucket],
             alpha=ALPHA_BANDAS, zorder=0, edgecolor="none",
         )
 
@@ -168,9 +175,9 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
     ax.set_xticklabels([])
 
     # Línea y relleno de datos — azul de marca del documento, no negro
-    ax.fill(angulos_cerrado, valores_cerrado, color=COLOR_MARCA, alpha=0.14, zorder=2)
+    ax.fill(angulos_cerrado, valores_cerrado, color=COLOR_MARCA, alpha=0.2, zorder=2)
     ax.plot(
-        angulos_cerrado, valores_cerrado, color=COLOR_MARCA, linewidth=2.6, zorder=3,
+        angulos_cerrado, valores_cerrado, color=COLOR_MARCA, linewidth=3.2, zorder=3,
         solid_capstyle="round",
     )
     ax.plot(
@@ -180,9 +187,13 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
 
     # Nombres de criterio
     for ang, nombre in zip(angulos, nombres):
+        # Anclado hacia afuera según su lado, para que ningún texto toque el círculo.
+        seno, coseno = np.sin(ang), np.cos(ang)
+        ha = "left" if seno > 0.2 else "right" if seno < -0.2 else "center"
+        va = "bottom" if coseno > 0.5 else "top" if coseno < -0.5 else "center"
         ax.text(
-            ang, 118, _wrap(nombre, 14), ha="center", va="center", fontsize=10.5, color=INK,
-            fontweight="medium", linespacing=1.25, zorder=5, clip_on=False,
+            ang, 105, _wrap(nombre, 18), ha=ha, va=va, fontsize=14, color=INK,
+            fontweight="medium", linespacing=1.2, zorder=5, clip_on=False,
         )
 
     # Valores como badge, borde = color de severidad de ese punto
@@ -190,34 +201,34 @@ def generar_grafica_radar(criterios: list[ResultadoCriterio]) -> bytes:
         bucket = clasificar_bucket(valor)
         r_label = min(valor + 14, 96)
         ax.annotate(
-            f"{valor:.0f}%", xy=(ang, r_label), ha="center", va="center", zorder=6,
-            fontsize=10, fontweight="bold", color=INK,
+            f"{valor:g}%", xy=(ang, r_label), ha="center", va="center", zorder=6,
+            fontsize=14, fontweight="bold", color=INK,
             bbox=dict(
                 boxstyle="round,pad=0.32", facecolor=SURFACE, edgecolor=COLOR_BANDA[bucket],
-                linewidth=1.6,
+                linewidth=2,
             ),
             clip_on=False,
         )
 
     # Leyenda — chips en una fila
-    leg_ax = fig.add_axes((0.06, 0.015, 0.88, 0.075))
+    leg_ax = fig.add_axes((0.02, 0.015, 0.96, 0.08))
     leg_ax.axis("off")
     n_bandas = len(BUCKETS)
     for i, bucket in enumerate(BUCKETS):
         x0 = i / n_bandas
         leg_ax.add_patch(
-            mpatches.FancyBboxPatch(
-                (x0 + 0.01, 0.35), 0.028, 0.28, boxstyle="round,pad=0,rounding_size=0.05",
-                transform=leg_ax.transAxes, facecolor=COLOR_BANDA[bucket], edgecolor="none",
+            mpatches.Rectangle(
+                (x0 + 0.005, 0.32), 0.03, 0.42, transform=leg_ax.transAxes,
+                facecolor=COLOR_BANDA_RADAR[bucket], alpha=ALPHA_BANDAS, edgecolor="none",
             )
         )
         leg_ax.text(
-            x0 + 0.055, 0.49, ETIQUETA_POR_BUCKET.get(bucket, bucket), transform=leg_ax.transAxes,
-            fontsize=8.8, color=INK_MUTED, va="center",
+            x0 + 0.042, 0.56, ETIQUETA_POR_BUCKET.get(bucket, bucket), transform=leg_ax.transAxes,
+            fontsize=12.5, color=INK, va="center", fontweight="medium",
         )
         leg_ax.text(
-            x0 + 0.055, 0.10, f"{i * 20}-{(i + 1) * 20}%", transform=leg_ax.transAxes,
-            fontsize=7.6, color=INK_MUTED, va="center", alpha=0.8,
+            x0 + 0.042, 0.12, f"{i * 20}-{(i + 1) * 20}%", transform=leg_ax.transAxes,
+            fontsize=11.5, color=INK_MUTED, va="center",
         )
 
     return _fig_a_bytes(fig)

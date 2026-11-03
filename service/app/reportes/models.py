@@ -32,3 +32,5 @@ class DatosEvaluacion:
     total_criterios: int  # cuántos integra el instrumento en total, no solo los respondidos
     plantillas_apertura_global: dict[str, str]  # bucket -> texto
     plantillas_cierre_global: dict[str, str]  # bucket -> texto
+    # Catálogo completo de criterios, aunque la evaluación haya respondido solo algunos.
+    nombres_criterios: list[str] = field(default_factory=list)

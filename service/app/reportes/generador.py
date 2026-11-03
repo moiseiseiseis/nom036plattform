@@ -38,17 +38,65 @@ def _fecha_generacion_es(momento: datetime) -> str:
     return f"{momento.day} de {MESES_ES[momento.month - 1]} de {momento.year}"
 
 
-# Firma del responsable de la elaboración (NOM-036, numeral 7.4 inciso f):
-# nombre completo + cédula profesional son datos reales de una persona, no
-# contenido que este proyecto pueda inventar — se configuran por variable de
-# entorno y, mientras no estén disponibles, el informe firma como equipo
-# (comportamiento actual) en vez de mostrar un campo vacío o inventado.
+RESPONSABLE_DEFAULT = "Mtro. Sergio Alberto Valenzuela Gómez"
+
+
+# Firma del responsable de la elaboración (NOM-036, numeral 7.4 inciso f). La
+# cédula profesional es un dato real que este proyecto no puede inventar: se
+# configura por variable de entorno y, sin ella, no se imprime esa línea.
 def _responsable() -> tuple[str, str | None]:
-    nombre = os.environ.get("INFORME_RESPONSABLE_NOMBRE")
-    cedula = os.environ.get("INFORME_RESPONSABLE_CEDULA")
-    if not nombre:
-        return "Equipo de investigación en Ergonomía y Factores Humanos", None
-    return nombre, cedula
+    nombre = os.environ.get("INFORME_RESPONSABLE_NOMBRE") or RESPONSABLE_DEFAULT
+    return nombre, os.environ.get("INFORME_RESPONSABLE_CEDULA")
+
+
+def _lugar_desde_ubicacion(ubicacion: str | None) -> str:
+    """"…, Zapopan, Jalisco" → "del estado de Jalisco". El formulario guarda el
+    estado como último elemento del domicilio. Si no se puede distinguir
+    (texto libre sin comas), el título simplemente no menciona el estado."""
+    partes = [p.strip() for p in (ubicacion or "").rstrip(" .").split(",")]
+    if len(partes) < 2 or not partes[-1]:
+        return ""
+    estado = partes[-1]
+    if estado == "Ciudad de México":
+        return "de la Ciudad de México"
+    if estado == "Estado de México":
+        return "del Estado de México"
+    return f"del estado de {estado}"
+
+
+def _titulo_informe(datos: DatosEvaluacion, color_empresa: str | None) -> RichText:
+    """Título del informe con el giro y el estado que capturó la empresa, igual
+    al del informe JASANA ("…en empresas de la industria textil y de la
+    confección del estado de Jalisco")."""
+    tamano = 26  # medios puntos: 13 pt
+    rt = RichText()
+    rt.add(
+        "Implementación de herramienta prediagnóstica para la identificación de riesgos "
+        "ergonómicos por manejo manual de cargas en empresas",
+        bold=True, size=tamano,
+    )
+    if datos.empresa_giro:
+        rt.add(" de ", bold=True, size=tamano)
+        rt.add(
+            como_continuacion(datos.empresa_giro.strip().rstrip(".")),
+            bold=True, size=tamano, highlight=color_empresa,
+        )
+    lugar = _lugar_desde_ubicacion(datos.empresa_ubicacion)
+    if lugar:
+        rt.add(f" {lugar}", bold=True, size=tamano, highlight=color_empresa)
+    return rt
+
+
+def _secciones_instrumento(datos: DatosEvaluacion) -> str:
+    """Los nombres llevan comas ("capacitación, adiestramiento y…"), por eso se
+    separan con punto y coma."""
+    nombres = [
+        como_continuacion(nombre)
+        for nombre in (datos.nombres_criterios or [c.nombre for c in datos.criterios])
+    ]
+    if len(nombres) < 2:
+        return "".join(nombres)
+    return "; ".join(nombres[:-1]) + f", y {nombres[-1]}"
 
 
 def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> bytes:
@@ -108,7 +156,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
     resultados, resultado_global = calcular_resultados(datos)
 
     tpl = DocxTemplate(str(PLANTILLA_BASE))
-    grafica_imagen = InlineImage(tpl, io.BytesIO(generar_grafica_radar(resultados)), width=Mm(140))
+    grafica_imagen = InlineImage(tpl, io.BytesIO(generar_grafica_radar(resultados)), width=Mm(155))
     grafica_heatmap = InlineImage(
         tpl, io.BytesIO(generar_heatmap_items(datos.criterios)), width=Mm(155)
     )
@@ -173,6 +221,8 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
 
     tpl.render(
         {
+            "titulo_informe": _titulo_informe(datos, color_empresa),
+            "secciones_instrumento": _secciones_instrumento(datos),
             "empresa_nombre": empresa_nombre,
             "empresa_ubicacion": empresa_ubicacion,
             "empresa_giro": empresa_giro,

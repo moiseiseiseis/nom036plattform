@@ -109,8 +109,22 @@ def test_generar_informe_produce_docx_valido_y_con_contenido_correcto():
     assert "no es posible emitir una conclusión general" in texto_completo
     assert "[PLACEHOLDER] Apertura global" not in texto_completo
 
-    # Firma por defecto (sin INFORME_RESPONSABLE_NOMBRE configurado).
-    assert "Equipo de investigación en Ergonomía y Factores Humanos" in texto_completo
+    # Título con el giro y el estado capturados por la empresa.
+    assert (
+        "por manejo manual de cargas en empresas de textil y confección del estado de Jalisco"
+        in texto_completo
+    )
+
+    # Temas como "Tema N:" en cursiva, no como viñetas.
+    tema_1 = next(p for p in documento.paragraphs if p.text.startswith("Tema 1:"))
+    assert tema_1.runs[0].italic is True
+    assert tema_1.style.name != "List Bullet"
+
+    # Firma por defecto (sin INFORME_RESPONSABLE_NOMBRE configurado) y datos institucionales.
+    assert "Mtro. Sergio Alberto Valenzuela Gómez" in texto_completo
+    assert "Cédula profesional" not in texto_completo
+    assert "LFHE Laboratorio de Factores Humanos y Ergonomía Tlajomulco" in texto_completo
+    assert "Centro Universitario de Tlajomulco" in texto_completo
 
     # El resaltado de modo_revision debe quedar como `w:shd` válido (con `w:val`), no como el
     # `<w:shd w:fill="..."/>` incompleto que produce docxtpl.RichText.add(highlight=...) y que

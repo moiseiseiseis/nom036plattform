@@ -46,6 +46,24 @@ def _parrafo_justificado(doc, *runs_con_texto):
     return p
 
 
+def _parrafo_tema(doc):
+    """"Tema N:" en cursiva seguido del texto, como en el informe JASANA."""
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.add_run("Tema {{ loop.index }}:").italic = True
+    p.add_run(" ")
+    p.add_run("{{r tema }}")
+    return p
+
+
+def _parrafo_cierre(doc, texto: str, *, centrado: bool = False):
+    p = doc.add_paragraph(texto)
+    if centrado:
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.keep_with_next = True
+    return p
+
+
 def _caption(doc, texto: str):
     p = doc.add_paragraph(texto)
     estilos.estilizar_texto_cita(p)
@@ -64,13 +82,8 @@ def construir_documento() -> Document:
 
     subtitulo = doc.add_paragraph()
     subtitulo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = subtitulo.add_run(
-        "Identificación de factores de riesgo ergonómico por manejo manual de cargas, "
-        "con base en la NOM-036-1-STPS-2018"
-    )
-    r.font.size = Pt(13)
-    r.font.color.rgb = estilos.COLOR_TEXTO_TENUE
-    r.font.italic = True
+    # El giro y el estado salen del formulario (ver `generador.py::_titulo_informe`).
+    subtitulo.add_run("{{r titulo_informe }}")
 
     doc.add_paragraph()
     ficha = doc.add_paragraph()
@@ -95,39 +108,38 @@ def construir_documento() -> Document:
     doc.add_page_break()
 
     # --- Introducción ------------------------------------------------------
-    # Las 3 plantillas fijas (contexto de vigencia, alcance de 3 kg, objetivo
-    # del instrumento) son texto de retroalimentación de la validación piloto
-    # (`retroalimentacion/reporte.txt`, hallazgo 5, apéndice 1) — reemplazan
-    # el enunciado único anterior, que se quedaba corto frente al modelo de
-    # referencia (informe JASANA real).
+    # Redacción del informe JASANA del Dr. Sergio, sin su párrafo inicial sobre
+    # el sector. Las fechas y el alcance son los del texto oficial (DOF
+    # 23/11/2018, Transitorios y numerales 2 y 2.1), no los de JASANA ("31 de
+    # marzo del 2024" y "aunque la actividad se realice una vez al día", lo
+    # contrario del numeral 2: "más de una vez al día").
     _seccion(doc, "Introducción")
     _parrafo_justificado(
         doc,
-        "La NOM-036-1-STPS-2018 establece los lineamientos para identificar, analizar, "
-        "prevenir y controlar los factores de riesgo ergonómico derivados del manejo "
-        "manual de cargas en los centros de trabajo. Su objetivo es minimizar la "
-        "exposición de los trabajadores a la manipulación de cargas que puedan afectar "
-        "su salud musculoesquelética.",
-    )
-    # Fechas y alcance tomados del texto oficial (DOF 23/11/2018, Transitorios
-    # y numerales 2 y 2.1): el texto anterior, heredado del informe JASANA,
-    # decía "aun cuando la actividad se realice una sola vez al día", lo
-    # contrario de lo que dice el numeral 2 ("más de una vez al día").
-    _parrafo_justificado(
-        doc,
-        "La norma entró en vigor el 2 de enero de 2020, y desde el 4 de enero de 2023 son "
-        "exigibles también el análisis de los factores de riesgo ergonómico y el programa de "
-        "ergonomía. Aplica en todos los centros de trabajo donde existan trabajadores que "
-        "realicen manejo manual de cargas de forma cotidiana (más de una vez al día), "
-        "considerando como carga todo objeto con una masa de 3 kg o más.",
+        "Desde el 2018 se han propuesto y aprobado nuevas normas oficiales específicas, las "
+        "cuales están directamente dirigidas a mejorar las condiciones laborales dentro de "
+        "los centros de trabajo. Un ejemplo de ello es la NOM-036-1-STPS-2018, que tiene como "
+        "objetivo establecer los lineamientos para analizar, prevenir y controlar los "
+        "factores de riesgo ergonómico por el manejo manual de cargas.",
     )
     _parrafo_justificado(
         doc,
-        "Este documento presenta los resultados de un instrumento de autoevaluación para "
-        "la identificación de factores de riesgo ergonómico por manejo manual de cargas, "
-        "aplicado en la empresa ",
+        "Dicha norma oficial mexicana está enfocada en minimizar la exposición que tienen los "
+        "trabajadores al manejo y/o manipulación de cargas durante sus jornadas laborales. "
+        "Entró en vigor el 2 de enero de 2020, y desde el 4 de enero de 2023 son exigibles "
+        "también el análisis de los factores de riesgo ergonómico y el programa de ergonomía, "
+        "de tal manera que todo puesto de trabajo en donde se manipulen o se transporten "
+        "objetos con una masa de 3 kg o más, de forma cotidiana (más de una vez al día), será "
+        "susceptible de ser evaluado con base en el marco normativo ya mencionado.",
+    )
+    _parrafo_justificado(
+        doc,
+        "En este sentido, el objetivo de este documento es presentar los resultados obtenidos "
+        "durante la implementación de un instrumento de autoevaluación para la identificación "
+        "de factores de riesgo ergonómico por manejo manual de cargas, con base en la "
+        "NOM-036-1-STPS-2018, dentro de la empresa ",
         "{{r empresa_nombre }}",
-        ", con base en los criterios establecidos por la NOM-036-1-STPS-2018.",
+        ".",
     )
 
     doc.add_paragraph("{% if es_revision %}")
@@ -150,24 +162,44 @@ def construir_documento() -> Document:
     p.add_run(" se encuentra ubicada en {{r empresa_ubicacion }}. Cuenta con aproximadamente ")
     p.add_run("{{r empresa_num_trabajadores }}")
     p.add_run(
-        " trabajadores, organizados en {{r empresa_turnos }}, y su actividad principal es "
-        "{{r empresa_giro }}."
+        " trabajadores, los cuales laboran en {{r empresa_turnos }}, y su actividad principal "
+        "es {{r empresa_giro }}."
     )
     _parrafo_justificado(
         doc,
-        "Como actividades relacionadas con el manejo manual de cargas, la empresa reporta "
+        "Dentro de las actividades relacionadas con el manejo manual de cargas se identificaron "
         "las siguientes: {{r empresa_descripcion_mmh }}.",
+    )
+    _parrafo_justificado(
+        doc,
+        "A continuación se presentan los resultados obtenidos con la aplicación del instrumento "
+        "de autoevaluación para la identificación de factores de riesgo ergonómico por manejo "
+        "manual de cargas.",
     )
 
     # --- Resultados de la evaluación ----------------------------------------
     _seccion(doc, "Resultados de la evaluación")
     _parrafo_justificado(
         doc,
-        "El instrumento de autoevaluación se divide en cinco criterios, cada uno integrado "
-        "por diez ítems que se califican en una escala del 0 (Nada) al 4 (Óptimo). La "
-        "calificación máxima de cada criterio es de 40 puntos: entre mayor sea el puntaje, "
-        "mayor es el grado de cumplimiento de la NOM-036-1-STPS-2018 en ese criterio. Los "
-        "resultados se presentan en las tablas 1 y 2 y en las figuras 1 y 2.",
+        "El instrumento de evaluación se dividió en cinco secciones, las cuales son: "
+        "{{ secciones_instrumento }}.",
+    )
+    _parrafo_justificado(
+        doc,
+        "Cada sección está constituida por 10 ítems, los cuales se calificaron en una escala "
+        "del 0 al 4, en donde 0 = Nada y 4 = Óptimo.",
+    )
+    _parrafo_justificado(
+        doc,
+        "La calificación máxima para cada sección fue de 40 puntos a partir de la sumatoria de "
+        "todos los ítems, de tal manera que entre mayor fuera el puntaje, mayor sería el grado "
+        "de cumplimiento de la NOM-036-1-STPS-2018 relativa a la identificación, análisis, "
+        "prevención y control de manejo manual de cargas.",
+    )
+    _parrafo_justificado(
+        doc,
+        "A continuación se explican los resultados obtenidos en cada una de las secciones del "
+        "instrumento, los cuales se pueden observar en las tablas 1 y 2 y en las figuras 1 y 2.",
     )
 
     doc.add_paragraph("Tabla 1. Calificación obtenida por criterio evaluado.")
@@ -177,11 +209,10 @@ def construir_documento() -> Document:
     doc.add_paragraph(MARCADOR_TABLA_PORCENTAJES)
     _parrafo_justificado(
         doc,
-        "La calificación de cada criterio se convirtió en porcentaje para facilitar su "
-        "interpretación, y cada porcentaje se clasificó en una de cinco franjas de 20 puntos "
-        "(Inexistente, Mínimo, Regular, Aceptable y Óptimo). Estos resultados reflejan el "
-        "grado de cumplimiento percibido por la persona que respondió la autoevaluación, por "
-        "lo que conviene corroborarlos en el centro de trabajo.",
+        "La calificación obtenida en cada criterio se convirtió en porcentaje con el propósito "
+        "de tener una interpretación más clara del grado de cumplimiento percibido por la "
+        "persona que respondió la autoevaluación. Se tomó como referencia que, para cada "
+        "criterio evaluado, la puntuación máxima es de 40 puntos.",
     )
 
     img_p = doc.add_paragraph("{{ grafica_radar }}")
@@ -233,10 +264,9 @@ def construir_documento() -> Document:
         "temas evaluados con nivel de cumplimiento bajo."
     )
     doc.add_paragraph("{% if temas_obligatorios %}")
-    doc.add_paragraph("{% for tema in temas_obligatorios %}")
-    tp = doc.add_paragraph(style="List Bullet")
-    tp.add_run("{{ loop.index }}. {{r tema }}")
-    doc.add_paragraph("{% endfor %}")
+    doc.add_paragraph("{%p for tema in temas_obligatorios %}")
+    _parrafo_tema(doc)
+    doc.add_paragraph("{%p endfor %}")
     doc.add_paragraph("{% else %}")
     doc.add_paragraph(
         "No se identificaron temas obligatorios pendientes en los criterios evaluados."
@@ -246,30 +276,38 @@ def construir_documento() -> Document:
     _seccion(doc, "Temas optativos", nivel=2)
     doc.add_paragraph("Buenas prácticas sugeridas, adicionales a lo que exige la norma.")
     doc.add_paragraph("{% if temas_optativos %}")
-    doc.add_paragraph("{% for tema in temas_optativos %}")
-    top = doc.add_paragraph(style="List Bullet")
-    top.add_run("{{ loop.index }}. {{r tema }}")
-    doc.add_paragraph("{% endfor %}")
+    doc.add_paragraph("{%p for tema in temas_optativos %}")
+    _parrafo_tema(doc)
+    doc.add_paragraph("{%p endfor %}")
     doc.add_paragraph("{% else %}")
     doc.add_paragraph(
         "No se identificaron temas optativos adicionales en los criterios evaluados."
     )
     doc.add_paragraph("{% endif %}")
 
-    # Nombre completo + cédula profesional del responsable de la elaboración
-    # (NOM-036, numeral 7.4 inciso f) — configurables por variable de entorno
-    # en `generador.py::_responsable`; sin configurar, firma como equipo
-    # (comportamiento anterior) en vez de mostrar un campo vacío
-    # (retroalimentación de la validación piloto, hallazgo 4).
-    cierre_regla = doc.add_paragraph()
-    estilos.agregar_regla_inferior(cierre_regla, grosor=4)
-    doc.add_paragraph("Atentamente,")
-    doc.add_paragraph()
-    firma = doc.add_paragraph()
+    # Cierre como en el informe JASANA: firma centrada con espacio para firmar
+    # y datos institucionales abajo a la izquierda. Nombre y cédula (NOM-036,
+    # numeral 7.4 inciso f) vienen de `generador.py::_responsable`. Se mantiene
+    # junto para que la firma no quede separada en dos páginas.
+    atentamente = _parrafo_cierre(doc, "Atentamente", centrado=True)
+    atentamente.paragraph_format.space_before = Pt(24)
+    for _ in range(3):
+        _parrafo_cierre(doc, "")
+    _parrafo_cierre(doc, "_" * 38, centrado=True)
+    firma = _parrafo_cierre(doc, "", centrado=True)
     firma.add_run("{{ responsable_nombre }}").bold = True
-    doc.add_paragraph("{% if responsable_cedula %}")
-    doc.add_paragraph("Cédula profesional: {{ responsable_cedula }}")
-    doc.add_paragraph("{% endif %}")
+    doc.add_paragraph("{%p if responsable_cedula %}")
+    _parrafo_cierre(doc, "Cédula profesional: {{ responsable_cedula }}", centrado=True)
+    doc.add_paragraph("{%p endif %}")
+    _parrafo_cierre(doc, "")
+    for linea in (
+        "LFHE Laboratorio de Factores Humanos y Ergonomía Tlajomulco",
+        "Universidad de Guadalajara",
+        "Centro Universitario de Tlajomulco",
+    ):
+        institucion = _parrafo_cierre(doc, "")
+        institucion.add_run(linea).italic = True
+        institucion.paragraph_format.space_after = Pt(0)
 
     return doc
 
