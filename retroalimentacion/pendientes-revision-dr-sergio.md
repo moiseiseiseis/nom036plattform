@@ -6,7 +6,7 @@ Lista consolidada de los puntos que quedaron abiertos al corregir los 5 criterio
 
 ## 0. Decisiones tomadas (2026-10-24)
 
-El Dr. Sergio delegó estas decisiones al equipo de desarrollo. Cada una se verificó contra el texto oficial de la NOM-036-1-STPS-2018 (DOF 23/11/2018) y ya está aplicada en `criterios-valoraciones-separadas.md`. Criterio general: **no se modifica el texto de las preguntas** (el instrumento está publicado en Valenzuela-Gómez et al., 2026); solo se ajustan las descripciones, las recomendaciones, los numerales y la clasificación.
+El Dr. Sergio delegó estas decisiones al equipo de desarrollo. Cada una se verificó contra el texto oficial de la NOM-036-1-STPS-2018 (DOF 23/11/2018) y ya está aplicada en `criterios-valoraciones-separadas.md`. Criterio general: **no se modifica el texto de las preguntas** (corrección del 2026-11-03: el artículo de Valenzuela-Gómez et al., 2026, solo publica el ítem 1.1; ver `cambios-al-instrumento.md`); solo se ajustan las descripciones, las recomendaciones, los numerales y la clasificación.
 
 | # | Decisión |
 |---|---|
@@ -27,6 +27,20 @@ El Dr. Sergio delegó estas decisiones al equipo de desarrollo. Cada una se veri
 | 3 · 3.3 | El nivel 1 ahora dice "incluye solo uno o dos de los tres componentes", para cubrir el caso de que falten dos. El nivel 2 se queda como está. |
 | 3 · 4.7 | Toda la organización: el 5.4 dice "informar a los trabajadores", sin acotar al personal expuesto. El nivel 4 ahora dice "todo el personal". |
 | 3 · 5.1 | Correcto, se queda. |
+
+---
+
+## 0.2 Retroalimentación del Dr. sobre el formulario (2026-11-03, ya aplicada)
+
+Tres preguntas cambiaron a petición del Dr., con sus valoraciones, en `criterios-valoraciones-separadas.md`. Esto hace una excepción al criterio de la sección 0 de no modificar el texto de las preguntas:
+
+| Ítem | Antes | Ahora | Por confirmar |
+|---|---|---|---|
+| 1.7 | "…los puntos críticos de manejo manual de cargas" | "…los puestos de trabajo con manejo manual de cargas" | Se conservó el numeral 7.4. |
+| 2.9 | "…condiciones térmicas o de iluminación…" | "…condiciones de ruido, temperatura o iluminación…" | Se conservó "en las rutas de traslado". El numeral 8.2 d) habla de "condiciones del ambiente" sin nombrar el ruido; lo cubre de forma general. |
+| 3.10 | "¿Se contempla el bienestar…?" | "¿Se prioriza el bienestar…?" | En el nivel 1, "se prioriza de forma informal" no se leía bien, así que quedó "se atiende de forma informal". El nivel 0 ahora dice "No se prioriza el bienestar…" en lugar de "No se contempla ningún programa…". |
+
+**Para el artículo:** el análisis completo está en `cambios-al-instrumento.md`. El artículo publicado solo muestra el ítem 1.1, así que la comparación se hizo contra el Excel versión 22.09.26. **Falta decidir qué redacción usar en el Criterio 1:** seis de sus ítems siguen la imagen de agosto y no el Excel.
 
 ---
 

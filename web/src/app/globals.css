@@ -31,7 +31,7 @@ body {
 @keyframes paso-entrar {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateX(calc(var(--direccion) * 36px));
   }
   to {
     opacity: 1;
@@ -39,12 +39,79 @@ body {
   }
 }
 
-.animar-paso {
-  animation: paso-entrar 240ms ease-out both;
+@keyframes paso-salir {
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--direccion) * -36px));
+  }
+}
+
+@keyframes aparecer-rebote {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes confeti-caer {
+  0% {
+    opacity: 1;
+    transform: translateY(-5vh) rotate(0deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(95vh) rotate(540deg);
+  }
+}
+
+.paso-entrar {
+  animation: paso-entrar 280ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.paso-salir {
+  animation: paso-salir 140ms ease-in both;
+}
+
+.aparecer-rebote {
+  animation: aparecer-rebote 420ms ease-out both;
+}
+
+.confeti {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+}
+
+.confeti span {
+  position: absolute;
+  top: 0;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confeti-caer 1600ms ease-in both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animar-paso {
+  .paso-entrar,
+  .paso-salir,
+  .aparecer-rebote {
     animation: none;
+  }
+
+  .confeti {
+    display: none;
   }
 }

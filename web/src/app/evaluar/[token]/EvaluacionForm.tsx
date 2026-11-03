@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 import type { CriterioConItems, Empresa, Item } from "@/lib/nom036/types";
 import { enviarEvaluacion, type DatosGeneralesForm } from "./actions";
 import { claveBorrador } from "./borrador";
+import { Confeti } from "./Confeti";
 
 // Mismo semáforo 0-4 que el instrumento original y el informe (rojo → azul).
 const NIVELES = [
@@ -58,7 +59,17 @@ const ESTADOS_MX = [
 // Tiempo aproximado por pregunta, solo para el "≈ N min restantes".
 const SEGUNDOS_POR_PREGUNTA = 15;
 // Pausa breve tras elegir una opción, para que se vea la selección antes de avanzar.
-const RETARDO_AVANCE_MS = 320;
+const RETARDO_AVANCE_MS = 260;
+// Duración de la salida de la pantalla actual: igual que `.paso-salir` en globals.css.
+const DURACION_SALIDA_MS = 140;
+
+// Se muestra al iniciar la sección siguiente a la que se acaba de completar.
+const MENSAJES_SECCION_COMPLETA = [
+  "¡Buen comienzo! La primera parte ya quedó.",
+  "¡Vas muy bien! Ya llevas dos secciones.",
+  "¡Ya pasaste la mitad del camino!",
+  "¡Ya casi! Solo queda una sección.",
+];
 
 const DATOS_VACIOS: DatosGeneralesForm = {
   calle: "",
@@ -148,6 +159,9 @@ export function EvaluacionForm({
   const [cargado, setCargado] = useState(false);
   const [erroresDatos, setErroresDatos] = useState<ErroresDatos>({});
   const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
+  const [direccion, setDireccion] = useState<1 | -1>(1);
+  const [saliendo, setSaliendo] = useState(false);
+  const [celebrar, setCelebrar] = useState(false);
   const [enviando, startTransition] = useTransition();
 
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -203,24 +217,56 @@ export function EvaluacionForm({
   const respondidas = itemIds.filter((id) => respuestas[id] !== undefined).length;
   const total = itemIds.length;
 
-  const irA = useCallback((indice: number) => {
-    if (temporizador.current) clearTimeout(temporizador.current);
-    setActual(Math.max(0, Math.min(indice, pasos.length - 1)));
-  }, [pasos.length]);
+  const irA = useCallback(
+    (indice: number, festejar = false) => {
+      if (temporizador.current) clearTimeout(temporizador.current);
+      const destino = Math.max(0, Math.min(indice, pasos.length - 1));
+      const cambiar = () => {
+        setSaliendo(false);
+        setCelebrar(festejar);
+        setActual(destino);
+      };
+      setDireccion(destino >= actual ? 1 : -1);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        cambiar();
+        return;
+      }
+      setSaliendo(true);
+      temporizador.current = setTimeout(cambiar, DURACION_SALIDA_MS);
+    },
+    [actual, pasos.length]
+  );
 
-  const siguiente = useCallback(() => {
-    if (paso.tipo === "datos") {
-      const errores = validarDatos(datos);
-      setErroresDatos(errores);
-      if (Object.keys(errores).length > 0) return;
-    }
-    if (desdeRevision) {
-      setDesdeRevision(false);
-      irA(indiceRevision);
-      return;
-    }
-    irA(actual + 1);
-  }, [paso, datos, desdeRevision, actual, indiceRevision, irA]);
+  // `respuestasNuevas` son las que incluyen la opción recién elegida: el
+  // avance automático corre antes de que el estado `respuestas` se actualice
+  // en este closure. El festejo es solo al completar algo en ese momento, no
+  // cada vez que se vuelve a pasar por la misma pantalla.
+  const siguiente = useCallback(
+    (respuestasNuevas: Record<string, number> = respuestas) => {
+      if (paso.tipo === "datos") {
+        const errores = validarDatos(datos);
+        setErroresDatos(errores);
+        if (Object.keys(errores).length > 0) return;
+      }
+      const completo = (ids: string[], r: Record<string, number>) =>
+        ids.every((id) => r[id] !== undefined);
+      const seCompleta = (ids: string[]) =>
+        completo(ids, respuestasNuevas) && !completo(ids, respuestas);
+
+      if (desdeRevision) {
+        setDesdeRevision(false);
+        irA(indiceRevision, seCompleta(itemIds));
+        return;
+      }
+      const destino = pasos[actual + 1];
+      const festejar =
+        destino?.tipo === "seccion"
+          ? destino.c > 0 && seCompleta(criterios[destino.c - 1].items.map((item) => item.id))
+          : destino?.tipo === "revision" && seCompleta(itemIds);
+      irA(actual + 1, festejar);
+    },
+    [paso, datos, respuestas, desdeRevision, actual, pasos, criterios, itemIds, indiceRevision, irA]
+  );
 
   const anterior = useCallback(() => {
     if (desdeRevision) {
@@ -233,11 +279,13 @@ export function EvaluacionForm({
 
   const responder = useCallback(
     (item: Item, nivel: number) => {
-      setRespuestas((prev) => ({ ...prev, [item.id]: nivel }));
+      const nuevas = { ...respuestas, [item.id]: nivel };
+      setRespuestas(nuevas);
+      setSaliendo(false);
       if (temporizador.current) clearTimeout(temporizador.current);
-      temporizador.current = setTimeout(siguiente, RETARDO_AVANCE_MS);
+      temporizador.current = setTimeout(() => siguiente(nuevas), RETARDO_AVANCE_MS);
     },
-    [siguiente]
+    [respuestas, siguiente]
   );
 
   const editarDesdeRevision = (indice: number) => {
@@ -311,7 +359,15 @@ export function EvaluacionForm({
         />
       )}
 
-      <div key={actual} className="animar-paso">
+      {/* Fuera del contenedor animado: un ancestro con transform cambiaría la
+          referencia de su position: fixed. */}
+      {celebrar && !saliendo && <Confeti key={`confeti-${actual}`} />}
+
+      <div
+        key={actual}
+        className={saliendo ? "paso-salir pointer-events-none" : "paso-entrar"}
+        style={{ "--direccion": direccion } as React.CSSProperties}
+      >
         {paso.tipo === "bienvenida" && (
           <Bienvenida
             tituloRef={tituloRef}
@@ -351,7 +407,7 @@ export function EvaluacionForm({
             respondidasSeccion={
               criterios[paso.c].items.filter((item) => respuestas[item.id] !== undefined).length
             }
-            restantesTotal={total - respondidas}
+            celebrar={celebrar}
           />
         )}
 
@@ -361,6 +417,7 @@ export function EvaluacionForm({
             criterio={criterios[paso.c]}
             item={criterios[paso.c].items[paso.i]}
             indice={paso.i}
+            esUltimaSeccion={paso.c === criterios.length - 1}
             seleccionado={respuestas[criterios[paso.c].items[paso.i].id]}
             onResponder={responder}
           />
@@ -400,7 +457,7 @@ export function EvaluacionForm({
                   : "Siguiente"
           }
           onAnterior={anterior}
-          onSiguiente={siguiente}
+          onSiguiente={() => siguiente()}
           mostrarAtajos={paso.tipo === "pregunta"}
         />
       )}
@@ -745,7 +802,7 @@ function PasoSeccion({
   numCriterios,
   anteriorCompleta,
   respondidasSeccion,
-  restantesTotal,
+  celebrar,
 }: {
   tituloRef: React.RefObject<HTMLHeadingElement | null>;
   criterio: CriterioConItems;
@@ -753,34 +810,50 @@ function PasoSeccion({
   numCriterios: number;
   anteriorCompleta: boolean;
   respondidasSeccion: number;
-  restantesTotal: number;
+  celebrar: boolean;
 }) {
-  const ultima = indice === numCriterios - 1;
+  const restantes = numCriterios - indice - 1;
   return (
-    <section className={`${TARJETA} mt-4 flex flex-col items-start gap-5 sm:mt-10`}>
+    <section className={`${TARJETA} mt-4 flex flex-col items-start gap-6 sm:mt-10`}>
       {anteriorCompleta && (
-        <p className="flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-800">
-          <IconoCheck className="h-4 w-4" />
-          Sección {indice} completa
-        </p>
+        <div className={`flex items-center gap-3 ${celebrar ? "aparecer-rebote" : ""}`}>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
+            <IconoCheck className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="font-semibold text-green-800">Sección {indice} completa</p>
+            <p className="text-sm text-green-800">
+              {MENSAJES_SECCION_COMPLETA[indice - 1] ?? "¡Vas muy bien!"}
+            </p>
+          </div>
+        </div>
       )}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-blue-700">
+      <div className="flex flex-col gap-3">
+        <p className="text-xl font-semibold text-blue-700 sm:text-2xl">
           Sección {indice + 1} de {numCriterios}
-          {ultima && " · la última"}
         </p>
-        <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
+        <h1
+          ref={tituloRef}
+          tabIndex={-1}
+          className="text-3xl leading-tight font-semibold outline-none sm:text-4xl"
+        >
           {criterio.nombre}
         </h1>
       </div>
-      <p className="text-gray-600">
-        {criterio.items.length} preguntas
-        {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
-          ? ` · ya respondiste ${respondidasSeccion}`
-          : ""}
-        {respondidasSeccion === criterio.items.length ? " · ya las respondiste todas" : ""}
-        {indice > 0 && restantesTotal > 0 && ` · te faltan ${restantesTotal} en total`}
-      </p>
+      <div className="flex flex-col gap-1 text-lg text-gray-600">
+        <p>
+          {criterio.items.length} preguntas
+          {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
+            ? ` · ya respondiste ${respondidasSeccion}`
+            : ""}
+          {respondidasSeccion === criterio.items.length ? " · ya las respondiste todas" : ""}
+        </p>
+        <p>
+          {restantes === 0
+            ? "Es la última sección."
+            : `Después de esta, ${restantes === 1 ? "te falta 1 sección" : `te faltan ${restantes} secciones`}.`}
+        </p>
+      </div>
     </section>
   );
 }
@@ -790,6 +863,7 @@ function PasoPregunta({
   criterio,
   item,
   indice,
+  esUltimaSeccion,
   seleccionado,
   onResponder,
 }: {
@@ -797,17 +871,33 @@ function PasoPregunta({
   criterio: CriterioConItems;
   item: Item;
   indice: number;
+  esUltimaSeccion: boolean;
   seleccionado: number | undefined;
   onResponder: (item: Item, nivel: number) => void;
 }) {
   const idTitulo = `pregunta-${item.id}`;
+  const animo =
+    indice === criterio.items.length - 1
+      ? esUltimaSeccion
+        ? "¡Última pregunta!"
+        : "¡Última de esta sección!"
+      : indice === Math.floor(criterio.items.length / 2)
+        ? "¡Vas a la mitad de esta sección!"
+        : null;
   return (
     <section className="flex flex-col gap-5 pt-2">
       <div className="flex flex-col gap-2">
-        <p className="text-sm text-gray-500">
-          <span className="font-medium text-blue-700">Sección {criterio.numero}</span>
-          {" · "}Pregunta {indice + 1} de {criterio.items.length}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <p className="text-sm text-gray-500">
+            <span className="font-medium text-blue-700">Sección {criterio.numero}</span>
+            {" · "}Pregunta {indice + 1} de {criterio.items.length}
+          </p>
+          {animo && (
+            <p className="aparecer-rebote rounded-full bg-green-50 px-3 py-0.5 text-sm font-medium text-green-800">
+              {animo}
+            </p>
+          )}
+        </div>
         <h1 ref={tituloRef} id={idTitulo} tabIndex={-1} className="text-xl leading-snug font-semibold outline-none sm:text-2xl">
           {item.texto_pregunta}
         </h1>
@@ -897,7 +987,7 @@ function PasoRevision({
     <section className="flex flex-col gap-4 pt-2">
       <div className="flex flex-col gap-2">
         <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
-          {listo ? "Todo listo para enviar" : "Revisa antes de enviar"}
+          {listo ? "¡Terminaste! Todo listo para enviar" : "Revisa antes de enviar"}
         </h1>
         <p className="text-gray-600">
           Toca cualquier pregunta para cambiar tu respuesta. Una vez enviada, la autoevaluación ya

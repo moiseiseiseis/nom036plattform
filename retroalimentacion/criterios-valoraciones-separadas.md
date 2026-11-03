@@ -5,7 +5,7 @@ Versión reestructurada de los 5 criterios, aplicando la nota global del Dr. Ser
 - **Descripción del nivel (formulario):** lo que ve el autoevaluador en el panel del formulario, para que todos interpreten igual cada valoración.
 - **Recomendación (motor / informe):** lo que el motor inserta en el informe prediagnóstico.
 
-Las recomendaciones se redactaron para que se entiendan por sí solas, sin depender de la descripción (por ejemplo, "Se recomienda formalizarla" → "Se recomienda formalizar la documentación de los puntos críticos de manejo manual de cargas").
+Las recomendaciones se redactaron para que se entiendan por sí solas, sin depender de la descripción (por ejemplo, "Se recomienda formalizarla" → "Se recomienda formalizar la documentación de los puestos de trabajo con manejo manual de cargas").
 
 Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 — Óptimo
 
@@ -87,15 +87,15 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 ### Ítem 1.7 — Numeral 7.4 — Obligatorio
 
-**Pregunta:** ¿Se cuenta con documentación o planos donde se indiquen los puntos críticos de manejo manual de cargas (MMC)?
+**Pregunta:** ¿Se cuenta con documentación o planos donde se indiquen los puestos de trabajo con manejo manual de cargas (MMC)?
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No existe ningún documento ni plano que señale los puntos donde el manejo manual de cargas representa un riesgo mayor. | Se recomienda elaborar un documento o plano que señale los puntos críticos de manejo manual de cargas. |
-| 1 — Mínimo | Existe documentación parcial o informal sobre los puntos críticos de manejo manual de cargas. | Se recomienda formalizar la documentación de los puntos críticos de manejo manual de cargas. |
-| 2 — Regular | Se cuenta con documentación de los puntos críticos en algunas áreas, pero no en todas. | Se recomienda completar la documentación de los puntos críticos para todos los puestos de trabajo con manejo manual de cargas. |
-| 3 — Aceptable | Se cuenta con documentación de los puntos críticos para la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener actualizada la documentación de los puntos críticos de manejo manual de cargas. |
-| 4 — Óptimo | Se cuenta con documentación o planos completos de los puntos críticos de manejo manual de cargas. | Se recomienda mantener actualizados los documentos y planos de los puntos críticos de manejo manual de cargas. |
+| 0 — Nada | No existe ningún documento ni plano que indique los puestos de trabajo con manejo manual de cargas. | Se recomienda elaborar un documento o plano que indique los puestos de trabajo con manejo manual de cargas. |
+| 1 — Mínimo | Existe documentación parcial o informal sobre los puestos de trabajo con manejo manual de cargas. | Se recomienda formalizar la documentación de los puestos de trabajo con manejo manual de cargas. |
+| 2 — Regular | Se cuenta con documentación de los puestos de trabajo con manejo manual de cargas en algunas áreas, pero no en todas. | Se recomienda completar la documentación de los puestos de trabajo con manejo manual de cargas en todas las áreas. |
+| 3 — Aceptable | Se cuenta con documentación de la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda completar y mantener actualizada la documentación de los puestos de trabajo con manejo manual de cargas. |
+| 4 — Óptimo | Se cuenta con documentación o planos completos de todos los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener actualizados los documentos y planos de los puestos de trabajo con manejo manual de cargas. |
 
 ### Ítem 1.8 — Numeral 8.7 b) y c) — Obligatorio
 
@@ -246,15 +246,15 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 ### Ítem 2.9 — Numeral 8.2 d) — Obligatorio
 
-**Pregunta:** ¿Se identifican riesgos adicionales por condiciones térmicas o de iluminación en las rutas de traslado?
+**Pregunta:** ¿Se identifican riesgos adicionales por condiciones de ruido, temperatura o iluminación en las rutas de traslado?
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se identifican los riesgos por condiciones térmicas o de iluminación en las rutas de traslado de cargas. | Se recomienda identificar los riesgos por condiciones térmicas o de iluminación en las rutas de traslado de cargas, ya que pueden incrementar el esfuerzo del trabajador. |
-| 1 — Mínimo | Se tiene una idea general de los riesgos por condiciones térmicas o de iluminación, pero no se ha realizado una identificación formal. | Se recomienda documentar las condiciones térmicas y de iluminación de las rutas de traslado de cargas. |
-| 2 — Regular | Se identifican los riesgos por condiciones térmicas o de iluminación en algunas rutas de traslado de cargas, pero no en todas. | Se recomienda identificar los riesgos por condiciones térmicas o de iluminación en todas las rutas de traslado de cargas. |
-| 3 — Aceptable | Se identifican los riesgos por condiciones térmicas o de iluminación en la mayoría de las rutas de traslado de cargas. | Se recomienda completar y mantener actualizada la identificación de los riesgos por condiciones térmicas o de iluminación en las rutas de traslado de cargas. |
-| 4 — Óptimo | Se identifican y documentan los riesgos por condiciones térmicas o de iluminación en todas las rutas de traslado de cargas. | Se recomienda mantener documentados y actualizados los riesgos por condiciones térmicas o de iluminación en las rutas de traslado de cargas. |
+| 0 — Nada | No se identifican los riesgos por condiciones de ruido, temperatura o iluminación en las rutas de traslado de cargas. | Se recomienda identificar los riesgos por condiciones de ruido, temperatura o iluminación en las rutas de traslado de cargas, ya que pueden incrementar el esfuerzo del trabajador. |
+| 1 — Mínimo | Se tiene una idea general de los riesgos por condiciones de ruido, temperatura o iluminación, pero no se ha realizado una identificación formal. | Se recomienda documentar las condiciones de ruido, temperatura e iluminación de las rutas de traslado de cargas. |
+| 2 — Regular | Se identifican los riesgos por condiciones de ruido, temperatura o iluminación en algunas rutas de traslado de cargas, pero no en todas. | Se recomienda identificar los riesgos por condiciones de ruido, temperatura o iluminación en todas las rutas de traslado de cargas. |
+| 3 — Aceptable | Se identifican los riesgos por condiciones de ruido, temperatura o iluminación en la mayoría de las rutas de traslado de cargas. | Se recomienda completar y mantener actualizada la identificación de los riesgos por condiciones de ruido, temperatura o iluminación en las rutas de traslado de cargas. |
+| 4 — Óptimo | Se identifican y documentan los riesgos por condiciones de ruido, temperatura o iluminación en todas las rutas de traslado de cargas. | Se recomienda mantener documentados y actualizados los riesgos por condiciones de ruido, temperatura o iluminación en las rutas de traslado de cargas. |
 
 ### Ítem 2.10 — Numeral 8.3 b) 5) — Obligatorio
 
@@ -393,15 +393,15 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 ### Ítem 3.10 — Sin numeral puntual — Optativo
 
-**Pregunta:** ¿Se contempla el bienestar físico y psicológico del personal en las actividades con esfuerzo físico?
+**Pregunta:** ¿Se prioriza el bienestar físico y psicológico del personal en las actividades con esfuerzo físico?
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se contempla ningún programa para el bienestar físico ni psicológico del personal en las actividades que implican esfuerzo físico. | Se recomienda incorporar el bienestar físico y psicológico del personal en los programas de ergonomía o de salud en el trabajo. |
-| 1 — Mínimo | El bienestar físico y psicológico del personal se contempla de forma informal, sin acciones concretas. | Se recomienda definir acciones concretas para el bienestar físico y psicológico del personal. |
+| 0 — Nada | No se prioriza el bienestar físico ni psicológico del personal en las actividades que implican esfuerzo físico. | Se recomienda incorporar el bienestar físico y psicológico del personal en los programas de ergonomía o de salud en el trabajo. |
+| 1 — Mínimo | El bienestar físico y psicológico del personal se atiende de forma informal, sin acciones concretas. | Se recomienda definir acciones concretas para el bienestar físico y psicológico del personal. |
 | 2 — Regular | Se implementa de manera irregular algún programa para el bienestar físico y psicológico del personal, solo en algunas de las actividades con esfuerzo físico. | Se recomienda extender el programa de bienestar físico y psicológico a todas las actividades con esfuerzo físico. |
-| 3 — Aceptable | Se contempla el bienestar físico y psicológico del personal en la mayoría de las actividades con esfuerzo físico. | Se recomienda extender el enfoque de bienestar físico y psicológico a todas las actividades con esfuerzo físico. |
-| 4 — Óptimo | Se contempla de forma integral el bienestar físico y psicológico del personal en todas las actividades con esfuerzo físico. | Se recomienda mantener el enfoque integral de bienestar físico y psicológico del personal. |
+| 3 — Aceptable | Se prioriza el bienestar físico y psicológico del personal en la mayoría de las actividades con esfuerzo físico. | Se recomienda extender el enfoque de bienestar físico y psicológico a todas las actividades con esfuerzo físico. |
+| 4 — Óptimo | Se prioriza de forma integral el bienestar físico y psicológico del personal en todas las actividades con esfuerzo físico. | Se recomienda mantener el enfoque integral de bienestar físico y psicológico del personal. |
 
 ### Apertura del Criterio 3 (por franja de cumplimiento)
 Introduce el párrafo narrativo del criterio en el informe. La implicación lo cierra, después de los aspectos favorables y de los aspectos por atender.
