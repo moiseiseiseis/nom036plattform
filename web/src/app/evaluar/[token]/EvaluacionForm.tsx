@@ -494,8 +494,12 @@ function BarraProgreso({
       <div className="flex items-baseline justify-between gap-3 text-xs text-gray-600">
         <span className="truncate font-medium">{empresa}</span>
         <span className="shrink-0 tabular-nums">
-          {respondidas} de {total}
-          {respondidas < total && <span className="hidden sm:inline"> · ≈ {minutos} min restantes</span>}
+          {seccionActual !== null && `Sección ${seccionActual + 1} de ${criterios.length}`}
+          {respondidas < total && (
+            <span className="hidden sm:inline">
+              {seccionActual !== null && " · "}≈ {minutos} min restantes
+            </span>
+          )}
         </span>
       </div>
       <div
