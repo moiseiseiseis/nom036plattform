@@ -19,8 +19,8 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | Todavía no se ha elaborado una lista de las tareas en las que el personal levanta, baja, empuja, jala, transporta o estiba cargas manualmente. | Se recomienda elaborar una lista de las tareas con manejo manual de cargas, indicando el puesto de trabajo y la actividad en que ocurre cada una. |
-| 1 — Mínimo | Se conocen de manera general las tareas con manejo manual de cargas, pero no existe una lista formal de las mismas. | Se recomienda elaborar por escrito una lista formal de las tareas con manejo manual de cargas que incluya todas las actividades de levantar, bajar, empujar, jalar, transportar y estibar cargas. |
+| 0 — Nada | Todavía no se ha elaborado una lista de las tareas en las que el personal levanta, baja, empuja, jala, transporta o estiba cargas manualmente. | Se recomienda elaborar una lista de las tareas que implican manejo manual de cargas, indicando el puesto de trabajo y la actividad en la que ocurre cada una. |
+| 1 — Mínimo | Se conocen de manera general las tareas con manejo manual de cargas, pero no existe una lista formal de las mismas. | Se recomienda elaborar por escrito una lista de las tareas con manejo manual de cargas que incluya las actividades de levantar, bajar, empujar, jalar, transportar y estibar. |
 | 2 — Regular | Existe una lista de las tareas con manejo manual de cargas, pero no se ha revisado ni actualizado. | Se recomienda verificar que la lista de tareas con manejo manual de cargas esté completa y actualizarla. |
 | 3 — Aceptable | Existe una lista actualizada de las tareas con manejo manual de cargas que cubre la mayoría de los puestos de trabajo. | Se recomienda mantener actualizada la lista de tareas con manejo manual de cargas y revisarla cuando cambien las condiciones de trabajo. |
 | 4 — Óptimo | La lista de tareas con manejo manual de cargas está completa, por escrito y actualizada. | Se recomienda conservar la lista de tareas con manejo manual de cargas y actualizarla periódicamente. |
@@ -31,8 +31,8 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se conoce el peso promedio ni el peso máximo de las cargas en cada estación de trabajo con manejo manual de cargas. | Se recomienda pesar las cargas de cada estación de trabajo con manejo manual de cargas y registrar su peso promedio y máximo. |
-| 1 — Mínimo | Se tiene una idea aproximada del peso de las cargas, pero no se ha medido ni registrado. | Se recomienda medir y registrar el peso promedio y máximo en cada estación de trabajo con manejo manual de cargas. |
+| 0 — Nada | No se conoce el peso promedio ni el peso máximo de las cargas en cada estación de trabajo con manejo manual de cargas. | Se recomienda pesar las cargas de cada estación de trabajo con manejo manual de cargas y registrar su peso. |
+| 1 — Mínimo | Se tiene una idea aproximada del peso de las cargas, pero no se ha medido ni registrado. | Se recomienda medir y registrar el peso mínimo, máximo y promedio que se manipula en cada estación de trabajo. |
 | 2 — Regular | Se conoce el peso de las cargas en algunas estaciones o puestos de trabajo con manejo manual de cargas. | Se recomienda completar el registro del peso de las cargas en todas las estaciones y puestos de trabajo con manejo manual de cargas. |
 | 3 — Aceptable | Se conoce el peso de las cargas en la mayoría de las estaciones de trabajo con manejo manual de cargas. | Se recomienda mantener actualizado el registro del peso de las cargas por estación de trabajo. |
 | 4 — Óptimo | Se conoce y está registrado por escrito el peso promedio y máximo de las cargas en todas las estaciones de trabajo con manejo manual de cargas. | Se recomienda mantener actualizado el registro del peso promedio y máximo de las cargas. |
@@ -55,8 +55,8 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se usa ningún método para estimar el riesgo de las tareas de manejo manual de cargas. | Se recomienda aplicar el Apéndice I (para levantar, bajar o transportar cargas) o el Apéndice II (para empujar o jalar) de la NOM-036-1-STPS-2018, según el caso. |
-| 1 — Mínimo | Se ha intentado aplicar algún método de estimación del riesgo en las tareas con manejo manual de cargas, pero de forma incompleta. | Se recomienda aplicar de manera formal la estimación del riesgo conforme al Apéndice I o II de la NOM-036-1-STPS-2018. |
+| 0 — Nada | No se usa ningún método para estimar el riesgo de las tareas de manejo manual de cargas. | Se recomienda aplicar el Apéndice I (para levantar, bajar o transportar cargas) o el Apéndice II (para empujar o jalar, con o sin el uso de equipo auxiliar) de la NOM-036-1-STPS-2018, según el caso. |
+| 1 — Mínimo | Se ha intentado aplicar algún método de estimación del riesgo en las tareas con manejo manual de cargas, pero de forma incompleta. | Se recomienda aplicar formalmente la estimación del riesgo conforme al Apéndice I o II de la NOM-036-1-STPS-2018. |
 | 2 — Regular | Se aplican métodos de estimación del riesgo en algunas tareas, pero no en todas las que involucran manejo manual de cargas. | Se recomienda extender la aplicación de los métodos de estimación del riesgo a todas las tareas con manejo manual de cargas identificadas. |
 | 3 — Aceptable | Se aplican los métodos de estimación del riesgo (Apéndice I o II) en la mayoría de las tareas con manejo manual de cargas. | Se recomienda continuar aplicando los métodos de estimación del riesgo y documentar sus resultados. |
 | 4 — Óptimo | Se aplican y quedan documentados los métodos de estimación del riesgo (Apéndice I o II) en todas las tareas con manejo manual de cargas. | Se recomienda continuar aplicando y documentando la estimación del riesgo en todas las tareas con manejo manual de cargas. |
@@ -67,8 +67,8 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se registra cuántas veces al día se levantan o trasladan cargas manualmente. | Se recomienda registrar la frecuencia de levantamiento o traslado de cargas en cada actividad con manejo manual de cargas. |
-| 1 — Mínimo | Se tiene una idea aproximada de la frecuencia de levantamiento o traslado de cargas, pero no está registrada por escrito. | Se recomienda registrar por escrito la frecuencia de levantamiento o traslado de cargas. |
+| 0 — Nada | No se registra cuántas veces al día se levantan o trasladan cargas manualmente. | Se recomienda registrar la frecuencia (por minuto o por hora) de levantamiento o traslado de cargas en cada actividad con manejo manual de cargas. |
+| 1 — Mínimo | Se tiene una idea aproximada de la frecuencia de levantamiento o traslado de cargas, pero no está registrada por escrito. | Se recomienda registrar por escrito la frecuencia de levantamiento o traslado de cargas (por minuto o por hora). |
 | 2 — Regular | Se registra la frecuencia en algunas estaciones o puestos de trabajo con manejo manual de cargas. | Se recomienda extender el registro de la frecuencia a todas las tareas y puestos de trabajo con manejo manual de cargas. |
 | 3 — Aceptable | Se registra la frecuencia de levantamiento o traslado de cargas en la mayoría de las actividades con manejo manual de cargas. | Se recomienda mantener actualizado el registro de la frecuencia de levantamiento o traslado de cargas. |
 | 4 — Óptimo | Se registra de forma sistemática la frecuencia de levantamiento o traslado de cargas en todas las actividades con manejo manual de cargas. | Se recomienda mantener el registro sistemático de la frecuencia de levantamiento o traslado de cargas. |
@@ -80,7 +80,7 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | No se revisa si las cargas que se manejan manualmente respetan los límites de peso permitidos según género y edad. | Se recomienda revisar que las cargas respeten los límites de peso permitidos según género y edad. |
-| 1 — Mínimo | Se tiene una noción general de si las cargas respetan los límites de peso, pero esta revisión no se registra por escrito. | Se recomienda documentar por escrito la revisión de los límites de peso por género y edad. |
+| 1 — Mínimo | Se tiene una noción general de si las cargas respetan los límites de peso, pero esta revisión no se registra por escrito. | Se recomienda documentar por escrito cómo se hizo la revisión de los límites de peso por género y edad. |
 | 2 — Regular | Se revisa el cumplimiento de los límites de peso en algunos puestos de trabajo con manejo manual de cargas, pero no en todos. | Se recomienda extender la revisión de los límites de peso a todos los puestos de trabajo con manejo manual de cargas. |
 | 3 — Aceptable | Las cargas respetan los límites de peso por género y edad en la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda revisar periódicamente el cumplimiento de los límites de peso por género y edad. |
 | 4 — Óptimo | Se revisa y queda documentado que las cargas respetan los límites de peso por género y edad en todos los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener documentada la revisión de los límites de peso por género y edad. |
@@ -92,7 +92,7 @@ Escala: 0 — Nada · 1 — Mínimo · 2 — Regular · 3 — Aceptable · 4 —
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | No existe ningún documento ni plano que indique los puestos de trabajo con manejo manual de cargas. | Se recomienda elaborar un documento o plano que indique los puestos de trabajo con manejo manual de cargas. |
-| 1 — Mínimo | Existe documentación parcial o informal sobre los puestos de trabajo con manejo manual de cargas. | Se recomienda formalizar la documentación de los puestos de trabajo con manejo manual de cargas. |
+| 1 — Mínimo | Existe documentación parcial o informal sobre los puestos de trabajo con manejo manual de cargas. | Se recomienda formalizar y organizar la documentación de los puestos de trabajo con manejo manual de cargas. |
 | 2 — Regular | Se cuenta con documentación de los puestos de trabajo con manejo manual de cargas en algunas áreas, pero no en todas. | Se recomienda completar la documentación de los puestos de trabajo con manejo manual de cargas en todas las áreas. |
 | 3 — Aceptable | Se cuenta con documentación de la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda completar y mantener actualizada la documentación de los puestos de trabajo con manejo manual de cargas. |
 | 4 — Óptimo | Se cuenta con documentación o planos completos de todos los puestos de trabajo con manejo manual de cargas. | Se recomienda mantener actualizados los documentos y planos de los puestos de trabajo con manejo manual de cargas. |
@@ -179,7 +179,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | No se conoce la capacidad de carga de los equipos auxiliares que se utilizan. | Se recomienda identificar y verificar la capacidad nominal de cada equipo auxiliar, para no excederla. |
-| 1 — Mínimo | Se tiene una idea aproximada de la capacidad de los equipos auxiliares, pero no está verificada ni documentada. | Se recomienda confirmar y registrar la capacidad nominal de cada equipo auxiliar. |
+| 1 — Mínimo | Se tiene una idea aproximada de la capacidad de los equipos auxiliares, pero no está verificada ni documentada. | Se recomienda confirmar y registrar la capacidad máxima de carga de cada equipo auxiliar. |
 | 2 — Regular | Se conoce la capacidad de carga de algunos equipos auxiliares, pero no de todos los que se utilizan. | Se recomienda identificar la capacidad de carga de todos los equipos auxiliares que se utilizan. |
 | 3 — Aceptable | Se conoce la capacidad de carga de la mayoría de los equipos auxiliares utilizados. | Se recomienda completar y mantener actualizado el registro de la capacidad de carga de los equipos auxiliares. |
 | 4 — Óptimo | Se conoce la capacidad nominal de cada equipo auxiliar utilizado y se verifica que no se exceda. | Se recomienda mantener la verificación de que no se exceda la capacidad nominal de los equipos auxiliares. |
@@ -202,8 +202,8 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | Los pasillos de tránsito peatonal no tienen el espacio suficiente para maniobrar con cargas de forma segura. | Se recomienda verificar que el espacio disponible corresponda a las dimensiones de las cargas que se transportan, en especial en pasillos angostos. |
-| 1 — Mínimo | Algunos pasillos de tránsito peatonal no permiten maniobrar con cargas de forma segura. | Se recomienda realizar una revisión formal de los pasillos donde se transportan cargas. |
+| 0 — Nada | Los pasillos de tránsito peatonal no tienen el espacio suficiente para maniobrar con cargas de forma segura. | Se recomienda verificar que el espacio disponible corresponda a las dimensiones de las cargas que se transportan, especialmente en pasillos angostos. |
+| 1 — Mínimo | Algunos pasillos de tránsito peatonal no permiten maniobrar con cargas de forma segura. | Se recomienda realizar revisiones periódicas de los pasillos donde se transportan cargas. |
 | 2 — Regular | Los pasillos de tránsito permiten maniobras seguras con cargas en algunas áreas, pero no en todas. | Se recomienda corregir los pasillos de tránsito que no permiten maniobrar con cargas de forma segura. |
 | 3 — Aceptable | Los pasillos de tránsito permiten maniobras seguras con cargas en la mayoría de las áreas donde se transportan cargas. | Se recomienda verificar periódicamente que todos los pasillos de tránsito permitan maniobras seguras con cargas. |
 | 4 — Óptimo | Los pasillos de tránsito permiten maniobras seguras con cargas en todas las áreas donde se transportan cargas, incluidos los pasillos angostos. | Se recomienda mantener los pasillos de tránsito con espacio suficiente para maniobrar con cargas de forma segura. |
@@ -226,7 +226,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se revisa el estado físico de los equipos auxiliares antes de usarlos. | Se recomienda verificar que los equipos auxiliares estén en condiciones seguras de operación antes de cada uso. |
+| 0 — Nada | No se revisa el estado físico de los equipos auxiliares antes de usarlos. | Se recomienda verificar que los equipos auxiliares estén en condiciones óptimas de operación antes de cada uso. |
 | 1 — Mínimo | El estado físico de los equipos auxiliares se revisa de forma ocasional, sin un programa establecido. | Se recomienda establecer un programa de revisión periódica del estado físico de los equipos auxiliares. |
 | 2 — Regular | Se revisa el estado físico de algunos equipos auxiliares, pero no de todos los que están en uso. | Se recomienda revisar el estado físico de todos los equipos auxiliares en uso. |
 | 3 — Aceptable | Se revisa periódicamente el estado físico de la mayoría de los equipos auxiliares. | Se recomienda mantener el programa de revisión periódica y extenderlo a todos los equipos auxiliares. |
@@ -301,7 +301,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No existen registros de las capacitaciones impartidas sobre manejo manual de cargas. | Se recomienda llevar un registro con el nombre y el puesto de trabajo de los trabajadores capacitados, la fecha y los temas impartidos. |
+| 0 — Nada | No existen registros de las capacitaciones impartidas sobre manejo manual de cargas. | Se recomienda llevar un registro por escrito con el nombre y el puesto de trabajo de los trabajadores capacitados, la fecha y los temas impartidos. |
 | 1 — Mínimo | Hay registros informales o incompletos de las capacitaciones sobre manejo manual de cargas, sin un formato establecido. | Se recomienda establecer un formato de registro para las capacitaciones sobre manejo manual de cargas. |
 | 2 — Regular | Existen registros de algunas de las capacitaciones impartidas sobre manejo manual de cargas, pero no de todas. | Se recomienda registrar todas las capacitaciones impartidas sobre manejo manual de cargas. |
 | 3 — Aceptable | Existen registros actualizados de la mayoría de las capacitaciones impartidas sobre manejo manual de cargas. | Se recomienda completar y mantener al día los registros de capacitación. |
@@ -314,7 +314,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | La capacitación en manejo manual de cargas no incluye ningún componente teórico, práctico ni de evaluación. | Se recomienda estructurar la capacitación con instrucción teórica, entrenamiento práctico y evaluación de los conocimientos adquiridos. |
-| 1 — Mínimo | La capacitación en manejo manual de cargas incluye solo uno o dos de los tres componentes (teórico, práctico o de evaluación). | Se recomienda integrar en la capacitación los componentes teórico, práctico y de evaluación. |
+| 1 — Mínimo | La capacitación en manejo manual de cargas incluye solo uno o dos de los tres componentes (teórico, práctico o de evaluación). | Se recomienda integrar en la capacitación los componentes teóricos, práctico y de evaluación. |
 | 2 — Regular | La capacitación en manejo manual de cargas incluye los componentes teórico, práctico y de evaluación, pero no de forma completa en todas las sesiones. | Se recomienda cubrir los componentes teórico, práctico y de evaluación en cada sesión de capacitación. |
 | 3 — Aceptable | La capacitación en manejo manual de cargas incluye aspectos teóricos, prácticos y de evaluación en la mayoría de las sesiones. | Se recomienda incluir los componentes teórico, práctico y de evaluación en todas las sesiones de capacitación. |
 | 4 — Óptimo | La capacitación en manejo manual de cargas incluye siempre instrucción teórica, entrenamiento práctico y evaluación de los conocimientos y habilidades adquiridos. | Se recomienda mantener la estructura teórica, práctica y de evaluación en todas las sesiones de capacitación. |
@@ -338,7 +338,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | No se aplican exámenes médicos de ingreso para evaluar la aptitud física del personal que realizará manejo manual de cargas. | Se recomienda aplicar exámenes médicos de ingreso para evaluar la aptitud física antes de asignar tareas de manejo manual de cargas. |
-| 1 — Mínimo | Se aplican exámenes médicos de ingreso de forma general, sin enfocarse en la aptitud física para el manejo manual de cargas. | Se recomienda incluir en los exámenes médicos de ingreso la evaluación específica de la aptitud física para el manejo manual de cargas. |
+| 1 — Mínimo | Se aplican exámenes médicos de ingreso de forma general, sin enfocarse en la aptitud física para el manejo manual de cargas. | Se recomienda incluir en los exámenes médicos de ingreso la evaluación de la aptitud física para el manejo manual de cargas. |
 | 2 — Regular | Se aplican exámenes médicos de ingreso para evaluar la aptitud física del personal que realizará manejo manual de cargas, pero no a todo el personal que ingresa a estas tareas. | Se recomienda aplicar exámenes médicos de ingreso a todo el personal de nuevo ingreso con tareas de manejo manual de cargas. |
 | 3 — Aceptable | Se aplican exámenes médicos de ingreso para evaluar la aptitud física a la mayoría del personal que realiza manejo manual de cargas. | Se recomienda aplicar exámenes médicos de ingreso a todo el personal que realizará manejo manual de cargas. |
 | 4 — Óptimo | Se aplican exámenes médicos de ingreso para evaluar la aptitud física de todo el personal que realizará manejo manual de cargas. | Se recomienda mantener la aplicación de exámenes médicos de ingreso a todo el personal que realizará manejo manual de cargas. |
@@ -349,8 +349,8 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se realizan evaluaciones médicas periódicas al personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda establecer un seguimiento clínico del personal ocupacionalmente expuesto al manejo manual de cargas, al menos anual, o antes si se presentan signos o síntomas. |
-| 1 — Mínimo | Se realizan evaluaciones médicas al personal ocupacionalmente expuesto al manejo manual de cargas de forma esporádica, sin una periodicidad establecida. | Se recomienda formalizar un programa de seguimiento clínico del personal ocupacionalmente expuesto al manejo manual de cargas. |
+| 0 — Nada | No se realizan evaluaciones médicas periódicas al personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda establecer un seguimiento médico del personal ocupacionalmente expuesto al manejo manual de cargas, al menos anual, o antes si se presentan signos o síntomas. |
+| 1 — Mínimo | Se realizan evaluaciones médicas al personal ocupacionalmente expuesto al manejo manual de cargas de forma esporádica, sin una periodicidad establecida. | Se recomienda formalizar un programa de seguimiento médico del personal ocupacionalmente expuesto al manejo manual de cargas. |
 | 2 — Regular | Se realizan evaluaciones médicas periódicas a una parte del personal ocupacionalmente expuesto al manejo manual de cargas, pero no a todo. | Se recomienda extender las evaluaciones médicas periódicas a todo el personal ocupacionalmente expuesto al manejo manual de cargas. |
 | 3 — Aceptable | Se realizan evaluaciones médicas periódicas a la mayoría del personal ocupacionalmente expuesto al manejo manual de cargas. | Se recomienda completar las evaluaciones médicas periódicas con el personal ocupacionalmente expuesto al manejo manual de cargas que aún no las recibe. |
 | 4 — Óptimo | Se realizan evaluaciones médicas periódicas a todo el personal ocupacionalmente expuesto al manejo manual de cargas, con seguimiento clínico al menos anual. | Se recomienda mantener el seguimiento clínico, al menos anual, del personal ocupacionalmente expuesto al manejo manual de cargas. |
@@ -509,7 +509,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
 | 0 — Nada | La información sobre los riesgos por manejo manual de cargas no está disponible para los trabajadores. | Se recomienda poner a disposición de los trabajadores la información sobre los riesgos por manejo manual de cargas, conforme a lo que exige la norma. |
-| 1 — Mínimo | La información sobre los riesgos por manejo manual de cargas está disponible de forma limitada, por ejemplo, solo si el trabajador la solicita expresamente. | Se recomienda facilitar de forma proactiva el acceso a la información sobre los riesgos por manejo manual de cargas. |
+| 1 — Mínimo | La información sobre los riesgos por manejo manual de cargas está disponible de forma limitada, por ejemplo, solo si el trabajador la solicita expresamente. | Se recomienda facilitar de forma proactiva y anticipada el acceso a la información sobre los riesgos por manejo manual de cargas. |
 | 2 — Regular | La información sobre los riesgos por manejo manual de cargas es accesible para algunos trabajadores, pero no para todo el personal de la organización. | Se recomienda poner la información sobre los riesgos por manejo manual de cargas a disposición de todo el personal. |
 | 3 — Aceptable | La información sobre los riesgos por manejo manual de cargas es accesible para la mayoría de los trabajadores. | Se recomienda asegurar que la información sobre los riesgos por manejo manual de cargas sea accesible para todos los trabajadores. |
 | 4 — Óptimo | La información sobre los riesgos por manejo manual de cargas está disponible para todos los trabajadores de la organización. | Se recomienda mantener accesible para todos los trabajadores la información sobre los riesgos por manejo manual de cargas. |
@@ -559,7 +559,7 @@ Introduce el párrafo narrativo del criterio en el informe. La implicación lo c
 
 | Nivel | Descripción del nivel (formulario) | Recomendación (motor / informe) |
 |---|---|---|
-| 0 — Nada | No se cuenta con ningún diagnóstico enfocado en identificar los factores de riesgo ergonómico por manejo manual de cargas. | Se recomienda elaborar el análisis que integra la identificación de actividades, la estimación del nivel de riesgo y, en su caso, la evaluación específica. |
+| 0 — Nada | No se cuenta con ningún diagnóstico enfocado en identificar los factores de riesgo ergonómico por manejo manual de cargas. | Se recomienda elaborar un análisis que integre la identificación de actividades, la estimación del nivel de riesgo y, en su caso, la evaluación específica. |
 | 1 — Mínimo | Se conocen las condiciones de trabajo que involucran manejo manual de cargas, pero no se cuenta con ningún diagnóstico. | Se recomienda elaborar el diagnóstico a partir de las condiciones de trabajo conocidas, integrando la identificación de actividades, la estimación del nivel de riesgo y, en su caso, la evaluación específica. |
 | 2 — Regular | Se cuenta con un diagnóstico parcial o informal que identifica algunos factores de riesgo, pero no cubre todos los puestos de trabajo con manejo manual de cargas. | Se recomienda completar el diagnóstico y extenderlo a todos los puestos de trabajo con manejo manual de cargas. |
 | 3 — Aceptable | Se cuenta con un diagnóstico que identifica los factores de riesgo ergonómico en la mayoría de los puestos de trabajo con manejo manual de cargas. | Se recomienda completar el diagnóstico en todos los puestos de trabajo con manejo manual de cargas y mantenerlo actualizado. |
