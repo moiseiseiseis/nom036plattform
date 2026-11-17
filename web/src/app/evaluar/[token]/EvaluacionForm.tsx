@@ -7,41 +7,37 @@ import { claveBorrador } from "./borrador";
 import { Confeti } from "./Confeti";
 
 // Mismo semáforo 0-4 que el instrumento original y el informe (rojo → azul).
+// Colores en los tokens `nivel-*` de globals.css.
 const NIVELES = [
   {
     valor: 0,
     etiqueta: "Nada",
-    chip: "bg-red-600 text-white",
-    seleccion: "border-red-600 bg-red-50",
-    punto: "bg-red-600 text-white border-red-600",
+    chip: "bg-nivel-0 text-white",
+    punto: "bg-nivel-0 text-white border-nivel-0",
   },
   {
     valor: 1,
     etiqueta: "Mínimo",
-    chip: "bg-orange-500 text-white",
-    seleccion: "border-orange-500 bg-orange-50",
-    punto: "bg-orange-500 text-white border-orange-500",
+    chip: "bg-nivel-1 text-white",
+    punto: "bg-nivel-1 text-white border-nivel-1",
   },
   {
     valor: 2,
     etiqueta: "Regular",
-    chip: "bg-yellow-400 text-yellow-950",
-    seleccion: "border-yellow-500 bg-yellow-50",
-    punto: "bg-yellow-400 text-yellow-950 border-yellow-400",
+    chip: "bg-nivel-2 text-nivel-texto-oscuro",
+    punto: "bg-nivel-2 text-nivel-texto-oscuro border-nivel-2",
   },
   {
     valor: 3,
     etiqueta: "Aceptable",
-    chip: "bg-green-600 text-white",
-    seleccion: "border-green-600 bg-green-50",
-    punto: "bg-green-600 text-white border-green-600",
+    chip: "bg-nivel-3 text-white",
+    punto: "bg-nivel-3 text-white border-nivel-3",
   },
   {
     valor: 4,
     etiqueta: "Óptimo",
-    chip: "bg-sky-600 text-white",
-    seleccion: "border-sky-600 bg-sky-50",
-    punto: "bg-sky-600 text-white border-sky-600",
+    chip: "bg-nivel-4 text-white",
+    punto: "bg-nivel-4 text-white border-nivel-4",
   },
 ] as const;
 
@@ -162,6 +158,7 @@ export function EvaluacionForm({
   const [direccion, setDireccion] = useState<1 | -1>(1);
   const [saliendo, setSaliendo] = useState(false);
   const [celebrar, setCelebrar] = useState(false);
+  const [hojaSecciones, setHojaSecciones] = useState(false);
   const [enviando, startTransition] = useTransition();
 
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -296,11 +293,37 @@ export function EvaluacionForm({
   const indicePregunta = (c: number, i: number) =>
     pasos.findIndex((p) => p.tipo === "pregunta" && p.c === c && p.i === i);
 
+  // Navegación por secciones: se puede ir a las completas y a la primera
+  // incompleta (donde va la empresa), nunca saltar adelante. Requiere los
+  // datos generales válidos, igual que el botón "Siguiente" de ese paso.
+  const datosValidos = Object.keys(validarDatos(datos)).length === 0;
+  const seccionCompleta = (c: number) =>
+    criterios[c].items.every((item) => respuestas[item.id] !== undefined);
+  const frontera = criterios.findIndex((_, c) => !seccionCompleta(c));
+  const puedeIrASeccion = (c: number) => datosValidos && (seccionCompleta(c) || c === frontera);
+
+  const irASeccion = (c: number) => {
+    setHojaSecciones(false);
+    if (!puedeIrASeccion(c)) return;
+    setDesdeRevision(false);
+    const items = criterios[c].items;
+    const pendiente = items.findIndex((item) => respuestas[item.id] === undefined);
+    // Sección sin empezar: su portada. Empezada: la primera pregunta sin
+    // responder. Completa: su primera pregunta, para revisarla.
+    const destino =
+      pendiente === 0
+        ? pasos.findIndex((p) => p.tipo === "seccion" && p.c === c)
+        : indicePregunta(c, pendiente === -1 ? 0 : pendiente);
+    if (destino !== actual) irA(destino);
+  };
+
   // Atajos de teclado: 0-4 eligen la opción, Enter avanza.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const destino = e.target as HTMLElement | null;
       if (destino && ["INPUT", "TEXTAREA", "SELECT"].includes(destino.tagName)) return;
+      // Con una hoja abierta, la pregunta de atrás no debe responderse.
+      if (document.querySelector("dialog[open]")) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (paso.tipo === "pregunta" && /^[0-4]$/.test(e.key)) {
         e.preventDefault();
@@ -344,18 +367,33 @@ export function EvaluacionForm({
     );
   }
 
+  const enCuestionario = paso.tipo !== "bienvenida";
+  const seccionActual = paso.tipo === "seccion" || paso.tipo === "pregunta" ? paso.c : null;
+  const minutosRestantes = Math.ceil(((total - respondidas) * SEGUNDOS_POR_PREGUNTA) / 60);
+  const listaSecciones = (variante: "lateral" | "hoja") => (
+    <ListaSecciones
+      variante={variante}
+      criterios={criterios}
+      respuestas={respuestas}
+      seccionActual={seccionActual}
+      puedeIr={puedeIrASeccion}
+      onIr={irASeccion}
+    />
+  );
+
   return (
     // Alto mínimo de la ventana: la navegación se queda pegada abajo aunque la
     // pantalla actual (p. ej. el inicio de una sección) tenga poco contenido.
-    <div className="flex min-h-dvh flex-col gap-4">
-      {paso.tipo !== "bienvenida" && (
-        <BarraProgreso
+    <div className="flex min-h-dvh flex-col">
+      {enCuestionario && (
+        <Encabezado
           empresa={empresa.nombre}
           criterios={criterios}
           respuestas={respuestas}
-          respondidas={respondidas}
-          total={total}
-          seccionActual={paso.tipo === "seccion" || paso.tipo === "pregunta" ? paso.c : null}
+          seccionActual={seccionActual}
+          paso={paso.tipo}
+          minutosRestantes={respondidas < total ? minutosRestantes : null}
+          onAbrirSecciones={() => setHojaSecciones(true)}
         />
       )}
 
@@ -363,9 +401,27 @@ export function EvaluacionForm({
           referencia de su position: fixed. */}
       {celebrar && !saliendo && <Confeti key={`confeti-${actual}`} />}
 
+      <div className="flex flex-1">
+        {enCuestionario && (
+          // Escritorio (≥ 1280 px): secciones en una columna blanca a toda la
+          // altura, debajo del encabezado (3 rem + 1 px de borde).
+          <nav
+            aria-label="Secciones"
+            className="sticky top-[calc(3rem+1px)] hidden h-[calc(100dvh-3rem-1px)] w-60 shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-gray-200 bg-white px-3 py-4 xl:flex"
+          >
+            <p className="px-2 pb-2 text-xs font-semibold tracking-wide text-gray-600 uppercase">
+              Secciones
+            </p>
+            {listaSecciones("lateral")}
+          </nav>
+        )}
+
+        <div className="flex min-w-0 flex-1 flex-col">
       <div
         key={actual}
-        className={saliendo ? "paso-salir pointer-events-none" : "paso-entrar"}
+        className={`mx-auto w-full max-w-[720px] flex-1 px-4 pt-5 pb-6 sm:px-6 sm:pt-8 ${
+          saliendo ? "paso-salir pointer-events-none" : "paso-entrar"
+        }`}
         style={{ "--direccion": direccion } as React.CSSProperties}
       >
         {paso.tipo === "bienvenida" && (
@@ -461,75 +517,285 @@ export function EvaluacionForm({
           mostrarAtajos={paso.tipo === "pregunta"}
         />
       )}
+        </div>
+      </div>
+
+      {enCuestionario && (
+        <Hoja
+          abierta={hojaSecciones}
+          onCerrar={() => setHojaSecciones(false)}
+          titulo="Secciones"
+          detalle={
+            <>
+              {respondidas < total && `≈ ${minutosRestantes} min restantes · `}
+              {GUARDADO}
+            </>
+          }
+        >
+          {listaSecciones("hoja")}
+        </Hoja>
+      )}
     </div>
   );
 }
 
+// El borrador vive solo en este navegador (`borrador.ts`): decirlo así evita
+// que la empresa crea que puede retomar desde otro dispositivo.
+const GUARDADO = "Guardado en este dispositivo";
+
 // ---------------------------------------------------------------------------
 // Piezas de la interfaz
 
-const TARJETA = "rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-8";
-const TITULO = "text-2xl font-semibold leading-tight outline-none sm:text-3xl";
+const TARJETA = "rounded-2xl border border-gray-200 bg-white p-5 sm:p-8";
+const TITULO = "text-2xl font-bold leading-tight outline-none sm:text-3xl";
 const CAMPO =
-  "w-full rounded-lg border bg-white px-3 py-2.5 text-base outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-600/30";
+  "w-full rounded-lg border bg-white px-3 py-2.5 text-base outline-none transition focus:border-blue-700 focus:ring-2 focus:ring-blue-700/30";
 
-function BarraProgreso({
+const respondidasDe = (criterio: CriterioConItems, respuestas: Record<string, number>) =>
+  criterio.items.filter((item) => respuestas[item.id] !== undefined).length;
+
+function Encabezado({
   empresa,
   criterios,
   respuestas,
-  respondidas,
-  total,
   seccionActual,
+  paso,
+  minutosRestantes,
+  onAbrirSecciones,
 }: {
   empresa: string;
   criterios: CriterioConItems[];
   respuestas: Record<string, number>;
-  respondidas: number;
-  total: number;
   seccionActual: number | null;
+  paso: Paso["tipo"];
+  minutosRestantes: number | null;
+  onAbrirSecciones: () => void;
 }) {
-  const minutos = Math.ceil(((total - respondidas) * SEGUNDOS_POR_PREGUNTA) / 60);
+  const ubicacion =
+    seccionActual !== null
+      ? `Sección ${seccionActual + 1} de ${criterios.length}`
+      : paso === "datos"
+        ? "Datos generales"
+        : "Resumen";
+  const total = criterios.reduce((n, c) => n + c.items.length, 0);
+  const respondidas = criterios.reduce((n, c) => n + respondidasDe(c, respuestas), 0);
   return (
-    <div className="sticky top-0 z-10 -mx-4 border-b border-black/5 bg-[var(--background)]/95 px-4 pt-3 pb-3 backdrop-blur">
-      <div className="flex items-baseline justify-between gap-3 text-xs text-gray-600">
-        <span className="truncate font-medium">{empresa}</span>
-        <span className="shrink-0 tabular-nums">
-          {seccionActual !== null && `Sección ${seccionActual + 1} de ${criterios.length}`}
-          {respondidas < total && (
-            <span className="hidden sm:inline">
-              {seccionActual !== null && " · "}≈ {minutos} min restantes
-            </span>
-          )}
+    <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
+      {/* Escritorio: barra simple; las secciones van en la columna lateral. */}
+      <div className="hidden h-12 items-center justify-between gap-3 px-6 xl:flex">
+        <span className="truncate text-[15px] font-semibold">{empresa}</span>
+        <span className="shrink-0 text-sm text-gray-600 tabular-nums">
+          {ubicacion}
+          {minutosRestantes !== null && ` · ≈ ${minutosRestantes} min restantes`} · {GUARDADO}
         </span>
       </div>
-      <div
-        className="mt-2 flex gap-1"
-        role="progressbar"
-        aria-label="Avance de la autoevaluación"
-        aria-valuemin={0}
-        aria-valuemax={total}
-        aria-valuenow={respondidas}
+
+      {/* Móvil, tableta y pantallas medianas: todo el encabezado abre la hoja de secciones. */}
+      <button
+        type="button"
+        onClick={onAbrirSecciones}
+        aria-haspopup="dialog"
+        className="flex w-full flex-col gap-2.5 px-4 py-3 text-left focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none focus-visible:ring-inset sm:px-6 xl:hidden"
       >
-        {criterios.map((criterio, c) => {
-          const hechas = criterio.items.filter((item) => respuestas[item.id] !== undefined).length;
-          const pct = criterio.items.length ? (hechas / criterio.items.length) * 100 : 0;
-          return (
-            <div
-              key={criterio.numero}
-              className={`h-1.5 flex-1 overflow-hidden rounded-full bg-black/10 ${
-                seccionActual === c ? "ring-2 ring-blue-600/30 ring-offset-1" : ""
-              }`}
-              title={`Sección ${criterio.numero}: ${hechas} de ${criterio.items.length}`}
-            >
-              <div
-                className="h-full rounded-full bg-blue-700 transition-[width] duration-300"
-                style={{ width: `${pct}%` }}
+        <span className="flex w-full items-center justify-between gap-3 text-[13px]">
+          <span className="truncate font-semibold">{empresa}</span>
+          <span className="flex shrink-0 items-center gap-1 text-gray-600">
+            {ubicacion}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+            <span className="sr-only">. Ver secciones</span>
+          </span>
+        </span>
+        <span
+          className="grid w-full gap-1.5"
+          style={{ gridTemplateColumns: `repeat(${criterios.length}, minmax(0, 1fr))` }}
+          role="progressbar"
+          aria-label="Avance de la autoevaluación"
+          aria-valuemin={0}
+          aria-valuemax={total}
+          aria-valuenow={respondidas}
+        >
+          {criterios.map((criterio, c) => {
+            const pct = criterio.items.length ? (respondidasDe(criterio, respuestas) / criterio.items.length) * 100 : 0;
+            return (
+              <span
+                key={criterio.numero}
+                className={`h-1.5 overflow-hidden rounded-full ${seccionActual === c ? "bg-pista" : "bg-gray-200"}`}
+              >
+                <span
+                  className="block h-full rounded-full bg-blue-700 transition-[width] duration-300"
+                  style={{ width: `${pct}%` }}
+                />
+              </span>
+            );
+          })}
+        </span>
+      </button>
+    </header>
+  );
+}
+
+// Una sola lista para la columna lateral (escritorio) y la hoja de secciones
+// (móvil): cambian solo el espaciado y el conteo a la derecha.
+function ListaSecciones({
+  variante,
+  criterios,
+  respuestas,
+  seccionActual,
+  puedeIr,
+  onIr,
+}: {
+  variante: "lateral" | "hoja";
+  criterios: CriterioConItems[];
+  respuestas: Record<string, number>;
+  seccionActual: number | null;
+  puedeIr: (c: number) => boolean;
+  onIr: (c: number) => void;
+}) {
+  const fila = variante === "hoja" ? "min-h-12 px-3 text-sm" : "px-2 py-2 text-[13px]";
+  return (
+    <ol className="flex flex-col gap-0.5">
+      {criterios.map((criterio, c) => {
+        const hechas = respondidasDe(criterio, respuestas);
+        const n = criterio.items.length;
+        const completa = hechas === n;
+        const actual = seccionActual === c;
+        const nombre = (
+          <span className="min-w-0 flex-1">
+            {criterio.numero} · {criterio.nombre}
+          </span>
+        );
+        const conteo = variante === "hoja" && (
+          <span className="shrink-0 text-xs text-gray-600 tabular-nums">
+            {hechas}/{n}
+          </span>
+        );
+        const contenido = actual ? (
+          <span className="flex w-full flex-col gap-1.5">
+            <span className="flex items-start gap-2 font-semibold text-blue-900">
+              {nombre}
+              {conteo}
+            </span>
+            <span className="h-1.5 overflow-hidden rounded-full bg-pista">
+              <span
+                className="block h-full rounded-full bg-blue-700 transition-[width] duration-300"
+                style={{ width: `${(hechas / n) * 100}%` }}
               />
-            </div>
-          );
-        })}
+            </span>
+            {variante === "lateral" && (
+              <span className="text-xs text-gray-700">
+                {hechas} de {n} respondidas
+              </span>
+            )}
+          </span>
+        ) : (
+          <span className="flex w-full items-start gap-2">
+            {completa ? (
+              <IconoCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-700" />
+            ) : (
+              <span className="h-4 w-4 shrink-0" aria-hidden="true" />
+            )}
+            {nombre}
+            {conteo}
+          </span>
+        );
+        const clases = `flex w-full items-center rounded-lg text-left ${fila} ${
+          actual ? "bg-seleccion py-2.5" : completa ? "text-gray-700" : "text-gray-600"
+        }`;
+        const estado = completa ? "completa" : actual ? `${hechas} de ${n} respondidas` : "pendiente";
+        return (
+          <li key={criterio.numero}>
+            {puedeIr(c) ? (
+              <button
+                type="button"
+                onClick={() => onIr(c)}
+                aria-current={actual ? "step" : undefined}
+                aria-label={`Sección ${criterio.numero}: ${criterio.nombre}, ${estado}`}
+                className={`${clases} transition-colors hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none ${
+                  actual ? "hover:bg-seleccion" : ""
+                }`}
+              >
+                {contenido}
+              </button>
+            ) : (
+              <div className={clases} aria-current={actual ? "step" : undefined}>
+                {contenido}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+// Hoja inferior sobre un `<dialog>` nativo: showModal() atrapa el foco, Esc la
+// cierra y, al cerrarse, el navegador devuelve el foco a quien la abrió.
+function Hoja({
+  abierta,
+  onCerrar,
+  titulo,
+  detalle,
+  children,
+}: {
+  abierta: boolean;
+  onCerrar: () => void;
+  titulo: string;
+  detalle?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialogo = ref.current;
+    if (!dialogo) return;
+    if (abierta && !dialogo.open) dialogo.showModal();
+    if (!abierta && dialogo.open) dialogo.close();
+  }, [abierta]);
+
+  // En escritorio la hoja no se muestra (xl:hidden): si la ventana crece con
+  // la hoja abierta, se cierra para no dejar la página bloqueada detrás.
+  useEffect(() => {
+    if (!abierta) return;
+    const escritorio = window.matchMedia("(min-width: 80rem)");
+    const alCambiar = () => escritorio.matches && onCerrar();
+    alCambiar();
+    escritorio.addEventListener("change", alCambiar);
+    return () => escritorio.removeEventListener("change", alCambiar);
+  }, [abierta, onCerrar]);
+
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby="hoja-titulo"
+      onClose={onCerrar}
+      // Un clic fuera del contenido cae en el propio <dialog> (su fondo).
+      onClick={(e) => e.target === e.currentTarget && onCerrar()}
+      className="hoja xl:hidden"
+    >
+      <div className="flex flex-col gap-3 px-4 pt-2.5 pb-6 sm:px-6">
+        <span className="h-1 w-10 self-center rounded-full bg-gray-300" aria-hidden="true" />
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 id="hoja-titulo" className="text-[17px] font-bold">
+              {titulo}
+            </h2>
+            {detalle && <p className="text-[13px] text-gray-600">{detalle}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-5 w-5" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        {children}
       </div>
-    </div>
+    </dialog>
   );
 }
 
@@ -554,7 +820,7 @@ function Bienvenida({
 }) {
   const hayAvance = pasoGuardado !== null;
   return (
-    <section className={`${TARJETA} mt-6 flex flex-col gap-6 sm:mt-12`}>
+    <section className="flex flex-col gap-6 sm:pt-6">
       <div className="flex flex-col gap-3">
         <p className="text-xs font-semibold tracking-wide text-blue-700 uppercase">
           Autoevaluación · NOM-036-1-STPS-2018
@@ -562,22 +828,38 @@ function Bienvenida({
         <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
           {hayAvance ? `Qué bueno verte de nuevo, ${empresa}` : `Prediagnóstico ergonómico de ${empresa}`}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-base leading-relaxed text-gray-700">
           Este cuestionario ayuda a identificar qué tan preparada está tu empresa frente a los
           factores de riesgo ergonómico por manejo manual de cargas. Con tus respuestas se
           elabora un informe de prediagnóstico con recomendaciones concretas.
         </p>
       </div>
 
-      <ul className="grid grid-cols-3 gap-2 sm:gap-3">
-        <Dato titulo={`${total} preguntas`} detalle={`en ${numCriterios} secciones cortas`} />
-        <Dato titulo="10 a 15 minutos" detalle="una pregunta a la vez" />
-        <Dato titulo="Se guarda solo" detalle="puedes pausar y volver" />
+      <ul className="flex flex-col rounded-2xl border border-gray-200 bg-white">
+        <Dato icono={<IconoLista />} titulo={`${total} preguntas`} detalle={`en ${numCriterios} secciones cortas`} />
+        <Dato icono={<IconoReloj />} titulo="10 a 15 minutos" detalle="una pregunta a la vez" />
+        <Dato icono={<IconoGuardar />} titulo="Se guarda solo" detalle="puedes pausar y volver" />
       </ul>
 
-      <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-950">
-        <p className="font-medium">Cómo responder</p>
-        <p className="mt-1">
+      <div className="flex flex-col gap-3 rounded-2xl bg-seleccion p-4 sm:p-5">
+        <p className="font-semibold text-nivel-texto-oscuro">Cómo responder</p>
+        <ul className="grid grid-cols-5 gap-1.5" aria-label="Escala de respuesta">
+          {NIVELES.map((n) => (
+            <li key={n.valor} className="flex flex-col items-center gap-1">
+              <span
+                className={`flex h-9 w-9 items-center justify-center rounded-[9px] text-xl font-bold ${n.chip}`}
+                aria-hidden="true"
+              >
+                {n.valor}
+              </span>
+              <span className="text-center text-[11px] leading-tight text-gray-700 sm:text-xs">
+                <span className="sr-only">{n.valor}: </span>
+                {n.etiqueta}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-sm leading-relaxed text-gray-700">
           Cada pregunta tiene 5 opciones, de <strong>0 (Nada)</strong> a <strong>4 (Óptimo)</strong>.
           Lee las descripciones y elige la que mejor refleje la situación <em>actual</em> de tu
           empresa, no la ideal. No hay respuestas correctas o incorrectas: entre más fiel sea la
@@ -595,7 +877,7 @@ function Bienvenida({
           </button>
         </div>
       ) : (
-        <button type="button" onClick={onComenzar} className={BOTON_PRIMARIO}>
+        <button type="button" onClick={onComenzar} className={`${BOTON_PRIMARIO} w-full sm:w-auto sm:self-start sm:px-10`}>
           Comenzar
         </button>
       )}
@@ -603,12 +885,51 @@ function Bienvenida({
   );
 }
 
-function Dato({ titulo, detalle }: { titulo: string; detalle: string }) {
+function Dato({ icono, titulo, detalle }: { icono: React.ReactNode; titulo: string; detalle: string }) {
   return (
-    <li className="rounded-xl border border-black/10 p-3 sm:p-4">
-      <p className="text-sm font-semibold sm:text-base">{titulo}</p>
-      <p className="text-xs text-gray-600 sm:text-sm">{detalle}</p>
+    <li className="flex items-center gap-3 border-b border-gray-100 px-4 py-3.5 last:border-b-0">
+      <span className="shrink-0 text-blue-700">{icono}</span>
+      <p className="text-[15px]">
+        <span className="font-semibold">{titulo}</span> <span className="text-gray-600">· {detalle}</span>
+      </p>
     </li>
+  );
+}
+
+const ICONO = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  className: "h-[22px] w-[22px]",
+  "aria-hidden": true,
+} as const;
+
+function IconoLista() {
+  return (
+    <svg {...ICONO}>
+      <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" />
+    </svg>
+  );
+}
+
+function IconoReloj() {
+  return (
+    <svg {...ICONO}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+function IconoGuardar() {
+  return (
+    <svg {...ICONO}>
+      <path d="M5 4h11l3 3v13H5z" />
+      <path d="M8 4v5h7V4M8 20v-6h8v6" />
+    </svg>
   );
 }
 
@@ -817,46 +1138,58 @@ function PasoSeccion({
   celebrar: boolean;
 }) {
   const restantes = numCriterios - indice - 1;
+  const minutos = Math.max(1, Math.round((criterio.items.length * SEGUNDOS_POR_PREGUNTA) / 60));
   return (
-    <section className={`${TARJETA} mt-4 flex flex-col items-start gap-6 sm:mt-10`}>
+    <section className="flex flex-col gap-4 sm:pt-6">
       {anteriorCompleta && (
-        <div className={`flex items-center gap-3 ${celebrar ? "aparecer-rebote" : ""}`}>
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
+        <div
+          className={`flex items-center gap-3.5 rounded-2xl border border-gray-200 bg-white p-4 ${
+            celebrar ? "aparecer-rebote" : ""
+          }`}
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-exito-fondo text-green-700">
             <IconoCheck className="h-6 w-6" />
           </span>
           <div>
-            <p className="font-semibold text-green-800">Sección {indice} completa</p>
-            <p className="text-sm text-green-800">
+            <p className="font-semibold text-green-900">Sección {indice} completa</p>
+            <p className="text-sm text-gray-700">
               {MENSAJES_SECCION_COMPLETA[indice - 1] ?? "¡Vas muy bien!"}
             </p>
           </div>
         </div>
       )}
-      <div className="flex flex-col gap-3">
-        <p className="text-xl font-semibold text-blue-700 sm:text-2xl">
-          Sección {indice + 1} de {numCriterios}
-        </p>
-        <h1
-          ref={tituloRef}
-          tabIndex={-1}
-          className="text-3xl leading-tight font-semibold outline-none sm:text-4xl"
-        >
-          {criterio.nombre}
-        </h1>
-      </div>
-      <div className="flex flex-col gap-1 text-lg text-gray-600">
-        <p>
-          {criterio.items.length} preguntas
-          {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
-            ? ` · ya respondiste ${respondidasSeccion}`
-            : ""}
-          {respondidasSeccion === criterio.items.length ? " · ya las respondiste todas" : ""}
-        </p>
-        <p>
-          {restantes === 0
-            ? "Es la última sección."
-            : `Después de esta, ${restantes === 1 ? "te falta 1 sección" : `te faltan ${restantes} secciones`}.`}
-        </p>
+      <div className={`${TARJETA} flex flex-col items-start gap-5`}>
+        <div className="flex flex-col gap-3">
+          <p className="text-lg font-semibold text-blue-700 sm:text-xl">
+            Sección {indice + 1} de {numCriterios}
+          </p>
+          <h1
+            ref={tituloRef}
+            tabIndex={-1}
+            className="text-3xl leading-tight font-bold outline-none sm:text-4xl"
+          >
+            {criterio.nombre}
+          </h1>
+        </div>
+        <div className="flex flex-col gap-2 text-lg text-gray-700">
+          <p className="flex items-center gap-2.5">
+            <span className="text-gray-600">
+              <IconoLista />
+            </span>
+            <span>
+              {criterio.items.length} preguntas · unos {minutos} minutos
+              {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
+                ? ` · ya respondiste ${respondidasSeccion}`
+                : ""}
+              {respondidasSeccion === criterio.items.length ? " · ya las respondiste todas" : ""}
+            </span>
+          </p>
+          <p>
+            {restantes === 0
+              ? "Es la última sección."
+              : `Después de esta, ${restantes === 1 ? "te falta 1 sección" : `te faltan ${restantes} secciones`}.`}
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -888,12 +1221,24 @@ function PasoPregunta({
       : indice === Math.floor(criterio.items.length / 2)
         ? "¡Vas a la mitad de esta sección!"
         : null;
+  // Flechas dentro de la escala: mueven el foco entre opciones sin elegir
+  // (elegir avanza solo, así que no debe pasar por accidente).
+  function moverFoco(e: React.KeyboardEvent<HTMLDivElement>) {
+    const delta = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+    if (!delta) return;
+    const opciones = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
+    const i = opciones.indexOf(document.activeElement as HTMLButtonElement);
+    const siguiente = opciones[i === -1 ? 0 : (i + delta + opciones.length) % opciones.length];
+    e.preventDefault();
+    siguiente?.focus();
+  }
+
   return (
-    <section className="flex flex-col gap-5 pt-2">
+    <section className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-          <p className="text-sm text-gray-500">
-            <span className="font-medium text-blue-700">Sección {criterio.numero}</span>
+          <p className="text-[13px] text-gray-600">
+            <span className="font-semibold text-blue-700">Sección {criterio.numero}</span>
             {" · "}Pregunta {indice + 1} de {criterio.items.length}
           </p>
           {animo && (
@@ -902,12 +1247,13 @@ function PasoPregunta({
             </p>
           )}
         </div>
-        <h1 ref={tituloRef} id={idTitulo} tabIndex={-1} className="text-xl leading-snug font-semibold outline-none sm:text-2xl">
+        <h1 ref={tituloRef} id={idTitulo} tabIndex={-1} className="text-[19px] leading-snug font-bold outline-none sm:text-2xl">
           {item.texto_pregunta}
         </h1>
+        <p className="text-[13px] font-semibold text-gray-600">Elige el nivel que describe hoy a tu empresa</p>
       </div>
 
-      <div role="radiogroup" aria-labelledby={idTitulo} className="flex flex-col gap-2.5">
+      <div role="radiogroup" aria-labelledby={idTitulo} onKeyDown={moverFoco} className="flex flex-col gap-2">
         {item.niveles.map(({ nivel, descripcion }) => {
           const estilo = NIVELES[nivel];
           const activo = seleccionado === nivel;
@@ -918,25 +1264,27 @@ function PasoPregunta({
               role="radio"
               aria-checked={activo}
               onClick={() => onResponder(item, nivel)}
-              className={`group flex w-full items-start gap-3 rounded-xl border-2 p-3.5 text-left transition sm:gap-4 sm:p-4 ${
-                activo
-                  ? `${estilo.seleccion} shadow-sm`
-                  : "border-black/10 bg-white hover:border-black/25 hover:bg-gray-50"
-              } focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:outline-none`}
+              className={`flex min-h-16 w-full items-center gap-3 rounded-xl border-2 px-3.5 py-2.5 text-left transition sm:gap-4 sm:px-4 ${
+                activo ? "border-blue-700 bg-seleccion" : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
+              } focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none`}
             >
               <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-base font-bold ${estilo.chip}`}
+                className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] text-xl font-bold ${estilo.chip}`}
                 aria-hidden="true"
               >
                 {nivel}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="font-semibold">{estilo.etiqueta}</span>
-                {descripcion && <span className="text-sm leading-snug text-gray-700">{descripcion}</span>}
+                <span className="text-[15px] font-semibold text-gray-900">{estilo.etiqueta}</span>
+                {descripcion && (
+                  <span className="text-[13.5px] leading-snug text-gray-700 sm:text-sm">
+                    <ConNegritas texto={descripcion} />
+                  </span>
+                )}
               </span>
               <span
-                className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
-                  activo ? "border-transparent bg-gray-900 text-white" : "border-black/20 text-transparent"
+                className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-2 transition ${
+                  activo ? "border-blue-700 bg-blue-700 text-white" : "border-gray-400 bg-white text-transparent"
                 }`}
                 aria-hidden="true"
               >
@@ -947,6 +1295,25 @@ function PasoPregunta({
         })}
       </div>
     </section>
+  );
+}
+
+// "Hay algunos, pero **no se usan**" → "no se usan" en negritas. Sin HTML en
+// la base ni dangerouslySetInnerHTML: el texto se parte y se arma con <strong>.
+function ConNegritas({ texto }: { texto: string }) {
+  const partes = texto.split(/\*\*(.+?)\*\*/g);
+  return (
+    <>
+      {partes.map((parte, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold text-gray-900">
+            {parte}
+          </strong>
+        ) : (
+          parte
+        )
+      )}
+    </>
   );
 }
 
@@ -1067,7 +1434,9 @@ function PasoRevision({
         </p>
       )}
 
-      <div className="sticky bottom-0 -mx-4 border-t border-black/5 bg-[var(--background)]/95 px-4 py-3 backdrop-blur">
+      {/* Del color del fondo: vive dentro de la columna de 720 px, y en blanco
+          se vería como un recuadro flotante en escritorio. */}
+      <div className="sticky bottom-0 -mx-4 -mb-6 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:-mx-6 sm:px-6">
         {listo ? (
           <button type="button" onClick={onEnviar} disabled={enviando} className={`${BOTON_PRIMARIO} w-full`}>
             {enviando ? "Enviando…" : "Enviar autoevaluación"}
@@ -1106,25 +1475,40 @@ function Navegacion({
   mostrarAtajos: boolean;
 }) {
   return (
-    <div className="sticky bottom-0 -mx-4 mt-auto border-t border-black/5 bg-[var(--background)]/95 px-4 py-3 backdrop-blur">
-      <div className="flex items-center gap-3">
-        <button type="button" onClick={onAnterior} className={BOTON_SECUNDARIO}>
-          <span aria-hidden="true">←</span> Anterior
-        </button>
-        {mostrarAtajos && (
-          <p className="hidden flex-1 text-center text-xs text-gray-500 md:block">
-            Atajos: teclas <kbd className={KBD}>0</kbd>–<kbd className={KBD}>4</kbd> para elegir,{" "}
-            <kbd className={KBD}>Enter</kbd> para seguir
+    // Pegado abajo en todos los tamaños: nunca tapa contenido porque ocupa su
+    // propio lugar al final de la columna (sticky, no fixed).
+    <div className="sticky bottom-0 border-t border-gray-200 bg-white">
+      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-2.5 pb-5 sm:px-6 sm:py-3">
+        {!puedeAvanzar && (
+          <p id="aviso-siguiente" className="text-right text-[13px] text-gray-600 md:hidden">
+            Elige una opción para continuar
           </p>
         )}
-        <button
-          type="button"
-          onClick={onSiguiente}
-          disabled={!puedeAvanzar}
-          className={`${BOTON_PRIMARIO} ml-auto`}
-        >
-          {etiquetaSiguiente} <span aria-hidden="true">→</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={onAnterior} className={BOTON_SECUNDARIO}>
+            <span aria-hidden="true">←</span> Anterior
+          </button>
+          {mostrarAtajos && (
+            <p className="hidden flex-1 text-center text-xs text-gray-600 md:block">
+              Teclas <kbd className={KBD}>0</kbd>–<kbd className={KBD}>4</kbd> para elegir ·{" "}
+              <kbd className={KBD}>Enter</kbd> para seguir
+            </p>
+          )}
+          <div className="ml-auto flex flex-1 items-center justify-end gap-3 md:flex-none">
+            {!puedeAvanzar && (
+              <span className="hidden text-[13px] text-gray-600 md:inline">Elige una opción</span>
+            )}
+            <button
+              type="button"
+              onClick={onSiguiente}
+              disabled={!puedeAvanzar}
+              aria-describedby={!puedeAvanzar ? "aviso-siguiente" : undefined}
+              className={`${BOTON_PRIMARIO} flex-1 md:flex-none`}
+            >
+              {etiquetaSiguiente} <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1148,10 +1532,10 @@ function IconoCheck({ className }: { className?: string }) {
 }
 
 const BOTON_PRIMARIO =
-  "rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40";
+  "min-h-[52px] rounded-xl bg-blue-700 px-6 text-base font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-600 md:min-h-11";
 const BOTON_SECUNDARIO =
-  "rounded-lg border border-black/15 bg-white px-4 py-3 font-medium text-gray-800 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:outline-none";
-const CHIP = "rounded-full border px-4 py-2 text-sm font-medium transition";
+  "min-h-[52px] rounded-xl border border-gray-300 bg-white px-4 text-base font-medium text-gray-900 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none md:min-h-11";
+const CHIP = "min-h-11 rounded-full border px-4 text-sm font-medium transition";
 const CHIP_ACTIVO = "border-blue-700 bg-blue-700 text-white";
-const CHIP_INACTIVO = "border-black/15 bg-white text-gray-800 hover:bg-gray-50";
-const KBD = "rounded border border-black/15 bg-white px-1.5 py-0.5 font-mono text-[11px]";
+const CHIP_INACTIVO = "border-gray-300 bg-white text-gray-800 hover:bg-gray-50";
+const KBD = "rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-[11px]";

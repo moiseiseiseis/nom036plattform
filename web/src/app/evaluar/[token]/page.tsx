@@ -39,7 +39,7 @@ export default async function EvaluarPage({
 
   return (
     // overflow-x-clip: la transición lateral entre preguntas no debe generar scroll horizontal.
-    <main className="mx-auto flex w-full max-w-2xl flex-col overflow-x-clip px-4 pb-6">
+    <main className="flex w-full flex-1 flex-col overflow-x-clip">
       <EvaluacionForm token={token} empresa={evaluacion.empresa} criterios={evaluacion.criterios} />
     </main>
   );

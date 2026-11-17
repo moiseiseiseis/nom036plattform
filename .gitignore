@@ -15,3 +15,7 @@ Thumbs.db
 # Informes .docx generados (pueden contener datos de empresas reales) —
 # quedan solo en disco local, nunca en el historial de git.
 contenido/*.docx
+
+# Instrucciones locales para Claude Code: solo en disco, no en el repo.
+CLAUDE.md
+web/CLAUDE.md
