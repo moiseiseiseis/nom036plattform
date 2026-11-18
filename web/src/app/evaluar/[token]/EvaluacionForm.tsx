@@ -981,7 +981,7 @@ function Bienvenida({
       </div>
 
       <ul className="flex flex-col rounded-2xl border border-gray-200 bg-white">
-        <Dato icono={<IconoLista />} titulo={`${total} preguntas`} detalle={`en ${numCriterios} secciones cortas`} />
+        <Dato icono={<IconoLista />} titulo={`${numCriterios} secciones cortas`} />
         <Dato icono={<IconoReloj />} titulo="10 a 15 minutos" detalle="una pregunta a la vez" />
         <Dato icono={<IconoGuardar />} titulo="Se guarda solo" detalle="se puede pausar y retomar" />
       </ul>
@@ -1034,12 +1034,13 @@ function Bienvenida({
   );
 }
 
-function Dato({ icono, titulo, detalle }: { icono: React.ReactNode; titulo: string; detalle: string }) {
+function Dato({ icono, titulo, detalle }: { icono: React.ReactNode; titulo: string; detalle?: string }) {
   return (
     <li className="flex items-center gap-3 border-b border-gray-100 px-4 py-3.5 last:border-b-0">
       <span className="shrink-0 text-blue-700">{icono}</span>
       <p className="text-[15px]">
-        <span className="font-semibold">{titulo}</span> <span className="text-gray-600">· {detalle}</span>
+        <span className="font-semibold">{titulo}</span>
+        {detalle && <span className="text-gray-600"> · {detalle}</span>}
       </p>
     </li>
   );
