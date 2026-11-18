@@ -7,7 +7,7 @@ import { CargaServicio } from "@/components/CargaServicio";
 import { obtenerResumenInformeSeguro } from "@/lib/informes";
 import { getEvaluacionDetallePanel } from "@/lib/nom036/panel";
 import { eliminarEvaluacionAction, marcarRevisadoAction } from "./actions";
-import { BotonDescarga } from "./BotonDescarga";
+import { BotonDescarga } from "@/components/BotonDescarga";
 import { EliminarEvaluacionBoton } from "./EliminarEvaluacionBoton";
 
 const BUCKET_ETIQUETAS: Record<string, string> = {

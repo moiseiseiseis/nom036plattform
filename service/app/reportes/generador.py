@@ -101,7 +101,9 @@ def _secciones_instrumento(datos: DatosEvaluacion) -> str:
     return "; ".join(nombres[:-1]) + f", y {nombres[-1]}"
 
 
-def nombre_archivo_informe(empresa_nombre: str, modo_revision: bool = False) -> str:
+def nombre_archivo_informe(
+    empresa_nombre: str, modo_revision: bool = False, preliminar: bool = False
+) -> str:
     """"Peñas & Hijos, S.A." → "Informe-prediagnostico-empresarial-Penas-Hijos-S-A.docx".
     Sin acentos ni símbolos, para que el nombre no se altere al descargarlo o
     enviarlo por correo. La versión de revisión se distingue para que nunca se
@@ -112,12 +114,16 @@ def nombre_archivo_informe(empresa_nombre: str, modo_revision: bool = False) -> 
     partes = ["Informe-prediagnostico-empresarial"]
     if empresa:
         partes.append(empresa)
+    if preliminar:
+        partes.append("PRELIMINAR")
     if modo_revision:
         partes.append("revision")
     return "-".join(partes) + ".docx"
 
 
-def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> tuple[bytes, str]:
+def generar_informe(
+    evaluacion_id: str, modo_revision: bool = True, preliminar: bool = False
+) -> tuple[bytes, str]:
     """Punto de entrada usado por la API: trae los datos de la evaluación de
     la base de datos y produce el `.docx` final y su nombre de archivo.
 
@@ -125,11 +131,15 @@ def generar_informe(evaluacion_id: str, modo_revision: bool = True) -> tuple[byt
     resultado calculado, plantilla fija, recomendación de catálogo) para
     facilitar la validación piloto de la Etapa 6. Por defecto está activo
     mientras dure esa etapa; se desactivará para el informe de entrega real
-    a una empresa."""
+    a una empresa.
+
+    `preliminar` es la versión que descarga la propia empresa al terminar la
+    autoevaluación: lleva un aviso de que no ha sido revisada y no lleva la
+    firma del responsable (el informe oficial se entrega después de revisarlo)."""
     with get_connection() as conn:
         datos = fetch_datos_evaluacion(conn, evaluacion_id)
-    contenido = generar_informe_desde_datos(datos, modo_revision=modo_revision)
-    return contenido, nombre_archivo_informe(datos.empresa_nombre, modo_revision)
+    contenido = generar_informe_desde_datos(datos, modo_revision=modo_revision, preliminar=preliminar)
+    return contenido, nombre_archivo_informe(datos.empresa_nombre, modo_revision, preliminar)
 
 
 def calcular_resultados(
@@ -168,7 +178,9 @@ def calcular_resultados(
     return resultados, resultado_global
 
 
-def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = True) -> bytes:
+def generar_informe_desde_datos(
+    datos: DatosEvaluacion, modo_revision: bool = True, preliminar: bool = False
+) -> bytes:
     """Lógica de ensamblado del informe a partir de datos ya resueltos, sin
     tocar la base de datos — es lo que permite probar el generador completo
     (motor + gráfica + plantilla + tablas) con datos sintéticos."""
@@ -258,6 +270,7 @@ def generar_informe_desde_datos(datos: DatosEvaluacion, modo_revision: bool = Tr
             "grafica_temas": grafica_temas_imagen,
             "hay_temas": hay_temas,
             "es_revision": modo_revision,
+            "es_preliminar": preliminar,
             "fecha_generacion": _fecha_generacion_es(datetime.now()),
             "resultado_global_es_parcial": resultado_global.es_parcial,
             "responsable_nombre": responsable_nombre,

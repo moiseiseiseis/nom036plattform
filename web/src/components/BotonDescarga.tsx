@@ -26,7 +26,7 @@ export function BotonDescarga({
     setError(false);
     try {
       const respuesta = await fetch(href);
-      // Con la sesión vencida, el proxy redirige al login y llega HTML con status 200.
+      // En el panel, con la sesión vencida, el proxy redirige al login y llega HTML con status 200.
       if (!respuesta.ok || !respuesta.headers.get("content-type")?.includes(TIPO_DOCX)) {
         setError(true);
         return;
@@ -60,7 +60,7 @@ export function BotonDescarga({
       </button>
       {error && (
         <span role="alert" className="text-xs text-red-700">
-          No se pudo generar. Intenta de nuevo.
+          No se pudo generar el informe. Se puede volver a intentar.
         </span>
       )}
     </span>

@@ -50,9 +50,10 @@ export async function obtenerResumenInforme(evaluacionId: string): Promise<Resum
 
 export async function descargarInformeDocx(
   evaluacionId: string,
-  { revision = true }: { revision?: boolean } = {}
+  { revision = true, preliminar = false }: { revision?: boolean; preliminar?: boolean } = {}
 ): Promise<Response> {
-  return fetch(`${urlServicioPython()}/informes/${evaluacionId}?revision=${revision}`, {
+  const query = `revision=${revision}&preliminar=${preliminar}`;
+  return fetch(`${urlServicioPython()}/informes/${evaluacionId}?${query}`, {
     cache: "no-store",
   });
 }

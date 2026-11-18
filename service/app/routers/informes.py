@@ -49,13 +49,16 @@ def resumen_informe(evaluacion_id: str) -> dict:
 
 
 @router.get("/{evaluacion_id}")
-def descargar_informe(evaluacion_id: str, revision: bool = True) -> Response:
+def descargar_informe(evaluacion_id: str, revision: bool = True, preliminar: bool = False) -> Response:
     """`revision=true` (default) resalta el texto por su origen dentro del
     motor de recomendaciones, para la validación piloto de la Etapa 6;
     `revision=false` produce el informe "limpio" tal como se entregaría a
-    una empresa real."""
+    una empresa real. `preliminar=true` es la versión sin revisar que descarga
+    la empresa al terminar la autoevaluación (aviso, sin firma)."""
     try:
-        contenido, nombre_archivo = generar_informe(evaluacion_id, modo_revision=revision)
+        contenido, nombre_archivo = generar_informe(
+            evaluacion_id, modo_revision=revision, preliminar=preliminar
+        )
     except EvaluacionNoEncontrada as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

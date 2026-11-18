@@ -262,3 +262,28 @@ def test_generar_informe_sin_criterios_lanza_error():
     )
     with pytest.raises(ValueError):
         generar_informe_desde_datos(datos_sin_criterios)
+
+
+def _texto(contenido: bytes) -> str:
+    return "\n".join(p.text for p in Document(io.BytesIO(contenido)).paragraphs)
+
+
+def test_informe_preliminar_lleva_aviso_y_no_lleva_firma():
+    texto = _texto(generar_informe_desde_datos(_datos_evaluacion_jasana(), modo_revision=False, preliminar=True))
+    assert "INFORME PRELIMINAR" in texto
+    assert "Informe preliminar sin firma" in texto
+    assert "Atentamente" not in texto
+
+
+def test_informe_oficial_no_lleva_aviso_preliminar():
+    texto = _texto(generar_informe_desde_datos(_datos_evaluacion_jasana(), modo_revision=False))
+    assert "INFORME PRELIMINAR" not in texto
+    assert "Informe preliminar sin firma" not in texto
+    assert "Atentamente" in texto
+
+
+def test_nombre_archivo_informe_distingue_la_version_preliminar():
+    assert (
+        nombre_archivo_informe("Grupo Modelo", preliminar=True)
+        == "Informe-prediagnostico-empresarial-Grupo-Modelo-PRELIMINAR.docx"
+    )

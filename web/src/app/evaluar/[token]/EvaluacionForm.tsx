@@ -7,25 +7,25 @@ import { claveBorrador } from "./borrador";
 import { Confeti } from "./Confeti";
 
 // Mismo semáforo 0-4 que el instrumento original y el informe (rojo → azul).
-// Colores en los tokens `nivel-*` de globals.css.
+// Colores en los tokens `nivel-*` de globals.css (degradado de azules).
 const NIVELES = [
   {
     valor: 0,
     etiqueta: "Nada",
-    chip: "bg-nivel-0 text-white",
-    punto: "bg-nivel-0 text-white border-nivel-0",
+    chip: "bg-nivel-0 text-nivel-texto-oscuro",
+    punto: "bg-nivel-0 text-nivel-texto-oscuro border-nivel-0",
   },
   {
     valor: 1,
     etiqueta: "Mínimo",
-    chip: "bg-nivel-1 text-white",
-    punto: "bg-nivel-1 text-white border-nivel-1",
+    chip: "bg-nivel-1 text-nivel-texto-oscuro",
+    punto: "bg-nivel-1 text-nivel-texto-oscuro border-nivel-1",
   },
   {
     valor: 2,
     etiqueta: "Regular",
-    chip: "bg-nivel-2 text-nivel-texto-oscuro",
-    punto: "bg-nivel-2 text-nivel-texto-oscuro border-nivel-2",
+    chip: "bg-nivel-2 text-white",
+    punto: "bg-nivel-2 text-white border-nivel-2",
   },
   {
     valor: 3,
@@ -982,7 +982,7 @@ function Bienvenida({
 
       <ul className="flex flex-col rounded-2xl border border-gray-200 bg-white">
         <Dato icono={<IconoLista />} titulo={`${numCriterios} secciones cortas`} />
-        <Dato icono={<IconoReloj />} titulo="10 a 15 minutos" detalle="una pregunta a la vez" />
+        <Dato icono={<IconoReloj />} titulo="Tiempo aproximado: 10 a 15 minutos" detalle="una pregunta a la vez" />
         <Dato icono={<IconoGuardar />} titulo="Se guarda solo" detalle="se puede pausar y retomar" />
       </ul>
 
@@ -1100,8 +1100,11 @@ function PasoDatos({
     datos.turnos !== "" && !OPCIONES_TURNOS.includes(datos.turnos)
   );
 
+  // Sin autocompletado del navegador: en una computadora compartida
+  // sugeriría los datos de otras empresas que ya respondieron.
   const campo = (nombre: keyof DatosGeneralesForm) => ({
     id: `campo-${nombre}`,
+    autoComplete: "off",
     value: datos[nombre],
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       onChange(nombre, e.target.value),
@@ -1129,26 +1132,25 @@ function PasoDatos({
           Domicilio del centro de trabajo
         </legend>
         <Campo etiqueta="Calle y número" error={errores.calle} nombre="calle">
-          <input {...campo("calle")} autoComplete="address-line1" placeholder="Av. Industrial 123, Int. 4" />
+          <input {...campo("calle")} placeholder="Av. Industrial 123, Int. 4" />
         </Campo>
         {/* El código postal cabe angosto: junto a la colonia también en móvil. */}
         <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] gap-3 sm:grid-cols-[1fr_9rem] sm:gap-4">
           <Campo etiqueta="Colonia" error={errores.colonia} nombre="colonia">
-            <input {...campo("colonia")} autoComplete="address-level3" />
+            <input {...campo("colonia")} />
           </Campo>
           <Campo etiqueta="Código postal" error={errores.codigo_postal} nombre="codigo_postal">
             <input
               {...campo("codigo_postal")}
               inputMode="numeric"
               maxLength={5}
-              autoComplete="postal-code"
               placeholder="00000"
             />
           </Campo>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Campo etiqueta="Municipio o alcaldía" error={errores.municipio} nombre="municipio">
-            <input {...campo("municipio")} autoComplete="address-level2" />
+            <input {...campo("municipio")} />
           </Campo>
           <Campo etiqueta="Estado" error={errores.estado} nombre="estado">
             <select {...campo("estado")}>
@@ -1330,7 +1332,7 @@ function PasoSeccion({
               <IconoLista />
             </span>
             <span>
-              {criterio.items.length} preguntas · unos {minutos} minutos
+              {criterio.items.length} preguntas · Tiempo aproximado: {minutos} {minutos === 1 ? "minuto" : "minutos"}
               {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
                 ? ` · ${respondidasSeccion} respondidas`
                 : ""}

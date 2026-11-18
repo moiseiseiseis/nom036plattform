@@ -105,6 +105,26 @@ def construir_documento() -> Document:
     r_aviso.font.italic = True
     r_aviso.font.color.rgb = estilos.COLOR_TEXTO_TENUE
 
+    # Versión que descarga la empresa al terminar la autoevaluación, antes de
+    # la revisión del equipo (`generador.py::generar_informe(preliminar=True)`).
+    doc.add_paragraph("{%p if es_preliminar %}")
+    marca = doc.add_paragraph()
+    marca.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    marca.paragraph_format.space_before = Pt(18)
+    r_marca = marca.add_run("INFORME PRELIMINAR")
+    r_marca.bold = True
+    r_marca.font.size = Pt(14)
+    r_marca.font.color.rgb = estilos.COLOR_ACENTO
+    nota = doc.add_paragraph()
+    nota.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r_nota = nota.add_run(
+        "Generado automáticamente a partir de la autoevaluación, sin revisión del equipo "
+        "responsable. No sustituye al informe oficial, que se entrega una vez revisado."
+    )
+    r_nota.font.size = Pt(10)
+    r_nota.italic = True
+    doc.add_paragraph("{%p endif %}")
+
     doc.add_page_break()
 
     # --- Introducción ------------------------------------------------------
@@ -289,6 +309,15 @@ def construir_documento() -> Document:
     # y datos institucionales abajo a la izquierda. Nombre y cédula (NOM-036,
     # numeral 7.4 inciso f) vienen de `generador.py::_responsable`. Se mantiene
     # junto para que la firma no quede separada en dos páginas.
+    # El preliminar no lleva firma: nadie lo ha revisado todavía.
+    doc.add_paragraph("{%p if es_preliminar %}")
+    sin_firma = _parrafo_cierre(doc, "")
+    sin_firma.paragraph_format.space_before = Pt(24)
+    sin_firma.add_run(
+        "Informe preliminar sin firma. El informe oficial, revisado y firmado por "
+        "{{ responsable_nombre }}, se entrega por separado."
+    ).italic = True
+    doc.add_paragraph("{%p else %}")
     atentamente = _parrafo_cierre(doc, "Atentamente", centrado=True)
     atentamente.paragraph_format.space_before = Pt(24)
     for _ in range(3):
@@ -298,6 +327,7 @@ def construir_documento() -> Document:
     firma.add_run("{{ responsable_nombre }}").bold = True
     doc.add_paragraph("{%p if responsable_cedula %}")
     _parrafo_cierre(doc, "Cédula profesional: {{ responsable_cedula }}", centrado=True)
+    doc.add_paragraph("{%p endif %}")
     doc.add_paragraph("{%p endif %}")
     _parrafo_cierre(doc, "")
     for linea in (

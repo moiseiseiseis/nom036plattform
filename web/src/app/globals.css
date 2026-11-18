@@ -17,18 +17,18 @@
 }
 
 /*
- * Tokens del formulario de autoevaluación. Semáforo de la escala 0-4: mismo
- * orden de color que el informe. El naranja es un poco más oscuro que el de
- * referencia (#FF6900, contraste 2.9:1 con blanco) para que el número del
- * badge, a 20 px en negritas, pase el 3:1 de texto grande.
+ * Tokens del formulario de autoevaluación. Escala 0-4 en degradado de azules
+ * (de claro a oscuro), a petición del Dr. en vez del semáforo; el informe
+ * conserva sus propios colores. En 0 y 1 el número va en texto oscuro; en
+ * 2-4, blanco (el número del badge, a 20 px en negritas, pasa el 3:1).
  */
 @theme {
-  --color-nivel-0: #dc0000;
-  --color-nivel-1: #f56500;
-  --color-nivel-2: #fdc700;
-  --color-nivel-3: #00a63e;
-  --color-nivel-4: #0284c7;
-  --color-nivel-texto-oscuro: #1e293b;
+  --color-nivel-0: #d6e6fb;
+  --color-nivel-1: #9cc2f3;
+  --color-nivel-2: #3b7ad4;
+  --color-nivel-3: #1d5bbf;
+  --color-nivel-4: #0c3a85;
+  --color-nivel-texto-oscuro: #0b2a5e;
   --color-lienzo: #f6f7f9;
   --color-seleccion: #eef2fb;
   --color-pista: #dce3f1;
