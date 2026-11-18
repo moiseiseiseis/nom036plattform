@@ -23,6 +23,11 @@ export interface Item {
   numero: number;
   texto_pregunta: string;
   niveles: NivelItem[];
+  // Ayuda del formulario (panel derecho / hoja en móvil). Nulos si el ítem
+  // no tiene: entonces no se muestra ni el panel ni el botón.
+  numeral_nom: string | null;
+  ayuda_definicion: string | null;
+  ayuda_preguntas_guia: string[] | null;
 }
 
 export interface CriterioConItems {

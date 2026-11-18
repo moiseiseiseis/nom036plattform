@@ -5,6 +5,10 @@
   --foreground: #171717;
 }
 
+/* Pantallas bajas (celulares chicos, o con las barras del navegador): la
+   pregunta se compacta para que sus 5 opciones quepan sin scroll. */
+@custom-variant bajo (@media (max-height: 700px));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

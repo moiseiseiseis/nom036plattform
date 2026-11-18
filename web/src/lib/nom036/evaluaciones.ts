@@ -39,11 +39,15 @@ export async function getEvaluacionPorToken(
       id: string;
       numero: number;
       texto_pregunta: string;
+      numeral_nom: string | null;
+      ayuda_definicion: string | null;
+      ayuda_preguntas_guia: string[] | null;
       niveles: { nivel: number; descripcion: string | null }[] | null;
     }[]
   >`
     select c.numero as criterio_numero, c.nombre as criterio_nombre,
            i.id, i.numero, i.texto_pregunta,
+           i.numeral_nom, i.ayuda_definicion, i.ayuda_preguntas_guia,
            (select json_agg(json_build_object('nivel', r.nivel, 'descripcion', r.descripcion_nivel)
                             order by r.nivel)
             from nom036.recomendacion r
@@ -71,6 +75,9 @@ export async function getEvaluacionPorToken(
       numero: fila.numero,
       texto_pregunta: fila.texto_pregunta,
       niveles,
+      numeral_nom: fila.numeral_nom,
+      ayuda_definicion: fila.ayuda_definicion,
+      ayuda_preguntas_guia: fila.ayuda_preguntas_guia?.length ? fila.ayuda_preguntas_guia : null,
     });
   }
 

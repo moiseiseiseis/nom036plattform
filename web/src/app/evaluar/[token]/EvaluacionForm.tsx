@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { CriterioConItems, Empresa, Item } from "@/lib/nom036/types";
 import { enviarEvaluacion, type DatosGeneralesForm } from "./actions";
 import { claveBorrador } from "./borrador";
@@ -159,6 +159,7 @@ export function EvaluacionForm({
   const [saliendo, setSaliendo] = useState(false);
   const [celebrar, setCelebrar] = useState(false);
   const [hojaSecciones, setHojaSecciones] = useState(false);
+  const [hojaAyuda, setHojaAyuda] = useState(false);
   const [enviando, startTransition] = useTransition();
 
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -381,6 +382,8 @@ export function EvaluacionForm({
   // En los datos generales todavía no hay secciones a las que ir: sin columna
   // lateral ni hoja, y el encabezado queda solo informativo.
   const conSecciones = enCuestionario && paso.tipo !== "datos";
+  const itemActual = paso.tipo === "pregunta" ? criterios[paso.c].items[paso.i] : null;
+  const ayudaActual = itemActual && tieneAyuda(itemActual) ? itemActual : null;
   const seccionActual = paso.tipo === "seccion" || paso.tipo === "pregunta" ? paso.c : null;
   const minutosRestantes = Math.ceil(((total - respondidas) * SEGUNDOS_POR_PREGUNTA) / 60);
   const listaSecciones = (variante: "lateral" | "hoja") => (
@@ -432,7 +435,7 @@ export function EvaluacionForm({
         <div className="flex min-w-0 flex-1 flex-col">
       <div
         key={actual}
-        className={`mx-auto w-full max-w-[720px] flex-1 px-4 pt-5 pb-6 sm:px-6 sm:pt-8 ${
+        className={`mx-auto w-full max-w-[720px] flex-1 px-4 pt-3 pb-4 sm:px-6 sm:pt-6 sm:pb-6 ${
           saliendo ? "paso-salir pointer-events-none" : "paso-entrar"
         }`}
         style={{ "--direccion": direccion } as React.CSSProperties}
@@ -489,6 +492,7 @@ export function EvaluacionForm({
             esUltimaSeccion={paso.c === criterios.length - 1}
             seleccionado={respuestas[criterios[paso.c].items[paso.i].id]}
             onResponder={responder}
+            onAbrirAyuda={ayudaActual ? () => setHojaAyuda(true) : null}
           />
         )}
 
@@ -531,13 +535,45 @@ export function EvaluacionForm({
         />
       )}
         </div>
+
+        {ayudaActual && (
+          // ≥ 1024 px: ayuda a la derecha, blanca y a toda la altura. En
+          // pantallas menores la misma ayuda va en una hoja (botón en la pregunta).
+          <aside
+            aria-label="Ayuda para esta pregunta"
+            className="hidden w-[300px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-gray-200 bg-white px-5 py-5 lg:flex xl:w-[320px]"
+          >
+            <p className="flex items-center gap-2 text-sm font-semibold">
+              <IconoInfo className="h-4 w-4 text-blue-700" />
+              Ayuda para esta pregunta
+            </p>
+            <ContenidoAyuda item={ayudaActual} />
+          </aside>
+        )}
       </div>
+
+      {ayudaActual && (
+        <Hoja
+          abierta={hojaAyuda}
+          onCerrar={() => setHojaAyuda(false)}
+          titulo="Ayuda para esta pregunta"
+          ocultarDesde="lg"
+          pie={
+            <button type="button" onClick={() => setHojaAyuda(false)} className={`${BOTON_PRIMARIO} w-full`}>
+              Entendido
+            </button>
+          }
+        >
+          <ContenidoAyuda item={ayudaActual} />
+        </Hoja>
+      )}
 
       {conSecciones && (
         <Hoja
           abierta={hojaSecciones}
           onCerrar={() => setHojaSecciones(false)}
           titulo="Secciones"
+          ocultarDesde="xl"
           detalle={
             <>
               {respondidas < total && `≈ ${minutosRestantes} min restantes · `}
@@ -620,7 +656,7 @@ function Encabezado({
         type="button"
         onClick={onAbrirSecciones}
         aria-haspopup="dialog"
-        className="flex w-full flex-col gap-2.5 px-4 py-3 text-left focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none focus-visible:ring-inset sm:px-6 xl:hidden"
+        className="flex w-full flex-col gap-2 px-4 py-2.5 bajo:py-2 text-left focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none focus-visible:ring-inset sm:px-6 xl:hidden"
       >
         <span className="flex w-full items-center justify-between gap-3 text-[13px]">
           <span className="truncate font-semibold">{empresa}</span>
@@ -757,20 +793,33 @@ function ListaSecciones({
 
 // Hoja inferior sobre un `<dialog>` nativo: showModal() atrapa el foco, Esc la
 // cierra y, al cerrarse, el navegador devuelve el foco a quien la abrió.
+// Desde este ancho la hoja no se usa: su contenido ya está en pantalla
+// (secciones en la columna lateral ≥ 1280 px, ayuda a la derecha ≥ 1024 px).
+const CORTE_HOJA = {
+  lg: { clase: "lg:hidden", consulta: "(min-width: 64rem)" },
+  xl: { clase: "xl:hidden", consulta: "(min-width: 80rem)" },
+} as const;
+
 function Hoja({
   abierta,
   onCerrar,
   titulo,
   detalle,
+  ocultarDesde,
+  pie,
   children,
 }: {
   abierta: boolean;
   onCerrar: () => void;
   titulo: string;
   detalle?: React.ReactNode;
+  ocultarDesde: keyof typeof CORTE_HOJA;
+  pie?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const idTitulo = useId();
+  const corte = CORTE_HOJA[ocultarDesde];
   useEffect(() => {
     const dialogo = ref.current;
     if (!dialogo) return;
@@ -778,31 +827,31 @@ function Hoja({
     if (!abierta && dialogo.open) dialogo.close();
   }, [abierta]);
 
-  // En escritorio la hoja no se muestra (xl:hidden): si la ventana crece con
-  // la hoja abierta, se cierra para no dejar la página bloqueada detrás.
+  // Desde el corte la hoja no se muestra: si la ventana crece con la hoja
+  // abierta, se cierra para no dejar la página bloqueada detrás.
   useEffect(() => {
     if (!abierta) return;
-    const escritorio = window.matchMedia("(min-width: 80rem)");
-    const alCambiar = () => escritorio.matches && onCerrar();
+    const ancho = window.matchMedia(corte.consulta);
+    const alCambiar = () => ancho.matches && onCerrar();
     alCambiar();
-    escritorio.addEventListener("change", alCambiar);
-    return () => escritorio.removeEventListener("change", alCambiar);
-  }, [abierta, onCerrar]);
+    ancho.addEventListener("change", alCambiar);
+    return () => ancho.removeEventListener("change", alCambiar);
+  }, [abierta, onCerrar, corte.consulta]);
 
   return (
     <dialog
       ref={ref}
-      aria-labelledby="hoja-titulo"
+      aria-labelledby={idTitulo}
       onClose={onCerrar}
       // Un clic fuera del contenido cae en el propio <dialog> (su fondo).
       onClick={(e) => e.target === e.currentTarget && onCerrar()}
-      className="hoja xl:hidden"
+      className={`hoja ${corte.clase}`}
     >
       <div className="flex flex-col gap-3 px-4 pt-2.5 pb-6 sm:px-6">
         <span className="h-1 w-10 self-center rounded-full bg-gray-300" aria-hidden="true" />
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 id="hoja-titulo" className="text-[17px] font-bold">
+            <h2 id={idTitulo} className="text-[17px] font-bold">
               {titulo}
             </h2>
             {detalle && <p className="text-[13px] text-gray-600">{detalle}</p>}
@@ -819,8 +868,55 @@ function Hoja({
           </button>
         </div>
         {children}
+        {pie && <div className="pt-2">{pie}</div>}
       </div>
     </dialog>
+  );
+}
+
+const tieneAyuda = (item: Item) =>
+  Boolean(item.ayuda_definicion || item.ayuda_preguntas_guia?.length || item.numeral_nom);
+
+// Un solo contenido de ayuda para el panel derecho y la hoja de móvil.
+function ContenidoAyuda({ item }: { item: Item }) {
+  const numeral = item.numeral_nom;
+  return (
+    <div className="flex flex-1 flex-col gap-4">
+      {item.ayuda_definicion && (
+        <p className="rounded-xl bg-seleccion px-3.5 py-3 text-[13.5px] leading-relaxed text-nivel-texto-oscuro">
+          <ConNegritas texto={item.ayuda_definicion} />
+        </p>
+      )}
+      {item.ayuda_preguntas_guia?.length ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-semibold text-gray-900">Para responder, piensa en…</p>
+          <ol className="flex flex-col gap-2">
+            {item.ayuda_preguntas_guia.map((pregunta, i) => (
+              <li key={i} className="flex gap-2 text-[13.5px] leading-relaxed text-gray-700">
+                <span className="font-semibold text-blue-700" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span>{pregunta}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+      {numeral && (
+        <p className="mt-auto border-t border-gray-100 pt-3 text-xs leading-relaxed text-gray-600">
+          Referencia: NOM-036-1-STPS-2018, {/\sy\s/.test(numeral) ? "numerales" : "numeral"} {numeral}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function IconoInfo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 8h.01" />
+    </svg>
   );
 }
 
@@ -894,7 +990,7 @@ function Bienvenida({
 
       {/* En móvil, fijo abajo: si no, "Comenzar" queda después de toda la
           explicación de la escala, fuera de la pantalla. */}
-      <div className="sticky bottom-0 -mx-4 -mb-6 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:static sm:m-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <div className="sticky bottom-0 -mx-4 -mb-4 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:static sm:m-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         {hayAvance ? (
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <button type="button" onClick={onContinuar} className={BOTON_PRIMARIO}>
@@ -1235,6 +1331,7 @@ function PasoPregunta({
   esUltimaSeccion,
   seleccionado,
   onResponder,
+  onAbrirAyuda,
 }: {
   tituloRef: React.RefObject<HTMLHeadingElement | null>;
   criterio: CriterioConItems;
@@ -1243,8 +1340,29 @@ function PasoPregunta({
   esUltimaSeccion: boolean;
   seleccionado: number | undefined;
   onResponder: (item: Item, nivel: number) => void;
+  onAbrirAyuda: (() => void) | null;
 }) {
   const idTitulo = `pregunta-${item.id}`;
+  const seccionRef = useRef<HTMLElement>(null);
+
+  // Sin scroll: la pregunta y sus 5 opciones deben caber en la ventana. Si
+  // con el tamaño normal no caben (textos largos, pantallas bajas), se reduce
+  // la escala de toda la pregunta en pasos pequeños hasta que quepa. `zoom`
+  // (no `transform`) para que el alto ocupado también se reduzca.
+  useLayoutEffect(() => {
+    const seccion = seccionRef.current;
+    if (!seccion) return;
+    const ajustar = () => {
+      const raiz = document.documentElement;
+      for (const escala of ESCALAS_PREGUNTA) {
+        seccion.style.zoom = String(escala);
+        if (raiz.scrollHeight <= window.innerHeight) return;
+      }
+    };
+    ajustar();
+    window.addEventListener("resize", ajustar);
+    return () => window.removeEventListener("resize", ajustar);
+  }, [item.id]);
   const animo =
     indice === criterio.items.length - 1
       ? esUltimaSeccion
@@ -1266,8 +1384,8 @@ function PasoPregunta({
   }
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
+    <section ref={seccionRef} className="flex flex-col gap-3 bajo:gap-2 sm:gap-4">
+      <div className="flex flex-col gap-1.5 sm:gap-2">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <p className="text-[13px] text-gray-600">
             <span className="font-semibold text-blue-700">Sección {criterio.numero}</span>
@@ -1279,13 +1397,29 @@ function PasoPregunta({
             </p>
           )}
         </div>
-        <h1 ref={tituloRef} id={idTitulo} tabIndex={-1} className="text-[19px] leading-snug font-bold outline-none sm:text-2xl">
+        <h1 ref={tituloRef} id={idTitulo} tabIndex={-1} className="text-[18px] leading-snug font-bold outline-none sm:text-2xl">
           {item.texto_pregunta}
         </h1>
-        <p className="text-[13px] font-semibold text-gray-600">Elige el nivel que describe hoy a tu empresa</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="hidden text-[13px] font-semibold text-gray-600 sm:block">
+            Elige el nivel que describe hoy a tu empresa
+          </p>
+          {onAbrirAyuda && (
+            // Solo bajo 1024 px: desde ahí la ayuda ya está a la derecha.
+            <button
+              type="button"
+              onClick={onAbrirAyuda}
+              aria-haspopup="dialog"
+              className="flex min-h-9 bajo:min-h-8 items-center gap-1.5 rounded-full bg-seleccion px-3.5 text-sm font-medium text-blue-700 transition-colors hover:bg-pista focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none lg:hidden"
+            >
+              <IconoInfo className="h-4 w-4" />
+              ¿Qué significa? · Cómo responder
+            </button>
+          )}
+        </div>
       </div>
 
-      <div role="radiogroup" aria-labelledby={idTitulo} onKeyDown={moverFoco} className="flex flex-col gap-2">
+      <div role="radiogroup" aria-labelledby={idTitulo} onKeyDown={moverFoco} className="flex flex-col gap-1.5 bajo:gap-1 sm:gap-2">
         {item.niveles.map(({ nivel, descripcion }) => {
           const estilo = NIVELES[nivel];
           const activo = seleccionado === nivel;
@@ -1296,22 +1430,28 @@ function PasoPregunta({
               role="radio"
               aria-checked={activo}
               onClick={() => onResponder(item, nivel)}
-              className={`flex min-h-16 w-full items-center gap-3 rounded-xl border-2 px-3.5 py-2.5 text-left transition sm:gap-4 sm:px-4 ${
+              className={`flex min-h-14 w-full items-center gap-3 rounded-xl border-2 px-3 py-2 bajo:min-h-0 bajo:py-1.5 text-left transition sm:gap-4 sm:px-4 sm:py-2.5 ${
                 activo ? "border-blue-700 bg-seleccion" : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
               } focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none`}
             >
               <span
-                className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] text-xl font-bold ${estilo.chip}`}
+                className={`flex h-[34px] w-[34px] bajo:h-[30px] bajo:w-[30px] shrink-0 items-center justify-center rounded-[9px] text-xl font-bold ${estilo.chip}`}
                 aria-hidden="true"
               >
                 {nivel}
               </span>
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-[15px] font-semibold text-gray-900">{estilo.etiqueta}</span>
+              {/* Etiqueta y descripción en el mismo párrafo (como en el mockup de
+                  escritorio): ahorra una línea por opción. */}
+              <span className="min-w-0 flex-1 text-[13.5px] leading-snug text-gray-700 sm:text-[14.5px]">
+                <span className="font-semibold text-gray-900">
+                  {estilo.etiqueta}
+                  {descripcion ? "." : ""}
+                </span>
                 {descripcion && (
-                  <span className="text-[13.5px] leading-snug text-gray-700 sm:text-sm">
+                  <>
+                    {" "}
                     <ConNegritas texto={descripcion} />
-                  </span>
+                  </>
                 )}
               </span>
               <span
@@ -1329,6 +1469,12 @@ function PasoPregunta({
     </section>
   );
 }
+
+// Escalas que se prueban, en orden, hasta que la pregunta quepa sin scroll.
+// 0.77 es el mínimo (descripción de ~10.4 px en móvil) y solo lo necesitan
+// las preguntas más largas en celulares de 360×640. Si ni así cabe, queda el
+// scroll del cuerpo con el pie fijo como último recurso.
+const ESCALAS_PREGUNTA = [1, 0.96, 0.92, 0.88, 0.84, 0.8, 0.77];
 
 // "Hay algunos, pero **no se usan**" → "no se usan" en negritas. Sin HTML en
 // la base ni dangerouslySetInnerHTML: el texto se parte y se arma con <strong>.
@@ -1468,7 +1614,7 @@ function PasoRevision({
 
       {/* Del color del fondo: vive dentro de la columna de 720 px, y en blanco
           se vería como un recuadro flotante en escritorio. */}
-      <div className="sticky bottom-0 -mx-4 -mb-6 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-4 -mb-4 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:-mx-6 sm:-mb-6 sm:px-6">
         {listo ? (
           <button type="button" onClick={onEnviar} disabled={enviando} className={`${BOTON_PRIMARIO} w-full`}>
             {enviando ? "Enviando…" : "Enviar autoevaluación"}
@@ -1510,12 +1656,7 @@ function Navegacion({
     // Pegado abajo en todos los tamaños: nunca tapa contenido porque ocupa su
     // propio lugar al final de la columna (sticky, no fixed).
     <div className="sticky bottom-0 border-t border-gray-200 bg-white">
-      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-2.5 pb-5 sm:px-6 sm:py-3">
-        {!puedeAvanzar && (
-          <p id="aviso-siguiente" className="text-right text-[13px] text-gray-600 md:hidden">
-            Elige una opción para continuar
-          </p>
-        )}
+      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-4 pt-2.5 bajo:pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bajo:pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-3">
         <div className="flex items-center gap-3">
           <button type="button" onClick={onAnterior} className={BOTON_SECUNDARIO}>
             <span aria-hidden="true">←</span> Anterior
@@ -1534,10 +1675,22 @@ function Navegacion({
               type="button"
               onClick={onSiguiente}
               disabled={!puedeAvanzar}
-              aria-describedby={!puedeAvanzar ? "aviso-siguiente" : undefined}
               className={`${BOTON_PRIMARIO} flex-1 md:flex-none`}
             >
-              {etiquetaSiguiente} <span aria-hidden="true">→</span>
+              {/* En móvil el botón deshabilitado dice por qué, sin ocupar una
+                  línea aparte (cada línea cuenta para que todo quepa). */}
+              {puedeAvanzar ? (
+                <>
+                  {etiquetaSiguiente} <span aria-hidden="true">→</span>
+                </>
+              ) : (
+                <>
+                  <span className="md:hidden">Elige una opción</span>
+                  <span className="hidden md:inline">
+                    {etiquetaSiguiente} <span aria-hidden="true">→</span>
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -1564,9 +1717,9 @@ function IconoCheck({ className }: { className?: string }) {
 }
 
 const BOTON_PRIMARIO =
-  "min-h-[52px] rounded-xl bg-blue-700 px-6 text-base font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-600 md:min-h-11";
+  "min-h-12 bajo:min-h-11 rounded-xl bg-blue-700 px-6 text-base font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-600 md:min-h-11";
 const BOTON_SECUNDARIO =
-  "min-h-[52px] rounded-xl border border-gray-300 bg-white px-4 text-base font-medium text-gray-900 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none md:min-h-11";
+  "min-h-12 bajo:min-h-11 rounded-xl border border-gray-300 bg-white px-4 text-base font-medium text-gray-900 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:outline-none md:min-h-11";
 const CHIP = "min-h-11 rounded-full border px-4 text-sm font-medium transition";
 const CHIP_ACTIVO = "border-blue-700 bg-blue-700 text-white";
 const CHIP_INACTIVO = "border-gray-300 bg-white text-gray-800 hover:bg-gray-50";
