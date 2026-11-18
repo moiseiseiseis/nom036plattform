@@ -62,8 +62,8 @@ const DURACION_SALIDA_MS = 140;
 // Se muestra al iniciar la sección siguiente a la que se acaba de completar.
 const MENSAJES_SECCION_COMPLETA = [
   "¡Buen comienzo! La primera parte ya quedó.",
-  "¡Vas muy bien! Ya llevas dos secciones.",
-  "¡Ya pasaste la mitad del camino!",
+  "¡Muy bien! Dos secciones completas.",
+  "¡Más de la mitad del camino!",
   "¡Ya casi! Solo queda una sección.",
 ];
 
@@ -99,13 +99,13 @@ function validarDatos(d: DatosGeneralesForm): ErroresDatos {
   const requerido = "Este dato es necesario para el informe.";
   if (!d.calle.trim()) errores.calle = requerido;
   if (!d.colonia.trim()) errores.colonia = requerido;
-  if (!/^\d{5}$/.test(d.codigo_postal.trim())) errores.codigo_postal = "Escribe los 5 dígitos.";
+  if (!/^\d{5}$/.test(d.codigo_postal.trim())) errores.codigo_postal = "El código postal debe tener 5 dígitos.";
   if (!d.municipio.trim()) errores.municipio = requerido;
-  if (!d.estado) errores.estado = "Elige un estado.";
+  if (!d.estado) errores.estado = "Falta seleccionar el estado.";
   if (!d.giro.trim()) errores.giro = requerido;
   const n = Number(d.num_trabajadores);
-  if (!Number.isInteger(n) || n <= 0) errores.num_trabajadores = "Escribe un número entero mayor que 0.";
-  if (!d.turnos.trim()) errores.turnos = "Elige una opción.";
+  if (!Number.isInteger(n) || n <= 0) errores.num_trabajadores = "Debe ser un número entero mayor que 0.";
+  if (!d.turnos.trim()) errores.turnos = "Falta seleccionar una opción.";
   if (!d.descripcion_mmh.trim()) errores.descripcion_mmh = requerido;
   return errores;
 }
@@ -160,6 +160,10 @@ export function EvaluacionForm({
   const [celebrar, setCelebrar] = useState(false);
   const [hojaSecciones, setHojaSecciones] = useState(false);
   const [hojaAyuda, setHojaAyuda] = useState(false);
+  // Columna de ayuda (≥ 1024 px): cerrada de entrada para no saturar; si la
+  // empresa la despliega, se queda abierta en las preguntas siguientes.
+  const [ayudaDesplegada, setAyudaDesplegada] = useState(false);
+  const idAyudaLateral = useId();
   const [enviando, startTransition] = useTransition();
 
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -537,17 +541,37 @@ export function EvaluacionForm({
         </div>
 
         {ayudaActual && (
-          // ≥ 1024 px: ayuda a la derecha, blanca y a toda la altura. En
-          // pantallas menores la misma ayuda va en una hoja (botón en la pregunta).
+          // ≥ 1024 px: columna derecha con un botón que despliega la ayuda.
+          // En pantallas menores, la misma ayuda va en una hoja (botón en la pregunta).
           <aside
             aria-label="Ayuda para esta pregunta"
             className="hidden w-[300px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-gray-200 bg-white px-5 py-5 lg:flex xl:w-[320px]"
           >
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <IconoInfo className="h-4 w-4 text-blue-700" />
-              Ayuda para esta pregunta
-            </p>
-            <ContenidoAyuda item={ayudaActual} />
+            <button
+              type="button"
+              aria-expanded={ayudaDesplegada}
+              aria-controls={idAyudaLateral}
+              onClick={() => setAyudaDesplegada((v) => !v)}
+              className="flex w-full items-center gap-2 rounded-xl bg-seleccion px-3.5 py-2.5 text-left text-sm font-medium text-blue-700 transition-colors hover:bg-pista focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
+            >
+              <IconoInfo className="h-4 w-4 shrink-0" />
+              <span className="flex-1">¿Qué significa? · Cómo responder</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`h-4 w-4 shrink-0 transition-transform ${ayudaDesplegada ? "rotate-180" : ""}`}
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <div id={idAyudaLateral} hidden={!ayudaDesplegada} className="flex flex-1 flex-col">
+              <ContenidoAyuda item={ayudaActual} />
+            </div>
           </aside>
         )}
       </div>
@@ -794,7 +818,7 @@ function ListaSecciones({
 // Hoja inferior sobre un `<dialog>` nativo: showModal() atrapa el foco, Esc la
 // cierra y, al cerrarse, el navegador devuelve el foco a quien la abrió.
 // Desde este ancho la hoja no se usa: su contenido ya está en pantalla
-// (secciones en la columna lateral ≥ 1280 px, ayuda a la derecha ≥ 1024 px).
+// (secciones en la columna lateral ≥ 1280 px, ayuda en la columna derecha ≥ 1024 px).
 const CORTE_HOJA = {
   lg: { clase: "lg:hidden", consulta: "(min-width: 64rem)" },
   xl: { clase: "xl:hidden", consulta: "(min-width: 80rem)" },
@@ -889,7 +913,7 @@ function ContenidoAyuda({ item }: { item: Item }) {
       )}
       {item.ayuda_preguntas_guia?.length ? (
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold text-gray-900">Para responder, piensa en…</p>
+          <p className="text-sm font-semibold text-gray-900">Para responder, conviene considerar:</p>
           <ol className="flex flex-col gap-2">
             {item.ayuda_preguntas_guia.map((pregunta, i) => (
               <li key={i} className="flex gap-2 text-[13.5px] leading-relaxed text-gray-700">
@@ -947,11 +971,11 @@ function Bienvenida({
           Autoevaluación · NOM-036-1-STPS-2018
         </p>
         <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
-          {hayAvance ? `Qué bueno verte de nuevo, ${empresa}` : `Prediagnóstico ergonómico de ${empresa}`}
+          {hayAvance ? `Autoevaluación en curso de ${empresa}` : `Prediagnóstico ergonómico de ${empresa}`}
         </h1>
         <p className="text-base leading-relaxed text-gray-700">
-          Este cuestionario ayuda a identificar qué tan preparada está tu empresa frente a los
-          factores de riesgo ergonómico por manejo manual de cargas. Con tus respuestas se
+          Este cuestionario ayuda a identificar qué tan preparada está la empresa frente a los
+          factores de riesgo ergonómico por manejo manual de cargas. Con las respuestas se
           elabora un informe de prediagnóstico con recomendaciones concretas.
         </p>
       </div>
@@ -959,7 +983,7 @@ function Bienvenida({
       <ul className="flex flex-col rounded-2xl border border-gray-200 bg-white">
         <Dato icono={<IconoLista />} titulo={`${total} preguntas`} detalle={`en ${numCriterios} secciones cortas`} />
         <Dato icono={<IconoReloj />} titulo="10 a 15 minutos" detalle="una pregunta a la vez" />
-        <Dato icono={<IconoGuardar />} titulo="Se guarda solo" detalle="puedes pausar y volver" />
+        <Dato icono={<IconoGuardar />} titulo="Se guarda solo" detalle="se puede pausar y retomar" />
       </ul>
 
       <div className="flex flex-col gap-3 rounded-2xl bg-seleccion p-4 sm:p-5">
@@ -982,8 +1006,8 @@ function Bienvenida({
         </ul>
         <p className="text-sm leading-relaxed text-gray-700">
           Cada pregunta tiene 5 opciones, de <strong>0 (Nada)</strong> a <strong>4 (Óptimo)</strong>.
-          Lee las descripciones y elige la que mejor refleje la situación <em>actual</em> de tu
-          empresa, no la ideal. No hay respuestas correctas o incorrectas: entre más fiel sea la
+          Se elige la opción que mejor refleja la situación <em>actual</em> de la empresa, no
+          la ideal. No hay respuestas correctas o incorrectas: entre más fiel sea la
           respuesta, más útil será el informe.
         </p>
       </div>
@@ -994,7 +1018,7 @@ function Bienvenida({
         {hayAvance ? (
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <button type="button" onClick={onContinuar} className={BOTON_PRIMARIO}>
-              Continuar donde me quedé ({respondidas} de {total})
+              Retomar la autoevaluación ({respondidas} de {total})
             </button>
             <button type="button" onClick={onComenzar} className={BOTON_SECUNDARIO}>
               Ir al inicio
@@ -1127,7 +1151,7 @@ function PasoDatos({
           </Campo>
           <Campo etiqueta="Estado" error={errores.estado} nombre="estado">
             <select {...campo("estado")}>
-              <option value="">Elige un estado</option>
+              <option value="">Seleccionar estado</option>
               {ESTADOS_MX.map((estado) => (
                 <option key={estado} value={estado}>
                   {estado}
@@ -1191,8 +1215,8 @@ function PasoDatos({
             <input
               {...campo("turnos")}
               autoFocus
-              aria-label="Describe los turnos"
-              placeholder="Describe los turnos"
+              aria-label="Descripción de los turnos"
+              placeholder="Descripción de los turnos"
             />
           )}
           {errores.turnos && <MensajeError id="error-turnos">{errores.turnos}</MensajeError>}
@@ -1200,7 +1224,7 @@ function PasoDatos({
 
         <Campo
           etiqueta="¿Qué cargas se manejan manualmente?"
-          ayuda="Describe brevemente qué se levanta, transporta, empuja o jala, y en qué áreas."
+          ayuda="Qué se levanta, transporta, empuja o jala, y en qué áreas."
           error={errores.descripcion_mmh}
           nombre="descripcion_mmh"
         >
@@ -1281,7 +1305,7 @@ function PasoSeccion({
           <div>
             <p className="font-semibold text-green-900">Sección {indice} completa</p>
             <p className="text-sm text-gray-700">
-              {MENSAJES_SECCION_COMPLETA[indice - 1] ?? "¡Vas muy bien!"}
+              {MENSAJES_SECCION_COMPLETA[indice - 1] ?? "¡Muy bien!"}
             </p>
           </div>
         </div>
@@ -1307,15 +1331,15 @@ function PasoSeccion({
             <span>
               {criterio.items.length} preguntas · unos {minutos} minutos
               {respondidasSeccion > 0 && respondidasSeccion < criterio.items.length
-                ? ` · ya respondiste ${respondidasSeccion}`
+                ? ` · ${respondidasSeccion} respondidas`
                 : ""}
-              {respondidasSeccion === criterio.items.length ? " · ya las respondiste todas" : ""}
+              {respondidasSeccion === criterio.items.length ? " · todas respondidas" : ""}
             </span>
           </p>
           <p>
             {restantes === 0
               ? "Es la última sección."
-              : `Después de esta, ${restantes === 1 ? "te falta 1 sección" : `te faltan ${restantes} secciones`}.`}
+              : `Después de esta, ${restantes === 1 ? "falta 1 sección" : `faltan ${restantes} secciones`}.`}
           </p>
         </div>
       </div>
@@ -1369,7 +1393,7 @@ function PasoPregunta({
         ? "¡Última pregunta!"
         : "¡Última de esta sección!"
       : indice === Math.floor(criterio.items.length / 2)
-        ? "¡Vas a la mitad de esta sección!"
+        ? "¡Mitad de la sección!"
         : null;
   // Flechas dentro de la escala: mueven el foco entre opciones sin elegir
   // (elegir avanza solo, así que no debe pasar por accidente).
@@ -1402,10 +1426,10 @@ function PasoPregunta({
         </h1>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="hidden text-[13px] font-semibold text-gray-600 sm:block">
-            Elige el nivel que describe hoy a tu empresa
+            ¿Qué nivel describe hoy a la empresa?
           </p>
           {onAbrirAyuda && (
-            // Solo bajo 1024 px: desde ahí la ayuda ya está a la derecha.
+            // Solo bajo 1024 px: desde ahí el botón está en la columna derecha.
             <button
               type="button"
               onClick={onAbrirAyuda}
@@ -1536,11 +1560,11 @@ function PasoRevision({
     <section className="flex flex-col gap-4 pt-2">
       <div className="flex flex-col gap-2">
         <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
-          {listo ? "¡Terminaste! Todo listo para enviar" : "Revisa antes de enviar"}
+          {listo ? "¡Autoevaluación completa! Lista para enviar" : "Revisión antes de enviar"}
         </h1>
         <p className="text-gray-600">
-          Toca cualquier pregunta para cambiar tu respuesta. Una vez enviada, la autoevaluación ya
-          no se puede modificar.
+          Cualquier respuesta se puede cambiar desde esta lista. Una vez enviada, la autoevaluación
+          ya no se puede modificar.
         </p>
       </div>
 
@@ -1662,14 +1686,14 @@ function Navegacion({
             <span aria-hidden="true">←</span> Anterior
           </button>
           {mostrarAtajos && (
-            <p className="hidden flex-1 text-center text-xs text-gray-600 md:block">
-              Teclas <kbd className={KBD}>0</kbd>–<kbd className={KBD}>4</kbd> para elegir ·{" "}
-              <kbd className={KBD}>Enter</kbd> para seguir
+            <p className="hidden flex-1 text-center text-xs whitespace-nowrap text-gray-600 md:block">
+              <kbd className={KBD}>0</kbd>–<kbd className={KBD}>4</kbd> elegir ·{" "}
+              <kbd className={KBD}>Enter</kbd> seguir
             </p>
           )}
           <div className="ml-auto flex flex-1 items-center justify-end gap-3 md:flex-none">
             {!puedeAvanzar && (
-              <span className="hidden text-[13px] text-gray-600 md:inline">Elige una opción</span>
+              <span className="hidden text-[13px] text-gray-600 md:inline">Elegir una opción</span>
             )}
             <button
               type="button"
@@ -1685,7 +1709,7 @@ function Navegacion({
                 </>
               ) : (
                 <>
-                  <span className="md:hidden">Elige una opción</span>
+                  <span className="md:hidden">Elegir una opción</span>
                   <span className="hidden md:inline">
                     {etiquetaSiguiente} <span aria-hidden="true">→</span>
                   </span>

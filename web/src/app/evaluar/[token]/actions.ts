@@ -61,14 +61,14 @@ export async function enviarEvaluacion(
     !Number.isInteger(numTrabajadores) ||
     numTrabajadores <= 0
   ) {
-    return { error: "Completa todos los datos generales con valores válidos." };
+    return { error: "Faltan datos generales o alguno no es válido." };
   }
 
   const respuestas: { item_id: string; nivel: number }[] = [];
   for (const itemId of itemIds) {
     const nivel = payload?.respuestas?.[itemId];
     if (!Number.isInteger(nivel) || nivel < 0 || nivel > 4) {
-      return { error: "Responde todas las preguntas antes de enviar." };
+      return { error: "Faltan preguntas por responder." };
     }
     respuestas.push({ item_id: itemId, nivel });
   }

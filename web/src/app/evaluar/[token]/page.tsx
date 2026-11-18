@@ -15,8 +15,8 @@ export default async function EvaluarPage({
         <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-semibold">Enlace no válido</h1>
           <p className="mt-2 text-gray-600">
-            Este enlace de autoevaluación no existe o ya no está disponible. Verifica que lo
-            copiaste completo, o solicita uno nuevo al equipo que te lo compartió.
+            Este enlace de autoevaluación no existe o ya no está disponible. Conviene verificar
+            que el enlace esté completo o solicitar uno nuevo al equipo que lo compartió.
           </p>
         </div>
       </main>
@@ -29,8 +29,8 @@ export default async function EvaluarPage({
         <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-semibold">Esta evaluación ya fue enviada</h1>
           <p className="mt-2 text-gray-600">
-            <strong>{evaluacion.empresa.nombre}</strong> ya completó este cuestionario. Si crees
-            que esto es un error, contacta al equipo que generó el enlace.
+            <strong>{evaluacion.empresa.nombre}</strong> ya completó este cuestionario. Si se trata
+            de un error, el equipo que generó el enlace puede revisarlo.
           </p>
         </div>
       </main>
