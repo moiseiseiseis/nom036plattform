@@ -243,7 +243,17 @@ export function EvaluacionForm({
       if (paso.tipo === "datos") {
         const errores = validarDatos(datos);
         setErroresDatos(errores);
-        if (Object.keys(errores).length > 0) return;
+        const primero = (Object.keys(DATOS_VACIOS) as (keyof DatosGeneralesForm)[]).find((c) => errores[c]);
+        if (primero) {
+          // Llevar a la empresa al primer dato con error (en móvil puede estar
+          // fuera de la pantalla). Turnos es un grupo de opciones, no un campo.
+          const campo =
+            document.getElementById(`campo-${primero}`) ??
+            document.querySelector<HTMLElement>('[aria-labelledby="etiqueta-turnos"] [role="radio"]');
+          campo?.scrollIntoView({ block: "center" });
+          campo?.focus({ preventScroll: true });
+          return;
+        }
       }
       const completo = (ids: string[], r: Record<string, number>) =>
         ids.every((id) => r[id] !== undefined);
@@ -368,6 +378,9 @@ export function EvaluacionForm({
   }
 
   const enCuestionario = paso.tipo !== "bienvenida";
+  // En los datos generales todavía no hay secciones a las que ir: sin columna
+  // lateral ni hoja, y el encabezado queda solo informativo.
+  const conSecciones = enCuestionario && paso.tipo !== "datos";
   const seccionActual = paso.tipo === "seccion" || paso.tipo === "pregunta" ? paso.c : null;
   const minutosRestantes = Math.ceil(((total - respondidas) * SEGUNDOS_POR_PREGUNTA) / 60);
   const listaSecciones = (variante: "lateral" | "hoja") => (
@@ -402,7 +415,7 @@ export function EvaluacionForm({
       {celebrar && !saliendo && <Confeti key={`confeti-${actual}`} />}
 
       <div className="flex flex-1">
-        {enCuestionario && (
+        {conSecciones && (
           // Escritorio (≥ 1280 px): secciones en una columna blanca a toda la
           // altura, debajo del encabezado (3 rem + 1 px de borde).
           <nav
@@ -520,7 +533,7 @@ export function EvaluacionForm({
         </div>
       </div>
 
-      {enCuestionario && (
+      {conSecciones && (
         <Hoja
           abierta={hojaSecciones}
           onCerrar={() => setHojaSecciones(false)}
@@ -579,6 +592,18 @@ function Encabezado({
         : "Resumen";
   const total = criterios.reduce((n, c) => n + c.items.length, 0);
   const respondidas = criterios.reduce((n, c) => n + respondidasDe(c, respuestas), 0);
+
+  if (paso === "datos") {
+    return (
+      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
+        <div className="flex h-12 items-center justify-between gap-3 px-4 text-[13px] sm:px-6 xl:text-sm">
+          <span className="truncate font-semibold xl:text-[15px]">{empresa}</span>
+          <span className="shrink-0 text-gray-600">Datos generales</span>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
       {/* Escritorio: barra simple; las secciones van en la columna lateral. */}
@@ -867,20 +892,24 @@ function Bienvenida({
         </p>
       </div>
 
-      {hayAvance ? (
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={onContinuar} className={BOTON_PRIMARIO}>
-            Continuar donde me quedé ({respondidas} de {total})
+      {/* En móvil, fijo abajo: si no, "Comenzar" queda después de toda la
+          explicación de la escala, fuera de la pantalla. */}
+      <div className="sticky bottom-0 -mx-4 -mb-6 bg-lienzo/95 px-4 pt-3 pb-5 backdrop-blur sm:static sm:m-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+        {hayAvance ? (
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+            <button type="button" onClick={onContinuar} className={BOTON_PRIMARIO}>
+              Continuar donde me quedé ({respondidas} de {total})
+            </button>
+            <button type="button" onClick={onComenzar} className={BOTON_SECUNDARIO}>
+              Ir al inicio
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={onComenzar} className={`${BOTON_PRIMARIO} w-full sm:w-auto sm:px-10`}>
+            Comenzar
           </button>
-          <button type="button" onClick={onComenzar} className={BOTON_SECUNDARIO}>
-            Ir al inicio
-          </button>
-        </div>
-      ) : (
-        <button type="button" onClick={onComenzar} className={`${BOTON_PRIMARIO} w-full sm:w-auto sm:self-start sm:px-10`}>
-          Comenzar
-        </button>
-      )}
+        )}
+      </div>
     </section>
   );
 }
@@ -961,7 +990,9 @@ function PasoDatos({
   });
 
   return (
-    <section className={`${TARJETA} flex flex-col gap-6`}>
+    // En móvil, sin tarjeta: el margen de la tarjeta dentro del de la página
+    // dejaba los campos angostos en 320-390 px. Desde tableta, tarjeta.
+    <section className="flex flex-col gap-7 sm:rounded-2xl sm:border sm:border-gray-200 sm:bg-white sm:p-8">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-blue-700">Antes de empezar</p>
         <h1 ref={tituloRef} tabIndex={-1} className={TITULO}>
@@ -979,7 +1010,8 @@ function PasoDatos({
         <Campo etiqueta="Calle y número" error={errores.calle} nombre="calle">
           <input {...campo("calle")} autoComplete="address-line1" placeholder="Av. Industrial 123, Int. 4" />
         </Campo>
-        <div className="grid gap-4 sm:grid-cols-[1fr_9rem]">
+        {/* El código postal cabe angosto: junto a la colonia también en móvil. */}
+        <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] gap-3 sm:grid-cols-[1fr_9rem] sm:gap-4">
           <Campo etiqueta="Colonia" error={errores.colonia} nombre="colonia">
             <input {...campo("colonia")} autoComplete="address-level3" />
           </Campo>
